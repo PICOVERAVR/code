@@ -1,0 +1,10 @@
+Notes:
+--------------
+
+1. Install go when you know it and can do something useful
+2. OpenCL would be cool to try here, but it's not supported.
+3. Learn stuff
+4. python gui toolkit??
+5. ispc, make fast apps that actually use xmm registers for stuff
+
+have fun and stuff
