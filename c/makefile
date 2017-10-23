@@ -17,8 +17,10 @@ clean:
 	@rm -f *.o
 
 debug:
-	$(CC) $(FINAL) $(DFLAGS) -o 'dbout'
+	$(CC) $(FINAL) $(DFLAGS) -o 'db.out'
 	@echo "Debug build completed."
 
+parallel:
+	$(CC) $(FINAL) $(CFLAGS) -fopenmp -o 'p.out'
+
 #command-line options in make
-#add parallel build options
