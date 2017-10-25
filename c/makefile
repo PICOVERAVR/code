@@ -17,7 +17,7 @@ clean:
 	@rm -f *.o
 
 debug:
-	$(CC) $(FINAL) $(DFLAGS) -o 'db.out'
+	$(CC) $(FINAL) $(DFLAGS) -fopenmp -o 'db.out'
 	@echo "Debug build completed."
 
 parallel:
