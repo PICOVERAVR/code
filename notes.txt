@@ -9,3 +9,4 @@ Notes:
 	or use GCC autovectorization, there's a guide somewhere
 
 
+WRITE AN ECONOMY SIMULATOR USING A SHIT TON OF THREADS FOR USERS, make it accurate or something
