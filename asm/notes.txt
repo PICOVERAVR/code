@@ -1,7 +1,0 @@
-Forth in Assembly:
-
-A lot easier than C, because a lot more things map directly to machine code.
-Hopefully can call c functions?
-Write in __asm__ statements in C file?
-
-
