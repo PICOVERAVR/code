@@ -6,7 +6,5 @@ Notes:
 3. Learn stuff
 4. python gui toolkit for cli apps
 5. ispc, make fast apps that actually use xmm registers for stuff
-	or use GCC autovectorization, there's a guide somewhere
-
-
-WRITE AN ECONOMY SIMULATOR USING A SHIT TON OF THREADS FOR USERS, make it accurate or something
+	or use GCC autovectorization, there's a guide somewhere on this
+6. write a heckin fast program?
