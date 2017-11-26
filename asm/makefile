@@ -10,5 +10,4 @@ all:
 
 clean:
 	@rm -f *out
-	@rm -f *.s
-	@rm -f *.o
+	@rm -f *.[so]
