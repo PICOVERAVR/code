@@ -1,13 +1,12 @@
 CC = gcc
 
-SRC = $(wildcard *.S) # grab anything with a .S ending
+SRC = $(wildcard *.S) # grab asm files
 # use gcc, throw in debugging info always
-#add an option for 32-bit support
 
 all:
-	$(CC) -nostdlib $(SRC)-g -o out
+	$(CC) -nostdlib $(SRC)-g 
 	@echo "Build completed."
 
 clean:
-	@rm -f *out
-	@rm -f *.[so]
+	@rm -f	*.out #remove executable and any leftover object files
+	@rm -f *.o
