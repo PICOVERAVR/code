@@ -1,5 +1,6 @@
 .macro NEXT //execute the next word
-	lodsq //rsi => rax, rsi += 8
+	mov %rsi, %rax
+	add $8, %rsi
 	jmp *(%rax)
 .endm
 
@@ -32,6 +33,30 @@ _start:
 	
 	//call set_up_data_segment
 	
-	//mov $cold_start, %rsi //runs the first few words to start the forth interpreter!
+	mov $asm_src, %rsi
 	NEXT
 
+asm_src:
+	.quad asm_1
+	.quad asm_2
+	.quad asm_quit
+
+asm_1:
+	mov $1, %rax
+	mov $1, %rbx
+	NEXT
+asm_2:
+	mov $2, %rax
+	NEXT
+
+
+asm_quit:
+	mov $60, %rax
+	xor %rdi, %rdi
+	syscall
+
+.bss
+	.align 4096
+return_stack:
+	.space 8192
+return_stack_top:
