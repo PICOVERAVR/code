@@ -36,14 +36,49 @@ _start:
 	mov $TEST, %rsi
 	NEXT
 
-.quad 0 //pointer to previous word
-.byte 4
-.ascii "TEST"
-.byte 0
-.byte 0
-.byte 0 //padding bytes to get to 8-byte boundary
-TEST:
+.set link, 0 //linked list for word defns
+
+//this is a macro to generate a forth word
+//it includes a link pointer to point to the previous word declared,
+//a name to look up and a length of that name, 
+//and the actual code, prefixed by a DOCOL, as always
+
+.macro defword name, namelen, flags=0, label
+	.section .rodata
+	.align 8
+	.global name_\label
+name_\label:
+	.quad link //pointer to previous word
+	.set link, name_\label
+	.byte \flags+\namelen
+	.ascii "\name"
+	.align 8
+	.globl \label
+\label:
 	.quad DOCOL
+.endm
+
+//this is a similar macro, except it is written to define words directly
+//in assembly.  The code field is the same, as forth does not treat forth words
+//and assembly words differently.
+.macro defcode name, namelen, flags=0, label
+	.section .rodata
+	.align 8
+	.globl name_\label
+name_\label:
+	.quad link
+	.set link, name_\label
+	.byte \flags+\namelen
+	.ascii "\name"
+	.align 8
+	.globl \label
+\label:
+	.quad code_\label
+code_\label:
+	//asm code
+.endm
+
+defword "TEST",4,,TEST
 	.quad one
 	.quad two
 	.quad three
