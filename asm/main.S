@@ -33,24 +33,30 @@ _start:
 	
 	//call set_up_data_segment
 	
-	mov $asm_src, %rsi
+	mov $TEST, %rsi
 	NEXT
 
-asm_src:
-	.quad asm_1
-	.quad asm_2
-	.quad asm_quit
+.quad 0 //pointer to previous word
+.byte 4
+.ascii "TEST"
+.byte 0
+.byte 0
+.byte 0 //padding bytes to get to 8-byte boundary
+TEST:
+	.quad DOCOL
+	.quad one
+	.quad two
+	.quad three
 
-asm_1:
-	mov $1, %rax
+one:
 	mov $1, %rbx
 	NEXT
-asm_2:
-	mov $2, %rax
+
+two:
+	mov $2, %rbx
 	NEXT
 
-
-asm_quit:
+three:
 	mov $60, %rax
 	xor %rdi, %rdi
 	syscall
