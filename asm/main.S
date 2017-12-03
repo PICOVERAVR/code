@@ -19,7 +19,7 @@
 
 DOCOL:
 	PUSHRSP %rsi //push previous address on return stack
-	addq $8, %rax //rax points to codeword, so add 8 and make rsi point to first code word
+	addq $8, %rax //rax points to codeword, so add 8 and make rsi point to first data word
 	movq %rax, %rsi
 	NEXT
 
@@ -72,28 +72,18 @@ name_\label:
 	.ascii "\name"
 	.align 8
 	.globl \label
+//note: jonesforth had a pointer to code here.
+//bug hunt caused me to just put code here
 \label:
-	.quad code_\label
-code_\label:
-	//asm code
+	//asm here
 .endm
 
 defword "TEST",4,,TEST
-	.quad one
-	.quad two
-	.quad three
+	.quad END_TEST
 
-one:
-	mov $1, %rbx
-	NEXT
-
-two:
-	mov $2, %rbx
-	NEXT
-
-three:
+defcode "END_TEST",8,,END_TEST
 	mov $60, %rax
-	xor %rdi, %rdi
+	mov $0, %rdi
 	syscall
 
 .bss

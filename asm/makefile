@@ -7,6 +7,10 @@ all:
 	$(CC) -nostdlib $(SRC)-g 
 	@echo "Build completed."
 
+final:
+	$(CC) -nostdlib $(SRC)
+	@echo "Prod build completed."
+
 clean:
 	@rm -f	*.out #remove executable and any leftover object files
 	@rm -f *.o
