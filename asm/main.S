@@ -78,6 +78,63 @@ name_\label:
 	//asm here
 .endm
 
+//start of forth words implemented in assembly for speed, and we need some forth words to write
+//more forth words
+defcode "DROP",4,,DROP //(n -- )
+	pop %rax
+	NEXT
+
+defcode "SWAP",4,,SWAP //(n1 n2 -- n2 n1)
+	pop %rax
+	pop %rbx
+	push %rax
+	push %rbx
+	NEXT
+
+defcode "DUP",3,,DUP //(n -- n n)
+	mov (%rsp), %rax
+	push %rax
+	NEXT
+
+defcode "OVER",4,,OVER //(n1 n2 -- n1 n2 n1)
+	mov 8(%rsp), %rax
+	push %rax
+	NEXT
+
+defcode "ROT",3,,ROT //(n1 n2 n3 -- n2 n3 n1)
+	pop %rax
+	pop %rbx
+	pop %rcx
+	push %rbx
+	push %rax
+	push %rcx
+	NEXT
+
+defcode "-ROT",4,,NROT //(n1 n2 n3 -- n3 n1 n2)
+	pop %rax
+	pop %rbx
+	pop %rcx
+	push %rax
+	push %rcx
+	push %rbx
+	NEXT
+
+defcode "2DROP",5,,TWODROP //(n n -- )
+	pop %rax
+	pop %rax
+	NEXT
+
+defcode "2DUP",4,,TWODUP //(n n -- n n n n)
+	mov (%rsp), %rax
+	mov 8(%rsp), %rbx
+	push %rbx
+	push %rax
+	NEXT
+
+
+
+
+//start of testing section, should be removed when forth system is fully self-hosting
 defword "TEST",4,,TEST
 	.quad END_TEST
 
