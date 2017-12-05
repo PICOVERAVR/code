@@ -79,7 +79,29 @@ name_\label:
 .endm
 
 //start of forth words implemented in assembly for speed, and we need some forth words to write
-//more forth words
+//start of testing section, should be removed when forth system is fully self-hosting
+defword "TEST",4,,TEST
+	.quad INIT_TEST //feed initial values
+	.quad ADD
+	.quad MUL
+	.quad END_TEST
+
+defcode "INIT_TEST",9,,INIT_TEST
+	push $8
+	push $8
+	push $16
+	NEXT
+
+defcode "END_TEST",8,,END_TEST
+	pop %rax
+	pop %rbx
+
+	//break here when debugging
+	
+	mov $60, %rax
+	mov $0, %rdi
+	syscall
+
 defcode "DROP",4,,DROP //(n -- )
 	pop %rax
 	NEXT
@@ -131,17 +153,200 @@ defcode "2DUP",4,,TWODUP //(n n -- n n n n)
 	push %rax
 	NEXT
 
+defcode "2SWAP",5,,TWOSWAP //(n1 n2 n3 n4 -- n3 n4 n1 n2)
+	pop %rax
+	pop %rbx
+	pop %rcx
+	pop %rdx
+	push %rbx
+	push %rax
+	push %rdx
+	push %rcx
+	NEXT
 
+defcode "?DUP",4,,QDUP //(n -- n n) if non-zero
+	movq (%rsp), %rax
+	test %rax, %rax
+	jz 1f
+	push %rax
+1:	NEXT
 
+defcode "1+",2,,INCR //(n -- n+1)
+	incq (%rsp)
+	NEXT
 
-//start of testing section, should be removed when forth system is fully self-hosting
-defword "TEST",4,,TEST
-	.quad END_TEST
+defcode "1-",2,,DECR//(n -- n-1)
+	decq (%rsp)
+	NEXT
 
-defcode "END_TEST",8,,END_TEST
-	mov $60, %rax
-	mov $0, %rdi
-	syscall
+defcode "4+",2,,INCR4//(n -- n+4)
+	addq $4, (%rsp)
+	NEXT
+
+defcode "4-",2,,DECR4//(n -- n-4)
+	subq $4, (%rsp)
+	NEXT
+
+//going to throw in INCR8 and DECR8 because we're using 8-byte pointers and this is a 64-bit system
+defcode "8+",2,,INCR8 //(n -- n+8)
+	addq $8, (%rsp)
+	NEXT
+
+defcode "8-",2,,DECR8 //(n -- n-8)
+	subq $8, (%rsp)
+	NEXT
+
+defcode "+",1,,ADD //(n1 n2 -- n1 + n2)
+	pop %rax
+	addq %rax, (%rsp)
+	NEXT
+
+defcode "-",1,,SUB //(n1 n2 -- n1 - n2)
+	pop %rax
+	subq %rax, (%rsp)
+	NEXT
+
+defcode "*",1,,MUL //(n1 n2 -- n1 * n2)
+	pop %rax
+	pop %rbx
+	imulq %rbx, %rax
+	push %rax
+	NEXT
+
+defcode "/MOD",4,,DIVMOD //basic division that pushes quotient and remainder on the stack, other versions in forth
+	xor %rdx, %rdx
+	pop %rbx
+	pop %rax
+	idivq %rbx
+	push %rdx
+	push %rax
+	NEXT
+
+//here, a 1 is "TRUE" and a 0 is "FALSE"
+//all of the following abide by (n1 n2 -- f) depending on condition
+defcode "=",1,,EQU
+	pop %rax
+	pop %rbx
+	cmp %rax, %rbx
+	sete %al //set al to 1 if condition == 1
+	movzbq %al, %rax //extend to 64-bit register
+	pushq %rax
+	NEXT
+
+defcode "<>",2,,NEQU
+	pop %rax
+	pop %rbx
+	cmp %rbx, %rax
+	setne %al
+	movzbq %al, %rax
+	pushq %rax
+	NEXT
+
+defcode "<",1,,LT
+	pop %rax
+	pop %rbx
+	cmp %rax, %rbx
+	setl %al
+	movzbq %al, %rax
+	pushq %rax
+	NEXT
+
+defcode ">",1,,GT
+	pop %rax
+	pop %rbx
+	cmp %rax, %rbx
+	setg %al
+	movzbq %al, %rax
+	pushq %rax
+	NEXT
+
+defcode "<=",2,,LE
+	pop %rax
+	pop %rbx
+	cmp %rax, %rbx
+	setle %al
+	movzbq %al, %rax
+	pushq %rax
+	NEXT
+
+defcode ">=",2,,GE
+	pop %rax
+	pop %rbx
+	cmp %rax, %rbx
+	setge %al
+	movzbq %al, %rax
+	pushq %rax
+	NEXT
+
+//zero test words abide by (n -- f)
+defcode "0=",2,,ZEQU
+	pop %rax
+	test %rax, %rax
+	setz %al
+	movzbq %al, %rax
+	pushq %rax
+	NEXT
+
+defcode "0<>",3,,ZNEQU
+	pop %rax
+	test %rax, %rax
+	setne %al
+	movzbq %al, %rax
+	pushq %rax
+	NEXT
+
+defcode "0<",2,,ZLT
+	pop %rax
+	test %rax, %rax
+	setl %al
+	movzbq %al, %rax
+	pushq %rax
+	NEXT
+
+defcode "0>",2,,ZGT
+	pop %rax
+	test %rax, %rax
+	setg %al
+	movzbq %al, %rax
+	pushq %rax
+	NEXT
+
+defcode "0<=",3,,ZLE
+	pop %rax
+	test %rax, %rax
+	setle %al
+	movzbq %al, %rax
+	pushq %rax
+	NEXT
+
+defcode "0>=",3,,ZGE
+	pop %rax
+	test %rax, %rax
+	setge %al
+	movzbq %al, %rax
+	pushq %rax
+	NEXT
+
+//finally at the bitwise ops
+defcode "AND",3,,AND
+	pop %rax
+	andq %rax, (%rsp)
+	NEXT
+
+defcode "OR",2,,OR
+	pop %rax
+	orq %rax, (%rsp)
+	NEXT
+
+defcode "XOR",3,,XOR
+	pop %rax
+	xorq %rax, (%rsp)
+	NEXT
+
+defcode "INVERT",6,,INVERT
+	notq (%rsp)
+	NEXT
+
 
 .bss
 	.align 4096
