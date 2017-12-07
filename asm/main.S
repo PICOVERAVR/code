@@ -82,20 +82,18 @@ name_\label:
 //start of testing section, should be removed when forth system is fully self-hosting
 defword "TEST",4,,TEST
 	.quad INIT_TEST //feed initial values
-	.quad ADD
-	.quad MUL
+	
 	.quad END_TEST
 
 defcode "INIT_TEST",9,,INIT_TEST
-	push $8
-	push $8
-	push $16
+	mov $0xDEADBEEFCAFE, %rax
+	push %rax //no pushing 32 or 64 bit literals directly
+	
+	
 	NEXT
 
 defcode "END_TEST",8,,END_TEST
-	pop %rax
-	pop %rbx
-
+	
 	//break here when debugging
 	
 	mov $60, %rax
@@ -346,6 +344,47 @@ defcode "XOR",3,,XOR
 defcode "INVERT",6,,INVERT
 	notq (%rsp)
 	NEXT
+
+//back to forth operations
+defcode "EXIT",4,,EXIT
+	POPRSP %rsi //pop return stack into rsi
+	NEXT
+
+defcode "LIT",3,,LIT //prepend before a literal number.  This pushes the number on the stack instead of trying to execute it.
+	mov %rsi, %rax
+	add $8, %rsi //same as NEXT but no jmp *(%rax)
+	push %rax
+	NEXT
+
+//memory read and write
+defcode "!",1,,STORE //(addr data -- )
+	pop %rbx
+	pop %rax
+	mov %rax, (%rbx)
+	NEXT
+
+defcode "@",1,,FETCH //(addr -- )
+	pop %rbx
+	mov (%rbx), %rax
+	push %rax
+	NEXT
+
+//adds a specified amount to a memory location
+defcode "+!",2,,ADDSTORE //(addr add -- )
+	pop %rbx
+	pop %rax
+	addq %rax, (%rbx)
+	NEXT
+
+defcode "-!",2,,SUBSTORE
+	pop %rbx
+	pop %rax
+	subq %rax, (%rbx)
+	NEXT
+
+//read and write a byte
+
+
 
 
 .bss
