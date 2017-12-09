@@ -82,7 +82,10 @@ name_\label:
 //start of testing section, should be removed when forth system is fully self-hosting
 defword "TEST",4,,TEST
 	.quad INIT_TEST //feed initial values
-	
+	.quad LIT
+	.quad 0xFFAF
+	.quad LIT
+	.quad 0x1234
 	.quad END_TEST
 
 defcode "INIT_TEST",9,,INIT_TEST
@@ -353,7 +356,7 @@ defcode "EXIT",4,,EXIT
 defcode "LIT",3,,LIT //prepend before a literal number.  This pushes the number on the stack instead of trying to execute it.
 	mov %rsi, %rax
 	add $8, %rsi //same as NEXT but no jmp *(%rax)
-	push %rax
+	push (%rax)
 	NEXT
 
 //memory read and write
