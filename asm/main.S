@@ -82,16 +82,13 @@ name_\label:
 //start of testing section, should be removed when forth system is fully self-hosting
 defword "TEST",4,,TEST
 	.quad INIT_TEST //feed initial values
-	.quad LIT
-	.quad 0xFFAF
-	.quad LIT
-	.quad 0x1234
 	.quad END_TEST
 
 defcode "INIT_TEST",9,,INIT_TEST
 	mov $0xDEADBEEFCAFE, %rax
-	push %rax //no pushing 32 or 64 bit literals directly
+	push %rax //no pushing 64 bit literals directly...?
 	
+	//allocate some memory to test quad and byte load and store
 	
 	NEXT
 
@@ -386,7 +383,20 @@ defcode "-!",2,,SUBSTORE
 	NEXT
 
 //read and write a byte
+defcode "C!",2,,STOREBYTE //(addr byte -- )
+	pop %rbx
+	pop %rax
+	movb %al, (%rbx)
+	NEXT
 
+defcode "C@",2,,FETCHBYTE //(addr -- byte)
+	pop %rbx
+	xor %rax, %rax //clear upper part of rax
+	movb (%rbx), %al
+	push %rax
+	NEXT
+
+//add block copy
 
 
 
