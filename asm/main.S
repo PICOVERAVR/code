@@ -81,14 +81,23 @@ name_\label:
 //start of forth words implemented in assembly for speed, and we need some forth words to write
 //start of testing section, should be removed when forth system is fully self-hosting
 defword "TEST",4,,TEST
-	.quad INIT_TEST //feed initial values
+	.quad INIT_TEST //feed initial stack and set up memory
+	.quad FETCH
+	.quad DROP
+	.quad SWAP
+	.quad ADDSTORE
 	.quad END_TEST
 
 defcode "INIT_TEST",9,,INIT_TEST
 	mov $0xDEADBEEFCAFE, %rax
 	push %rax //no pushing 64 bit literals directly...?
 	
-	//allocate some memory to test quad and byte load and store
+	movq $test_memory, %rax
+	movq $0x5, (%rax)
+	push %rax
+	push $2
+	push %rax
+	
 	
 	NEXT
 
@@ -397,7 +406,14 @@ defcode "C@",2,,FETCHBYTE //(addr -- byte)
 	NEXT
 
 //add block copy
-
+defcode "C@C!",3,,CCOPY
+	movq 8(%rsp), %rax
+	movb (%rbx), %al
+	pop %rdi
+	//	mov 
+	push %rdi
+	incq (%rsp)
+	NEXT
 
 
 .bss
@@ -405,3 +421,8 @@ defcode "C@",2,,FETCHBYTE //(addr -- byte)
 return_stack:
 	.space 8192
 return_stack_top:
+
+.align 64
+test_memory:
+	.space 64
+
