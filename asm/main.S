@@ -82,23 +82,17 @@ name_\label:
 //start of testing section, should be removed when forth system is fully self-hosting
 defword "TEST",4,,TEST
 	.quad INIT_TEST //feed initial stack and set up memory
-	.quad FETCH
-	.quad DROP
-	.quad SWAP
-	.quad ADDSTORE
+	.quad CMOVE
 	.quad END_TEST
 
 defcode "INIT_TEST",9,,INIT_TEST
-	mov $0xDEADBEEFCAFE, %rax
+	mov $0xFF, %rax
 	push %rax //no pushing 64 bit literals directly...?
 	
-	movq $test_memory, %rax
-	movq $0x5, (%rax)
-	push %rax
-	push $2
-	push %rax
 	
+	//test space
 	
+		
 	NEXT
 
 defcode "END_TEST",8,,END_TEST
@@ -405,16 +399,23 @@ defcode "C@",2,,FETCHBYTE //(addr -- byte)
 	push %rax
 	NEXT
 
-//add block copy
-defcode "C@C!",3,,CCOPY
-	movq 8(%rsp), %rax
+defcode "C@C!",3,,CCOPY //(src dest -- src+8 dest+8)???
+	movq 8(%rsp), %rbx
 	movb (%rbx), %al
 	pop %rdi
-	//	mov 
+	mov %al, (%rdi)
 	push %rdi
-	incq (%rsp)
+	incq 8(%rsp)
 	NEXT
 
+defcode "CMOVE",5,,CMOVE
+	mov %rsi, %rdx
+	pop %rcx
+	pop %rdi
+	pop %rsi
+	rep movsb
+	mov %rdx, %rsi
+	NEXT
 
 .bss
 	.align 4096
