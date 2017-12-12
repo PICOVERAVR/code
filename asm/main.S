@@ -82,7 +82,6 @@ name_\label:
 //start of testing section, should be removed when forth system is fully self-hosting
 defword "TEST",4,,TEST
 	.quad INIT_TEST //feed initial stack and set up memory
-	.quad CMOVE
 	.quad END_TEST
 
 defcode "INIT_TEST",9,,INIT_TEST
