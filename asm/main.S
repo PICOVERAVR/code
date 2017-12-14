@@ -416,6 +416,41 @@ defcode "CMOVE",5,,CMOVE
 	mov %rdx, %rsi
 	NEXT
 
+//variable macro to hold a few variables outside of the stack (global state)
+.macro defvar name, namelen, flags=0, label, initial=0
+	defcode \name, \namelen, \flags, \label
+	push $var_\name
+	NEXT	
+	.data
+	.align 8
+var_\name:
+	.quad \initial
+.endm
+
+defvar "STATE",5,,STATE
+defvar "HERE",4,,HERE
+//defvar "LATEST",6,,LATEST,name_SYSCALL0 //must be last in dictonary for some reason
+defvar "S0",2,,SZ
+defvar "BASE",4,,BASE
+
+//constant macro, similar to defvar but only pushes to stack
+.macro defconst name, namelen, flags=0, label, value
+	defcode \name,\namelen,\flags,\label //is there a better way to do this?
+	push $\value
+	NEXT
+.endm
+
+defconst "VERSION",7,,VERSION,-1 //whatever the most recent git version is
+defconst "R0",2,,RZ,return_stack_top //pointer to tos in memory
+defconst "DOCOL",5,,__DOCOL,DOCOL
+//defconst "F_IMMED",7,,__F_IMMED,F_IMMED
+//defconst "F_HIDDEN",8,,__F_HIDDEN,F_HIDDEN
+//defconst "F_LENMASK",9,,__F_LENMASK,F_LENMASK //will become useful once we get to compiling words
+
+//TODO: defconst the linux syscall numbers
+
+
+
 .bss
 	.align 4096
 return_stack:
