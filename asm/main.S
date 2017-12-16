@@ -453,7 +453,44 @@ defconst "DOCOL",5,,__DOCOL,DOCOL
 //defconst "F_HIDDEN",8,,__F_HIDDEN,F_HIDDEN
 //defconst "F_LENMASK",9,,__F_LENMASK,F_LENMASK //will become useful once we get to compiling words
 
-//TODO: defconst the linux syscall numbers
+//some words to manuipulate the return stack
+//note: these values must be popped before the word returns or the interpreter will crash!
+defcode ">R",2,,TOR //(n -- )
+	pop %rax
+	PUSHRSP %rax
+	NEXT
+
+defcode "R>",2,,FROMR //( -- n)
+	POPRSP %rax
+	push %rax
+	NEXT
+
+//these words actually get and set the return stack pointer
+defcode "RSP@",4,,RSPFETCH //( -- n)
+	push %rbp
+	NEXT
+
+defcode "RSP!",4,,RSPSTORE //(n -- )
+	pop %rbp
+	NEXT
+
+defcode "RDROP",5,,RDROP //( -- )
+	addq $8, %rbp
+	NEXT
+
+//these words get and set the parameter stack pointer directly
+defcode "DSP@",4,,DSPFETCH
+	mov %rsp, %rax
+	push %rax
+	NEXT
+
+defcode "DSP!",4,,DSPSTORE
+	pop %rsp
+	NEXT
+
+//we're approaching a fully functional forth system here.  All the basic mechanics are in place, and all that is left is to make it user-interactive instead of a fixed program.
+
+//key...?
 
 
 
