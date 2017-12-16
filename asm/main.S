@@ -94,8 +94,6 @@ defword "TEST",4,,TEST
 defcode "INIT_TEST",9,,INIT_TEST
 	push $0xFF
 		
-	push $0x41 //'A'
-		
 	NEXT
 
 defcode "END_TEST",8,,END_TEST
@@ -489,12 +487,14 @@ defcode "DSP!",4,,DSPSTORE
 //we're approaching a fully functional forth system here.  All the basic mechanics are in place, and all that is left is to make it user-interactive instead of a fixed program.
 //this is where the assembly gets bigger than ~5 instructions.
 
-//read a byte from stdin, meant to be used with WORD and such
+//read a byte from stdin and push it on the stack.
 defcode "KEY",3,,KEY
+	mov %rsi, %r14 //save rsi, needed as operand register
 	call _KEY
+	mov %r14, %rsi
 	push %rax
 	NEXT
-_KEY:
+_KEY:	
 	mov (currkey), %rbx //no $ indicates a memory read
 	cmp (bufftop), %rbx //at end of buffer?
 	jge 1f
@@ -507,18 +507,15 @@ _KEY:
 1: //get input from read syscall
 	xor %rax, %rax //read syscall
 	xor %rdi, %rdi //use stdin
-	mov %rsi, %r14 //save %rsi
 	mov $buffer, %rsi
 	mov %rsi, currkey //?????
 	mov $BUFFER_SIZE, %rdx
 	syscall
 	
-	mov %r14, %rsi
-		
 	test %rax, %rax //if rax <= 0, exit
 	jbe 2f
 	addq %rax, %rsi //buffer + rax = bufftop
-	mov %rcx, bufftop
+	mov %rsi, bufftop
 	jmp _KEY
 
 2: //error / EOF, exit
@@ -552,9 +549,6 @@ _EMIT:
 	.data
 emit_byte:
 	.space 1 //scratch byte
-
-
-
 
 
 .set RET_STACK_SIZE, 8192
