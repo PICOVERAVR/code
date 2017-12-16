@@ -1,6 +1,5 @@
 .macro NEXT //execute the next word
-	mov %rsi, %rax
-	add $8, %rsi
+	lodsq //(rsi) -> rax, rsi += 8
 	jmp *(%rax)
 .endm
 
@@ -33,7 +32,7 @@ _start:
 	
 	//call set_up_data_segment
 	
-	mov $TEST, %rsi
+	mov $TEST_START_PT, %rsi
 	NEXT
 
 .set link, 0 //linked list for word defns
@@ -72,25 +71,32 @@ name_\label:
 	.ascii "\name"
 	.align 8
 	.globl \label
-//note: jonesforth had a pointer to code here.
-//bug hunt caused me to just put code here
 \label:
+	.quad code_\label
+	.text
+	.align 8
+	.globl code_\label
+code_\label:
 	//asm here
 .endm
 
 //start of forth words implemented in assembly for speed, and we need some forth words to write
 //start of testing section, should be removed when forth system is fully self-hosting
+TEST_START_PT:
+	.quad TEST
+
 defword "TEST",4,,TEST
 	.quad INIT_TEST //feed initial stack and set up memory
-	.quad END_TEST
+	.quad ADD
+	.quad END_TEST //break and analyze
 
 defcode "INIT_TEST",9,,INIT_TEST
 	mov $0xFF, %rax
 	push %rax //no pushing 64 bit literals directly...?
 	
-	
-	//test space
-	
+	push $4
+	push $5
+	push $3 //some initial example test values
 		
 	NEXT
 

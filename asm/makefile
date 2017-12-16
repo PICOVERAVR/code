@@ -1,6 +1,6 @@
 CC = gcc
 
-SRC = $(wildcard *.S) # grab asm files
+SRC = $(filter-out test.S, $(wildcard *.S)) # grab all asm files except the test one
 # use gcc, throw in debugging info always
 
 all:
