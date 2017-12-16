@@ -3,7 +3,7 @@ SRC = $(filter-out test.S, $(wildcard *.S)) # grab all asm files except the test
 
 debug:
 	$(CC) -nostdlib $(SRC)-g -o dev.out
-	@echo "Dev Build completed."
+	@echo "dev build completed."
 
 check: #if gmake is not installed, then this makefile will fail, fix
 	GCC_EXISTS := $(shell gcc --version 2>/dev/null)
@@ -13,7 +13,7 @@ check: #if gmake is not installed, then this makefile will fail, fix
  
 release:
 	$(CC) -nostdlib $(SRC) -o release.out
-	@echo "Release build completed."
+	@echo "release build completed."
 
 clean:
 	@rm -f	*.out #remove executable and any leftover object files

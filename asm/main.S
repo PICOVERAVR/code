@@ -513,11 +513,12 @@ _KEY:
 	mov $BUFFER_SIZE, %rdx
 	syscall
 	
+	mov %r14, %rsi
+		
 	test %rax, %rax //if rax <= 0, exit
 	jbe 2f
 	addq %rax, %rsi //buffer + rax = bufftop
 	mov %rcx, bufftop
-	mov %r14, %rsi //restore rsi
 	jmp _KEY
 
 2: //error / EOF, exit
