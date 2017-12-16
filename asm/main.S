@@ -87,16 +87,14 @@ TEST_START_PT:
 
 defword "TEST",4,,TEST
 	.quad INIT_TEST //feed initial stack and set up memory
-	.quad ADD
+	.quad KEY
+	.quad EMIT
 	.quad END_TEST //break and analyze
 
 defcode "INIT_TEST",9,,INIT_TEST
-	mov $0xFF, %rax
-	push %rax //no pushing 64 bit literals directly...?
-	
-	push $4
-	push $5
-	push $3 //some initial example test values
+	push $0xFF
+		
+	push $0x41 //'A'
 		
 	NEXT
 
@@ -489,10 +487,77 @@ defcode "DSP!",4,,DSPSTORE
 	NEXT
 
 //we're approaching a fully functional forth system here.  All the basic mechanics are in place, and all that is left is to make it user-interactive instead of a fixed program.
+//this is where the assembly gets bigger than ~5 instructions.
 
-//key...?
+//read a byte from stdin, meant to be used with WORD and such
+defcode "KEY",3,,KEY
+	call _KEY
+	push %rax
+	NEXT
+_KEY:
+	mov (currkey), %rbx //no $ indicates a memory read
+	cmp (bufftop), %rbx //at end of buffer?
+	jge 1f
+	xor %rax, %rax
+	mov (%rbx), %al //get next char, increment bufptr
+	inc %rbx
+	mov %rbx, (currkey) //increment currkey
+	ret
+
+1: //get input from read syscall
+	xor %rax, %rax //read syscall
+	xor %rdi, %rdi //use stdin
+	mov %rsi, %r14 //save %rsi
+	mov $buffer, %rsi
+	mov %rsi, currkey //?????
+	mov $BUFFER_SIZE, %rdx
+	syscall
+	
+	test %rax, %rax //if rax <= 0, exit
+	jbe 2f
+	addq %rax, %rsi //buffer + rax = bufftop
+	mov %rcx, bufftop
+	mov %r14, %rsi //restore rsi
+	jmp _KEY
+
+2: //error / EOF, exit
+	mov $60, %rax
+	mov $1, %rdi //return exit code 1
+	syscall
+	
+	.data
+	.align 8
+currkey:
+	.quad buffer //current place
+bufftop:
+	.quad buffer //last valid data
+
+//write a byte to stdout
+defcode "EMIT",4,,EMIT
+	pop %rax
+	call _EMIT
+	NEXT
+_EMIT:
+	mov %rsi, %r14 //save rsi again
+	mov $1, %rdi
+	mov %al, emit_byte
+	mov $emit_byte, %rsi //write needs an address
+	mov $1, %rdx
+	mov $1, %rax
+	syscall
+	mov %r14, %rsi //restore rsi
+	ret
+	
+	.data
+emit_byte:
+	.space 1 //scratch byte
 
 
+
+
+
+.set RET_STACK_SIZE, 8192
+.set BUFFER_SIZE, 4096
 
 .bss
 	.align 4096
@@ -500,7 +565,7 @@ return_stack:
 	.space 8192
 return_stack_top:
 
-.align 64
-test_memory:
-	.space 64
+	.align 4096
+buffer:
+	.space BUFFER_SIZE
 
