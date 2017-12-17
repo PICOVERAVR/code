@@ -87,12 +87,12 @@ TEST_START_PT:
 
 defword "TEST",4,,TEST
 	.quad INIT_TEST //feed initial stack and set up memory
-	.quad KEY
-	.quad EMIT
+	.quad WORD
+	.quad NUMBER
 	.quad END_TEST //break and analyze
 
 defcode "INIT_TEST",9,,INIT_TEST
-	push $0xFF
+	push $0xFF //EOS value
 		
 	NEXT
 
@@ -433,7 +433,7 @@ defvar "STATE",5,,STATE
 defvar "HERE",4,,HERE
 //defvar "LATEST",6,,LATEST,name_SYSCALL0 //must be last in dictonary for some reason
 defvar "S0",2,,SZ
-defvar "BASE",4,,BASE
+defvar "BASE",4,,BASE,10
 
 //constant macro, similar to defvar but only pushes to stack
 .macro defconst name, namelen, flags=0, label, value
@@ -503,7 +503,6 @@ _KEY:
 	inc %rbx
 	mov %rbx, (currkey) //increment currkey
 	ret
-
 1: //get input from read syscall
 	xor %rax, %rax //read syscall
 	xor %rdi, %rdi //use stdin
@@ -517,7 +516,6 @@ _KEY:
 	addq %rax, %rsi //buffer + rax = bufftop
 	mov %rsi, bufftop
 	jmp _KEY
-
 2: //error / EOF, exit
 	mov $60, %rax
 	mov $1, %rdi //return exit code 1
@@ -549,6 +547,109 @@ _EMIT:
 	.data
 emit_byte:
 	.space 1 //scratch byte
+
+//get a word (search for a space)
+defcode "WORD",4,,WORD
+	mov %rsi, %r14 //save rsi again
+	call _WORD
+	push %rdi
+	push %rcx
+	mov %r14, %rsi
+	NEXT
+_WORD:
+
+1:
+	call _KEY //char returned in rax
+	cmpb $'\\', %al // if it's a comment, skip it
+	je 3f
+	cmpb $' ', %al 
+	jbe 1b
+	
+	mov $word_buffer, %rdi //ptr to word buffer
+2:
+	stosb //add character to return buffer
+	call _KEY //get next key
+	cmpb $' ', %al //if not blank, keep looking
+	ja 2b
+	
+	sub $word_buffer, %rdi
+	mov %rdi, %rcx //return length
+	mov $word_buffer, %rdi //return address
+	ret
+3:
+	call _KEY
+	cmpb $'\n', %al //eol yet?
+	jne 3b
+	jmp 1b
+
+	.data
+word_buffer: //forth words can only be 64 bytes long!
+	.space 64
+
+//parse a numeric string and push the result
+//this would benefit from a C library linking
+defcode "NUMBER",6,,NUMBER
+	pop %rcx
+	pop %rdi
+	call _NUMBER
+	push %rax
+	push %rcx
+	NEXT
+
+_NUMBER:
+	xor %rax, %rax
+	xor %rbx, %rbx
+	
+	test %rcx, %rcx //if length is 0, return 0
+	jz 5f
+	
+	movq var_BASE, %rdx //get base value
+	
+	mov (%rdi), %bl //mov first char of string into bl
+	inc %rdi
+	push %rax
+	cmpb $'-', %bl
+	jnz 2f
+	pop %rax
+	push %rbx
+	dec %rcx
+	jnz 1f
+	pop %rbx
+	movq $1, %rcx
+	ret
+1:
+	imulq %rdx, %rax //rax *= BASE
+	movb (%rdi), %bl
+	inc %rdi
+2:
+	subb $'0', %bl //< '0'?
+	jb 4f
+	cmp $10, %bl //<= '9'?
+	jb 3f
+	subb $17, %bl // < 'A'?
+	jb 4f
+	addb $10, %bl
+3:
+	cmp %dl, %bl // >= BASE?
+	jge 4f
+	
+	add %rbx, %rax
+	dec %rcx
+	jnz 1b
+4:
+	pop %rbx
+	test %rbx, %rbx
+	jz 5f
+	neg %rax
+5:
+	ret
+
+//have enough infastructure to be able to read and parse text from the command line, and now we need to implement the dictonary that ties everything together.
+
+
+
+
+
 
 
 .set RET_STACK_SIZE, 8192
