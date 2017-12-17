@@ -35,6 +35,9 @@ _start:
 	mov $TEST_START_PT, %rsi
 	NEXT
 
+.set F_IMMED, 0x80 //flags for special compiled forth words
+.set F_HIDDEN, 0x20
+.set F_LENMASK, 0x1f
 .set link, 0 //linked list for word defns
 
 //this is a macro to generate a forth word
@@ -88,7 +91,8 @@ TEST_START_PT:
 defword "TEST",4,,TEST
 	.quad INIT_TEST //feed initial stack and set up memory
 	.quad WORD
-	.quad NUMBER
+	.quad SWAP
+	.quad TDFA
 	.quad END_TEST //break and analyze
 
 defcode "INIT_TEST",9,,INIT_TEST
@@ -431,7 +435,7 @@ var_\name:
 
 defvar "STATE",5,,STATE
 defvar "HERE",4,,HERE
-//defvar "LATEST",6,,LATEST,name_SYSCALL0 //must be last in dictonary for some reason
+defvar "LATEST",6,,LATEST,name_TDFA
 defvar "S0",2,,SZ
 defvar "BASE",4,,BASE,10
 
@@ -445,9 +449,9 @@ defvar "BASE",4,,BASE,10
 defconst "VERSION",7,,VERSION,-1 //whatever the most recent git version is
 defconst "R0",2,,RZ,return_stack_top //pointer to tos in memory
 defconst "DOCOL",5,,__DOCOL,DOCOL
-//defconst "F_IMMED",7,,__F_IMMED,F_IMMED
-//defconst "F_HIDDEN",8,,__F_HIDDEN,F_HIDDEN
-//defconst "F_LENMASK",9,,__F_LENMASK,F_LENMASK //will become useful once we get to compiling words
+defconst "F_IMMED",7,,__F_IMMED,F_IMMED
+defconst "F_HIDDEN",8,,__F_HIDDEN,F_HIDDEN
+defconst "F_LENMASK",9,,__F_LENMASK,F_LENMASK //will become useful once we get to compiling words
 
 //some words to manuipulate the return stack
 //note: these values must be popped before the word returns or the interpreter will crash!
@@ -646,7 +650,71 @@ _NUMBER:
 
 //have enough infastructure to be able to read and parse text from the command line, and now we need to implement the dictonary that ties everything together.
 
+//this could be a hash table, but collisions between unrelated words could be a problem
+defcode "FIND",4,,FIND
+	pop %rcx
+	pop %rdi
+	call _FIND
+	push %rax
+	NEXT
 
+_FIND:
+	push %rsi //save rsi so we can use it in a string comparison
+	
+	//search backwards through the dictonary to find the thing
+	mov var_LATEST, %rdx
+1:	test %rdx, %rdx //end of linked list?
+	je 4f
+	
+	//cmp lengths of string, and if they are equal, cmp strings themselves
+	xor %rax, %rax
+	movb 8(%rdx), %al //al is flags and lengths field
+	andb $(F_HIDDEN|F_LENMASK), %al
+	cmpb %cl, %al
+	jne 2f
+	
+	push %rcx //lengths are the same, compare the strings in detail
+	push %rdi
+	lea 9(%rdx), %rsi
+	repe cmpsb
+	pop %rdi
+	pop %rcx
+	jne 2f //not the same
+	
+	pop %rsi //strings are the same
+	mov %rdx, %rax
+	ret
+2:
+	mov (%rdx), %rdx //loop through the next entry in the list
+	jmp 1b
+4:
+	pop %rsi
+	xor %rax, %rax //return 0 (not found)
+	ret
+
+//return a pointer to the "DOCOL" portion, not the link portion of the word.
+defcode ">CFA",4,,TCFA
+	pop %rdi
+	call _TCFA
+	push %rdi
+	NEXT
+
+_TCFA:
+	xor %rax, %rax
+	add $4, %rdi //skip link pointer
+	movb (%rdi), %al
+	inc %rdi //skip flags byte
+	andb $F_LENMASK, %al //get length of name
+	add %rax, %rdi //skip that much
+	addq $7, %rdi
+	andq $~7,%rdi
+	ret
+
+//just >CFA minus the DOCOL
+defword ">DFA",4,,TDFA
+	.quad TCFA
+	.quad INCR8
+	.quad EXIT
 
 
 
