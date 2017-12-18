@@ -716,6 +716,80 @@ defword ">DFA",4,,TDFA
 	.quad INCR8
 	.quad EXIT
 
+//make header for a word (add length and name, update here and latest pointers)
+defcode "CREATE",6,,CREATE
+	pop %rcx //length of name
+	pop %rbx //address of name
+	movq var_HERE, %rdi
+	movq var_LATEST, %rax
+	stosq
+	
+	mov %cl, %al
+	stosb
+	push %rsi
+	mov %rbx, %rsi
+	rep movsb
+	pop %rsi
+	addq $7, %rdi
+	andq $~7, %rdi
+	
+	movq var_HERE, %rax
+	movq %rax, var_LATEST
+	movq %rdi, var_HERE
+	NEXT
+
+//appends a codeword to the current word
+defcode ",",1,,COMMA
+	pop %rax
+	call _COMMA
+	NEXT
+_COMMA:
+	movq var_HERE, %rdi
+	stosq
+	movq %rdi, var_HERE
+	ret
+
+defcode "[",1,F_IMMED,LBRAC
+	xor %rax, %rax
+	movq %rax, var_STATE //set state to 0
+	NEXT
+
+defcode "]",1,,RBRAC
+	movq $1, var_STATE
+	NEXT
+
+defword ":",1,,COLON
+	.quad WORD //get name
+	.quad CREATE //make space for it
+	.quad LIT, DOCOL, COMMA //append a DOCOL
+	.quad LATEST, FETCH, HIDDEN //make the word hidden for now
+	.quad RBRAC //go into 
+	.quad EXIT
+
+defword ";",1,F_IMMED,SEMICOLON
+	.quad LIT, EXIT, COMMA //append an exit so word will return
+	.quad LATEST, FETCH, HIDDEN //toggle hidden flag
+	.quad LBRAC //go to immediate mode
+	.quad EXIT //ret
+
+//this word makes the defined word immediate, which allows you to extend the compiler
+defcode "IMMEDIATE",9,F_IMMED,IMMEDIATE
+	movq var_LATEST, %rdi
+	addq $8, %rdi
+	xorb $F_IMMED, (%rdi)
+	NEXT
+
+defcode "HIDDEN",6,,HIDDEN
+	pop %rdi
+	addq $8, %rdi
+	xorb $F_HIDDEN, (%rdi)
+	NEXT
+
+defword "HIDE",4,,HIDE
+	.quad WORD
+	.quad FIND
+	.quad HIDDEN
+	.quad EXIT
 
 
 
