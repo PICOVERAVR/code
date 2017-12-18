@@ -435,7 +435,7 @@ var_\name:
 
 defvar "STATE",5,,STATE
 defvar "HERE",4,,HERE
-defvar "LATEST",6,,LATEST,name_TDFA
+defvar "LATEST",6,,LATEST,name_HIDE
 defvar "S0",2,,SZ
 defvar "BASE",4,,BASE,10
 
@@ -791,6 +791,7 @@ defword "HIDE",4,,HIDE
 	.quad HIDDEN
 	.quad EXIT
 
+//better check this crap cause it's boring and hard to test
 
 
 
