@@ -27,13 +27,18 @@ DOCOL:
 _start:
 	//rsi is the pointer to the next word to execute
 	//set pointer to start of code
+	cld //set string ops to move the right way
 	mov %rsp, %r15 //save initial stack frame
 	mov $return_stack_top, %rbp
 	
-	//call set_up_data_segment
+	call set_up_data_segment
 	
 	mov $TEST_START_PT, %rsi
 	NEXT
+	
+	.section .rodata
+cold_start:
+	.quad QUIT
 
 .set F_IMMED, 0x80 //flags for special compiled forth words
 .set F_HIDDEN, 0x20
@@ -90,9 +95,11 @@ TEST_START_PT:
 
 defword "TEST",4,,TEST
 	.quad INIT_TEST //feed initial stack and set up memory
-	.quad WORD
-	.quad SWAP
-	.quad TDFA
+	
+	//this shit isnt working.  Figure out why.  With a project this complex test everything.
+	//pos
+	
+	
 	.quad END_TEST //break and analyze
 
 defcode "INIT_TEST",9,,INIT_TEST
@@ -435,7 +442,7 @@ var_\name:
 
 defvar "STATE",5,,STATE
 defvar "HERE",4,,HERE
-defvar "LATEST",6,,LATEST,name_HIDE
+defvar "LATEST",6,,LATEST,name_SYSCALL0 //must be last for some reason
 defvar "S0",2,,SZ
 defvar "BASE",4,,BASE,10
 
@@ -791,9 +798,171 @@ defword "HIDE",4,,HIDE
 	.quad HIDDEN
 	.quad EXIT
 
-//better check this crap cause it's boring and hard to test
+//appends codeword to currently being defined word
+defcode "'",1,,TICK
+	lodsq
+	pushq %rax
+	NEXT
 
+//jmp instruction
+defcode "BRANCH",6,,BRANCH
+	add (%rsi), %rsi //add offset to ip
+	NEXT
 
+//branch if zero
+defcode "0BRANCH",7,,ZBRANCH
+	pop %rax
+	test %rax, %rax
+	jz code_BRANCH
+	lodsq
+	NEXT
+
+defcode "LITSTRING",9,,LITSTRING
+	lodsq
+	push %rsi
+	push %rax
+	addq %rax, %rsi
+	addq $7, %rsi
+	andq $~7, %rsi //align to 8-byte boundry
+	NEXT
+
+defcode "TELL",4,,TELL
+	mov $1, %rax
+	mov $1, %rdi
+	pop %rdx
+	pop %rsi
+	syscall
+	NEXT
+
+defword "QUIT",4,,QUIT
+	.quad RZ, RSPSTORE
+	.quad INTERPRET
+	.quad BRANCH, -8
+
+//and finally, we have the holy grail of interpreters: the interpret function
+defcode "INTERPRET",9,,INTERPRET
+	//note: these things are workarounds.  Fix them.
+	mov %rsi, %r14
+	call _WORD
+	mov %r14, %rsi
+	
+	xor %rax, %rax
+	movq %rax, interpret_is_lit
+	call _FIND
+	test %rax, %rax
+	jz 1f
+	
+	mov %rax, %rdi
+	movb 8(%rdi), %al
+	push %ax
+	call _TCFA
+	pop %ax
+	andb $F_IMMED, %al
+	mov %rdi, %rax
+	jnz 4f
+	
+	jmp 2f
+1:
+	incq interpret_is_lit
+	call _NUMBER
+	test %rcx, %rcx
+	jnz 6f
+	mov %rax, %rbx
+	mov $LIT, %rax //literal word
+2:
+	movq var_STATE, %rdx
+	test %rdx, %rdx
+	jz 4f //jump if executing
+	
+	call _COMMA
+	mov interpret_is_lit, %rcx
+	test %rcx, %rcx
+	jz 3f
+	mov %rbx, %rax
+	call _COMMA
+3:	NEXT
+4:
+	mov interpret_is_lit, %rcx
+	test %rcx, %rcx
+	jnz 5f
+	
+	jmp *(%rax)
+5:
+	push %rbx
+	NEXT
+6:
+	mov $1, %r11
+	push (%r11) //cause segfault if parse error, come back to this
+
+	.section .rodata
+errmsg: .ascii "unknown input: "
+errmsgend: 
+errmsgnl: .ascii "\n"
+	
+	.data
+	.align 8
+interpret_is_lit:
+	.quad 0
+
+//misc stuff to add
+defcode "CHAR",4,,CHAR
+	call _WORD
+	xor %rax, %rax
+	movb (%rdi), %al
+	push %rax
+	NEXT
+
+defcode "EXECUTE",7,,EXECUTE
+	pop %rax
+	jmp *(%rax)
+
+defcode "SYSCALL3",8,,SYSCALL3
+	mov %rsi, %r14 //save rsi
+	pop %rax
+	pop %rdi
+	pop %rsi
+	pop %rdx
+	syscall
+	push %rax
+	mov %r14, %rsi
+	NEXT
+
+defcode "SYSCALL2",8,,SYSCALL2
+	mov %rsi, %r14
+	pop %rax
+	pop %rdi
+	pop %rsi
+	syscall
+	push %rax
+	mov %r14, %rsi
+	NEXT
+
+defcode "SYSCALL1",8,,SYSCALL1
+	pop %rax
+	pop %rdi
+	syscall
+	push %rax
+	NEXT
+
+defcode "SYSCALL0",8,,SYSCALL0
+	pop %rax
+	syscall
+	push %rax
+	NEXT
+
+.text
+	.set INITIAL_DATA_SEGMENT_SIZE, 65536
+set_up_data_segment:
+	xor %rdi, %rdi
+	mov $12, %rax
+	syscall //brk(0)
+	
+	movq %rax, var_HERE
+	addq $INITIAL_DATA_SEGMENT_SIZE, %rax
+	movq %rax, %rdi
+	mov $12, %rax //allocate some memory and call brk again
+	syscall
+	ret
 
 .set RET_STACK_SIZE, 8192
 .set BUFFER_SIZE, 4096
@@ -807,4 +976,3 @@ return_stack_top:
 	.align 4096
 buffer:
 	.space BUFFER_SIZE
-
