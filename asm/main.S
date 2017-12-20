@@ -1,3 +1,5 @@
+//A forth interpreter based on jonesforth, written for x86_64
+
 .macro NEXT //execute the next word
 	lodsq //(rsi) -> rax, rsi += 8
 	jmp *(%rax)
@@ -33,7 +35,7 @@ _start:
 	
 	call set_up_data_segment
 	
-	mov $TEST_START_PT, %rsi
+	mov $cold_start, %rsi
 	NEXT //and we're off!
 	
 	.section .rodata
@@ -89,30 +91,6 @@ code_\label:
 .endm
 
 //start of forth words implemented in assembly for speed, and we need some forth words to write
-//start of testing section, should be removed when forth system is fully self-hosting
-TEST_START_PT:
-	.quad TEST
-
-defword "TEST",4,,TEST
-	.quad INIT_TEST //feed initial stack and set up memory
-	.quad INTERPRET
-	.quad INTERPRET
-	.quad INTERPRET
-	.quad END_TEST //break and analyze
-
-defcode "INIT_TEST",9,,INIT_TEST
-	push $0xFF //EOS value
-		
-	NEXT
-
-defcode "END_TEST",8,,END_TEST
-	
-	//break here when debugging
-	
-	mov $60, %rax
-	mov $0, %rdi
-	syscall
-
 defcode "DROP",4,,DROP //(n -- )
 	pop %rax
 	NEXT
@@ -837,7 +815,7 @@ defcode "TELL",4,,TELL
 defword "QUIT",4,,QUIT
 	.quad RZ, RSPSTORE
 	.quad INTERPRET
-	.quad BRANCH, -8
+	.quad BRANCH, -16
 
 //and finally, we have the holy grail of interpreters: the interpret function
 defcode "INTERPRET",9,,INTERPRET
