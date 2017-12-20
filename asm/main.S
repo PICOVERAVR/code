@@ -28,13 +28,13 @@ _start:
 	//rsi is the pointer to the next word to execute
 	//set pointer to start of code
 	cld //set string ops to move the right way
-	mov %rsp, %r15 //save initial stack frame
+	mov %rsp, var_S0 //save initial stack frame
 	mov $return_stack_top, %rbp
 	
 	call set_up_data_segment
 	
 	mov $TEST_START_PT, %rsi
-	NEXT
+	NEXT //and we're off!
 	
 	.section .rodata
 cold_start:
@@ -95,11 +95,9 @@ TEST_START_PT:
 
 defword "TEST",4,,TEST
 	.quad INIT_TEST //feed initial stack and set up memory
-	
-	//this shit isnt working.  Figure out why.  With a project this complex test everything.
-	//pos
-	
-	
+	.quad INTERPRET
+	.quad INTERPRET
+	.quad INTERPRET
 	.quad END_TEST //break and analyze
 
 defcode "INIT_TEST",9,,INIT_TEST
@@ -708,7 +706,7 @@ defcode ">CFA",4,,TCFA
 
 _TCFA:
 	xor %rax, %rax
-	add $4, %rdi //skip link pointer
+	add $8, %rdi //skip link pointer
 	movb (%rdi), %al
 	inc %rdi //skip flags byte
 	andb $F_LENMASK, %al //get length of name
@@ -827,11 +825,13 @@ defcode "LITSTRING",9,,LITSTRING
 	NEXT
 
 defcode "TELL",4,,TELL
+	mov %rsi, %r14
 	mov $1, %rax
 	mov $1, %rdi
 	pop %rdx
 	pop %rsi
 	syscall
+	mov %r14, %rsi
 	NEXT
 
 defword "QUIT",4,,QUIT
@@ -891,8 +891,9 @@ defcode "INTERPRET",9,,INTERPRET
 	push %rbx
 	NEXT
 6:
-	mov $1, %r11
-	push (%r11) //cause segfault if parse error, come back to this
+	mov $60, %rax
+	xor %rdi, %rdi
+	syscall //TODO: if there's a parse error, this should return an error message.
 
 	.section .rodata
 errmsg: .ascii "unknown input: "
@@ -970,7 +971,7 @@ set_up_data_segment:
 .bss
 	.align 4096
 return_stack:
-	.space 8192
+	.space RET_STACK_SIZE
 return_stack_top:
 
 	.align 4096
