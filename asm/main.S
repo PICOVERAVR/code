@@ -980,8 +980,8 @@ set_up_data_segment:
 	syscall
 	ret
 
-.set RET_STACK_SIZE, 8192
-.set BUFFER_SIZE, 4096
+.set RET_STACK_SIZE, 0x7FFF
+.set BUFFER_SIZE, 0x7FFF
 
 .bss
 	.align 4096
