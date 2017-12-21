@@ -202,12 +202,28 @@ defcode "*",1,,MUL //(n1 n2 -- n1 * n2)
 	push %rax
 	NEXT
 
-defcode "/MOD",4,,DIVMOD //basic division that pushes quotient and remainder on the stack, other versions in forth
+defcode "/MOD",4,,DIVMOD //basic division that pushes quotient and remainder on the stack
 	xor %rdx, %rdx
 	pop %rbx
 	pop %rax
 	idivq %rbx
 	push %rdx
+	push %rax
+	NEXT
+
+defcode "/",1,,DIV
+	xor %rdx, %rdx
+	pop %rbx
+	pop %rax
+	idivq %rbx
+	push %rdx
+	NEXT
+
+defcode "MOD",1,,MOD
+	xor %rdx, %rdx
+	pop %rbx
+	pop %rax
+	idivq %rbx
 	push %rax
 	NEXT
 
@@ -868,10 +884,31 @@ defcode "INTERPRET",9,,INTERPRET
 5:
 	push %rbx
 	NEXT
-6:
-	mov $60, %rax
-	xor %rdi, %rdi
-	syscall //TODO: if there's a parse error, this should return an error message.
+6:	
+	//can't figure out what the input is, throw an error
+	mov %rsi, %r14
+	mov $2, %rdi //stderr
+	mov $errmsg, %rsi
+	mov $errmsgend - errmsg, %rdx
+	mov $1, %rax //write actual error message
+	syscall
+	
+	mov (currkey), %rsi
+	mov %rsi, %rdx
+	sub $buffer, %rdx
+	cmp $40, %rdx
+	jle 7f
+	mov $40, %rdx
+7:	sub %rdx, %rsi
+	mov $1, %rax
+	syscall
+	
+	mov $errmsgnl, %rdi
+	mov $1, %rdx
+	syscall
+	
+	mov %r14, %rsi
+	NEXT
 
 	.section .rodata
 errmsg: .ascii "unknown input: "
