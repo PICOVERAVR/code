@@ -352,6 +352,12 @@ defcode "INVERT",6,,INVERT
 	notq (%rsp)
 	NEXT
 
+defcode "NEGATE",6,,NEGATE
+	pop %rax
+	NEG %rax
+	push %rax
+	NEXT
+
 //back to forth operations
 defcode "EXIT",4,,EXIT
 	POPRSP %rsi //pop return stack into rsi
@@ -903,7 +909,7 @@ defcode "INTERPRET",9,,INTERPRET
 	mov $1, %rax
 	syscall
 	
-	mov $errmsgnl, %rdi
+	mov $errmsgnl, %rsi
 	mov $1, %rdx
 	syscall
 	
@@ -912,8 +918,8 @@ defcode "INTERPRET",9,,INTERPRET
 
 	.section .rodata
 errmsg: .ascii "unknown input: "
-errmsgend: 
-errmsgnl: .ascii "\n"
+errmsgend:
+errmsgnl: .ascii "\n" 
 	
 	.data
 	.align 8
