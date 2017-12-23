@@ -183,3 +183,15 @@
 	DROP
 	CR
 ;
+
+\: UWIDTH ( u -- width )
+\	BASE @ /
+\	?DUP IF
+\		RECURSE 1+
+\	ELSE
+\		1
+\	THEN
+\;
+
+\ there's a bug with the base getting corrupted somewhere in either this file or the assembly file... without loading 
+\ the core.f file it's fine...?
