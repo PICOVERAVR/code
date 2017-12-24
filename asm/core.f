@@ -15,7 +15,6 @@
 	,
 ;
 
-\ no idea how this works at all
 : ':'
 	[
 	CHAR :
@@ -166,7 +165,8 @@
 		10 -
 		'A'
 	THEN
-	+ EMIT
+	+
+	EMIT
 ;
 
 ( .S prints the whole stack, useful for debugging )
@@ -184,14 +184,12 @@
 	CR
 ;
 
-\: UWIDTH ( u -- width )
-\	BASE @ /
-\	?DUP IF
-\		RECURSE 1+
-\	ELSE
-\		1
-\	THEN
-\;
+: UWIDTH ( u -- width )
+	BASE @ /
+	?DUP IF
+		RECURSE 1+
+	ELSE
+		1
+	THEN
+;
 
-\ there's a bug with the base getting corrupted somewhere in either this file or the assembly file... without loading 
-\ the core.f file it's fine...?

@@ -35,6 +35,8 @@ _start:
 	
 	call set_up_data_segment
 	
+	push $0 //set a canary
+	
 	mov $cold_start, %rsi
 	NEXT //and we're off!
 	
