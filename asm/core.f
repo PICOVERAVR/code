@@ -184,12 +184,16 @@
 	CR
 ;
 
-: UWIDTH ( u -- width )
-	BASE @ /
+: UWIDTH2 ( u -- width )
+	BASE @ /MOD
 	?DUP IF
+		SWAP DROP
 		RECURSE 1+
 	ELSE
 		1
 	THEN
 ;
+
+: UWIDTH UWIDTH2 SWAP DROP ;
+
 

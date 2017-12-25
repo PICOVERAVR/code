@@ -218,15 +218,15 @@ defcode "/",1,,DIV
 	pop %rbx
 	pop %rax
 	idivq %rbx
-	push %rdx
+	push %rax
 	NEXT
 
-defcode "MOD",1,,MOD
+defcode "MOD",3,,MOD
 	xor %rdx, %rdx
 	pop %rbx
 	pop %rax
 	idivq %rbx
-	push %rax
+	push %rdx
 	NEXT
 
 //here, a 1 is "TRUE" and a 0 is "FALSE"
