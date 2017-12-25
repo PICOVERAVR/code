@@ -196,4 +196,136 @@
 
 : UWIDTH UWIDTH2 SWAP DROP ;
 
+( ?? )
+: U.R
+	SWAP
+	DUP
+	UWIDTH
+	ROT
+	SWAP -
+	SPACES
+	U.
+;
 
+( print a signed number to some number of bits )
+( n width )
+: .R
+	SWAP
+	DUP 0< IF
+		NEGATE
+		1
+		SWAP
+		ROT
+		1-
+	ELSE
+		0
+		SWAP
+		ROT
+	THEN
+	SWAP
+	DUP
+	UWIDTH
+	ROT
+	SWAP -
+	SPACES
+	SWAP
+	IF
+		'-' EMIT
+	THEN
+	
+	U.
+;
+
+( . is pop and print )
+: . 0 .R SPACE ;
+( note trailing space )
+: U. U. SPACE ;
+( get an integer at an address and print it )
+: ? @ . ;
+
+( c a b WITHIN returns true if a <= c and c < b )
+: WITHIN
+	-ROT
+	OVER
+	<= IF
+		> IF
+			TRUE
+		ELSE
+			FALSE
+		THEN
+	ELSE
+		2DROP
+		FALSE
+	THEN
+;
+
+( returns depth of stack )
+: DEPTH
+	S0 @ DSP@ -
+	8- ( adjust because s0 was on stack when we pushed dsp )
+;
+
+: ALIGNED ( align an address )
+	7 + 7 INVERT AND
+;
+
+( align here pointer )
+: ALIGN HERE @ ALIGNED HERE ! ;
+
+( strings are hard because we have to decide what to do in compiled mode vs immediate mode )
+( append a byte to compiled word )
+: C,
+	HERE @ C!
+	1 HERE +!
+;
+
+( -- addr len )
+: S" IMMEDIATE
+	STATE @ IF
+		' LITSTRING ,
+		HERE @
+		0 ,
+		BEGIN
+			KEY
+			DUP '"' <>
+		WHILE
+			C,
+		REPEAT
+		DROP
+		DUP
+		HERE @ SWAP -
+		8-
+		SWAP !
+		ALIGN
+	ELSE
+		HERE @
+		BEGIN
+			KEY
+			DUP '"' <>
+		WHILE
+			OVER C!
+			1+
+		REPEAT
+		DROP
+		HERE @ -
+		HERE @
+		SWAP
+	THEN
+;
+
+: ." IMMEDIATE
+	STATE @ IF ( compiling mode )
+		[COMPILE] S"
+		' TELL ,
+	ELSE ( immediate mode, just read and print the characters )
+		BEGIN
+			KEY DUP '"' = IF
+				DROP
+				EXIT
+			THEN
+			EMIT
+		AGAIN
+	THEN
+;
+
+." KForth, by Kyle Neil." CR
