@@ -328,4 +328,127 @@
 	THEN
 ;
 
+( create a constant, same as : <name> <value> ; )
+: CONSTANT
+	WORD
+	CREATE
+	DOCOL ,
+	' LIT ,
+	,
+	' EXIT ,
+;
+
+: ALLOT ( n -- addr )
+	HERE @ SWAP
+	HERE +!
+;
+
+( turn # of cells into # of bytes )
+: CELLS 8 * ;
+
+( allocate one cell to hold the variable, and define it )
+: VARIABLE
+	1 CELLS ALLOT
+	WORD CREATE
+	DOCOL ,
+	' LIT ,
+	,
+	' EXIT ,
+;
+
+( values are like variables, but push the actual value instead of a pointer to the value onto the stack.
+  Implementation is more complex, but the runtime overhead is the same. )
+
+: VALUE ( make a dictonary entry for value )
+	WORD CREATE
+	DOCOL ,
+	' LIT ,
+	,
+	' EXIT ,
+;
+
+( this word compiles the address of the value, and therefore avoids a dictonary search each time. )
+: TO IMMEDIATE
+	WORD
+	FIND
+	>DFA
+	8+
+	STATE @ IF
+		' LIT ,
+		,
+		' ! ,
+	ELSE
+		!
+	THEN
+;
+
+: +TO IMMEDIATE
+	WORD
+	FIND
+	>DFA
+	8+
+	STATE @ IF
+		' LIT ,
+		,
+		' +! ,
+	ELSE
+		+!
+	THEN
+;
+
+( finds name of address in dictonary )
+: ID.
+	8+
+	DUP C@
+	F_LENMASK AND
+	
+	BEGIN
+		DUP 0>
+	WHILE
+		SWAP 1+
+		DUP C@
+		EMIT
+		SWAP 1-
+	REPEAT
+	2DROP
+;
+
+: ?HIDDEN
+	8+
+	C@
+	F_HIDDEN AND
+;
+
+: ?IMMEDIATE
+	8+
+	C@
+	F_IMMED AND
+;
+
+: WORDS
+	LATEST @
+	BEGIN
+		?DUP
+	WHILE
+		DUP ?HIDDEN NOT IF
+			DUP ID.
+			SPACE
+		THEN
+		@
+	REPEAT
+	CR
+;
+
+( forget a word and everything after it by setting the HERE pointer to its location )
+: FORGET
+	WORD FIND
+	DUP @ LATEST !
+	HERE !
+;
+
+( dump memory addresses )
+
+
+
+
 ." KForth, by Kyle Neil." CR
