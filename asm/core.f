@@ -446,12 +446,190 @@
 	HERE !
 ;
 
+( dump memory contents in a pretty way ) 
+: DUMP
+	BASE @ -ROT
+	HEX
 
+	BEGIN
+		?DUP
+	WHILE
+		OVER 8 U.R
+		SPACE
 
+		( print up to 16 words on this line )
+		2DUP
+		1- 15 AND 1+
+		BEGIN
+			?DUP
+		WHILE
+			SWAP
+			DUP C@
+			2 .R SPACE
+			1+ SWAP 1-
+		REPEAT
+		DROP
 
+		2DUP 1- 15 AND 1+
+		BEGIN
+			?DUP
+		WHILE
+			SWAP
+			DUP C@
+			DUP 32 128 WITHIN IF
+				EMIT
+			ELSE
+				DROP '.' EMIT
+			THEN
+			1+ SWAP 1-
+		REPEAT
+		DROP
+		CR
 
+		DUP 1- 15 AND 1+
+		TUCK
+		-
+		>R + R>
+	REPEAT
 
+	DROP
+	BASE !
+;
 
+( case statement is just a series of if statements chained together )
+: CASE IMMEDIATE
+	0
+;
+
+: OF IMMEDIATE
+	' OVER ,
+	' = ,
+	[COMPILE] IF
+	' DROP ,
+;
+
+: ENDOF IMMEDIATE
+	[COMPILE] ELSE
+;
+
+: ENDCASE IMMEDIATE
+	' DROP ,
+	BEGIN
+		?DUP
+	WHILE
+		[COMPILE] THEN
+	REPEAT
+;
+
+( this word tries to find a specified codeword in the dictionary, and returns a 0 if it cannot find one )
+( this is really inefficiant since there is no back pointer included, fix this later? )
+: CFA>
+	LATEST @
+	BEGIN
+		?DUP
+	WHILE
+		2DUP SWAP
+		< IF
+			NIP
+			EXIT
+		THEN
+		@
+	REPEAT
+	DROP
+	0
+;
+
+( this long word decompiles a given forth word )
+: SEE
+	WORD FIND
+	HERE @
+	LATEST @
+	BEGIN
+		2 PICK
+		OVER
+		<>
+	WHILE
+		NIP
+		DUP @
+	REPEAT
+	
+	DROP
+	SWAP
+	
+	':' EMIT SPACE DUP ID. SPACE ( print out the first part of the word definition )
+	DUP ?IMMEDIATE IF ." IMMEDIATE " THEN
+	
+	>DFA
+	BEGIN
+		2DUP >
+	WHILE
+		DUP @
+		
+		CASE
+		' LIT OF
+			8 + DUP @
+			.
+		ENDOF
+		' LITSTRING OF
+			[ CHAR S ] LITERAL EMIT '"' EMIT SPACE
+			8 + DUP @
+			SWAP 8 + SWAP
+			2DUP TELL
+			'"' EMIT SPACE
+			+ ALIGNED
+			8 -
+		ENDOF
+		' 0BRANCH OF
+			." 0BRANCH ( "
+			8 + DUP @
+			.
+			." ) "
+		ENDOF
+		' BRANCH OF
+			." BRANCH ( "
+			8 + DUP @
+			.
+			." ) "
+		ENDOF
+		' ' OF
+			[ CHAR ' ] LITERAL EMIT SPACE
+			8 + DUP @
+			CFA>
+			ID. SPACE
+		ENDOF
+		' EXIT OF
+			2DUP
+			8 +
+			<> IF
+				." EXIT "
+			THEN
+		ENDOF
+			DUP
+			CFA>
+			ID. SPACE
+		ENDCASE
+		8 +
+	REPEAT
+	
+	';' EMIT CR
+	2DROP
+;
+
+( apparently forth has a thing called execution tokens that are similar to function pointers in C )
+( :NONAME creates a dummy dictionary entry and calls it with EXECUTE )
+
+: :NONAME
+	0 0 CREATE
+	HERE @
+	DOCOL ,
+	]
+;
+
+: ['] IMMEDAITE
+	' LIT ,
+;
+
+( even weirder, forth has an exception mechanism! )\
 
 
 ." KForth, by Kyle Neil." CR
