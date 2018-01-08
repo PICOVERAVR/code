@@ -625,9 +625,9 @@
 	]
 ;
 
-: ['] IMMEDAITE
-	' LIT ,
-;
+\: ['] IMMEDAITE
+\	' LIT ,
+\;
 
 ( even weirder, forth has an exception mechanism! )\
 
