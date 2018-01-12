@@ -35,6 +35,8 @@ _start:
 	
 	call set_up_data_segment
 	
+	push $0 //set a canary
+	
 	mov $cold_start, %rsi
 	NEXT //and we're off!
 	
@@ -202,13 +204,29 @@ defcode "*",1,,MUL //(n1 n2 -- n1 * n2)
 	push %rax
 	NEXT
 
-defcode "/MOD",4,,DIVMOD //basic division that pushes quotient and remainder on the stack, other versions in forth
+defcode "/MOD",4,,DIVMOD //basic division that pushes quotient and remainder on the stack
 	xor %rdx, %rdx
 	pop %rbx
 	pop %rax
 	idivq %rbx
 	push %rdx
 	push %rax
+	NEXT
+
+defcode "/",1,,DIV
+	xor %rdx, %rdx
+	pop %rbx
+	pop %rax
+	idivq %rbx
+	push %rax
+	NEXT
+
+defcode "MOD",3,,MOD
+	xor %rdx, %rdx
+	pop %rbx
+	pop %rax
+	idivq %rbx
+	push %rdx
 	NEXT
 
 //here, a 1 is "TRUE" and a 0 is "FALSE"
@@ -334,6 +352,12 @@ defcode "XOR",3,,XOR
 
 defcode "INVERT",6,,INVERT
 	notq (%rsp)
+	NEXT
+
+defcode "NEGATE",6,,NEGATE
+	pop %rax
+	NEG %rax
+	push %rax
 	NEXT
 
 //back to forth operations
@@ -868,15 +892,36 @@ defcode "INTERPRET",9,,INTERPRET
 5:
 	push %rbx
 	NEXT
-6:
-	mov $60, %rax
-	xor %rdi, %rdi
-	syscall //TODO: if there's a parse error, this should return an error message.
+6:	
+	//can't figure out what the input is, throw an error
+	mov %rsi, %r14
+	mov $2, %rdi //stderr
+	mov $errmsg, %rsi
+	mov $errmsgend - errmsg, %rdx
+	mov $1, %rax //write actual error message
+	syscall
+	
+	mov (currkey), %rsi
+	mov %rsi, %rdx
+	sub $buffer, %rdx
+	cmp $40, %rdx
+	jle 7f
+	mov $40, %rdx
+7:	sub %rdx, %rsi
+	mov $1, %rax
+	syscall
+	
+	mov $errmsgnl, %rsi
+	mov $1, %rdx
+	syscall
+	
+	mov %r14, %rsi
+	NEXT
 
 	.section .rodata
 errmsg: .ascii "unknown input: "
-errmsgend: 
-errmsgnl: .ascii "\n"
+errmsgend:
+errmsgnl: .ascii "\n" 
 	
 	.data
 	.align 8
@@ -943,8 +988,8 @@ set_up_data_segment:
 	syscall
 	ret
 
-.set RET_STACK_SIZE, 8192
-.set BUFFER_SIZE, 4096
+.set RET_STACK_SIZE, 0x7FFF
+.set BUFFER_SIZE, 0x7FFF
 
 .bss
 	.align 4096
