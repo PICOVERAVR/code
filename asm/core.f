@@ -1,20 +1,22 @@
 : '\n' 10 ;
 : BL 32 ;
 
-\ maybe useful later?
+\ emit a \n
 : CR '\n' EMIT ;
 : SPACE BL EMIT ;
 
+\logical defns
 : TRUE 1 ;
 : FALSE 0 ;
 : NOT 0= ;
 
-\take tos and compile LIT <tos>
+\take top of stack and compile LIT <top of stack>
 : LITERAL IMMEDIATE
 	' LIT ,
 	,
 ;
 
+\a literal ':'
 : ':'
 	[
 	CHAR :
@@ -22,7 +24,7 @@
 	LITERAL
 ;
 
-\ defining some character constants for some reason
+\ defining some character constants
 : ';' [ CHAR ; ] LITERAL ;
 : '(' [ CHAR ( ] LITERAL ;
 : ')' [ CHAR ) ] LITERAL ;
@@ -47,13 +49,15 @@
 	,
 ;
 
-\ control structures here
+\here we turn assembly-like "branch if zero" into
+\structured programming constructs like "if" statements
 : IF IMMEDIATE
 	' 0BRANCH , \ compile a 0BRANCH
 	HERE @ \save offset on stack
 	0 , \ compile a dummy offset
 ;
 
+\terminating the "if" statement
 : THEN IMMEDIATE
 	DUP
 	HERE @ SWAP - \find offset from address saved
@@ -88,6 +92,7 @@
 	,
 ;
 
+\allows for for-loop like construct
 : WHILE IMMEDIATE
 	' 0BRANCH ,
 	HERE @
@@ -425,6 +430,7 @@
 	F_IMMED AND
 ;
 
+( print out all words previously defined )
 : WORDS
 	LATEST @
 	BEGIN
@@ -629,7 +635,7 @@
 \	' LIT ,
 \;
 
-( even weirder, forth has an exception mechanism! )\
+( even weirder, forth has an exception mechanism! )
 
 
 ." KForth, by Kyle Neil." CR
