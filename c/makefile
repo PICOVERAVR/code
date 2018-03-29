@@ -21,6 +21,9 @@ debug:
 	@echo "Debug build completed."
 
 parallel:
-	$(CC) $(FINAL) $(CFLAGS) -fopenmp -o 'p.out'
+	$(CC) $(FINAL) $(DFLAGS) -fopenmp -o 'p.out'
 
-#command-line options in make
+# for graphics in the terminal
+gui:
+	$(CC) $(FINAL) $(DFLAGS) -lncurses -o 'gui.out'
+

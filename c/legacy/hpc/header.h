@@ -10,5 +10,3 @@
 
 #include <omp.h> //for parallel workloads
 #include <pthread.h>
-
-#include <ncurses.h> //for graphics programming
