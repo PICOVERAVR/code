@@ -7,3 +7,4 @@ To be nice and fair to everyone, here is the license put in the original Jonesfo
 	In case this is not legally possible, I grant any entity the right to use this work for any purpose,
 	without any conditions, unless such conditions are required by law.
 
+A copy of the version of jonesforth that I translated is also included.

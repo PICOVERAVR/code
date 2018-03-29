@@ -1,6 +1,15 @@
 //A forth interpreter based on jonesforth, written for x86_64
+//by Kyle Neil
 
-.macro NEXT //execute the next word
+//register map:
+//rsi -> pointer to next word
+//rax -> pointer to current word?
+//rbp -> pointer to return stack (as usual)
+//rsp -> pointer to parameter stack
+
+//any register not mentioned here is free to use as a gp register
+
+.macro NEXT //execute the next Forth word
 	lodsq //(rsi) -> rax, rsi += 8
 	jmp *(%rax)
 .endm
@@ -16,8 +25,9 @@
 .endm
 
 .text
-.align 8
+.align 8 //align to 8-byte boundaries
 
+//this is called when executing a new forth word (not continuing an existing one)
 DOCOL:
 	PUSHRSP %rsi //push previous address on return stack
 	addq $8, %rax //rax points to codeword, so add 8 and make rsi point to first data word
@@ -27,22 +37,20 @@ DOCOL:
 .text
 .globl _start
 _start:
-	//rsi is the pointer to the next word to execute
-	//set pointer to start of code
 	cld //set string ops to move the right way
 	mov %rsp, var_S0 //save initial stack frame
-	mov $return_stack_top, %rbp
+	mov $return_stack_top, %rbp //set up rbp to point to the right area
 	
-	call set_up_data_segment
+	call set_up_data_segment 
 	
-	push $0 //set a canary
+	push $0 //set a stack canary for debugging
 	
 	mov $cold_start, %rsi
 	NEXT //and we're off!
 	
 	.section .rodata
 cold_start:
-	.quad QUIT
+	.quad QUIT //our first forth word, which is just interpreting the next word infinitely
 
 .set F_IMMED, 0x80 //flags for special compiled forth words
 .set F_HIDDEN, 0x20
@@ -53,7 +61,6 @@ cold_start:
 //it includes a link pointer to point to the previous word declared,
 //a name to look up and a length of that name, 
 //and the actual code, prefixed by a DOCOL, as always
-
 .macro defword name, namelen, flags=0, label
 	.section .rodata
 	.align 8
@@ -92,7 +99,10 @@ code_\label:
 	//asm here
 .endm
 
-//start of forth words implemented in assembly for speed, and we need some forth words to write
+//start of forth words implemented in assembly for speed, and because
+//we have to start somewhere.
+//this will form the base of the rest of our forth system
+
 defcode "DROP",4,,DROP //(n -- )
 	pop %rax
 	NEXT
@@ -155,7 +165,7 @@ defcode "2SWAP",5,,TWOSWAP //(n1 n2 n3 n4 -- n3 n4 n1 n2)
 	push %rcx
 	NEXT
 
-defcode "?DUP",4,,QDUP //(n -- n n) if non-zero
+defcode "?DUP",4,,QDUP //DUP if non-zero
 	movq (%rsp), %rax
 	test %rax, %rax
 	jz 1f
@@ -228,6 +238,9 @@ defcode "MOD",3,,MOD
 	idivq %rbx
 	push %rdx
 	NEXT
+
+//if I were to throw in MMX/SSE algorithms in here, this would be the place to put them
+
 
 //here, a 1 is "TRUE" and a 0 is "FALSE"
 //all of the following abide by (n1 n2 -- f) depending on condition
@@ -411,7 +424,7 @@ defcode "C@",2,,FETCHBYTE //(addr -- byte)
 	push %rax
 	NEXT
 
-defcode "C@C!",3,,CCOPY //(src dest -- src+8 dest+8)???
+defcode "C@C!",3,,CCOPY //(src dest -- src+8 dest+8)
 	movq 8(%rsp), %rbx
 	movb (%rbx), %al
 	pop %rdi
@@ -442,26 +455,27 @@ var_\name:
 
 defvar "STATE",5,,STATE
 defvar "HERE",4,,HERE
-defvar "LATEST",6,,LATEST,name_SYSCALL0 //must be last for some reason
+defvar "LATEST",6,,LATEST,name_SYSCALL0 //must be last for some reason...?
 defvar "S0",2,,SZ
-defvar "BASE",4,,BASE,10
+defvar "BASE",4,,BASE,10 //radix
 
 //constant macro, similar to defvar but only pushes to stack
 .macro defconst name, namelen, flags=0, label, value
-	defcode \name,\namelen,\flags,\label //is there a better way to do this?
+	defcode \name,\namelen,\flags,\label
 	push $\value
 	NEXT
 .endm
 
 defconst "VERSION",7,,VERSION,-1 //whatever the most recent git version is
-defconst "R0",2,,RZ,return_stack_top //pointer to tos in memory
+defconst "R0",2,,RZ,return_stack_top //pointer to top of stack in memory
 defconst "DOCOL",5,,__DOCOL,DOCOL
-defconst "F_IMMED",7,,__F_IMMED,F_IMMED
-defconst "F_HIDDEN",8,,__F_HIDDEN,F_HIDDEN
+defconst "F_IMMED",7,,__F_IMMED,F_IMMED //should the word be executed immediately, even when being compiled?
+defconst "F_HIDDEN",8,,__F_HIDDEN,F_HIDDEN //is the word visible to the user?
 defconst "F_LENMASK",9,,__F_LENMASK,F_LENMASK //will become useful once we get to compiling words
 
 //some words to manuipulate the return stack
-//note: these values must be popped before the word returns or the interpreter will crash!
+//note: these values must be popped before the word returns or the interpreter will
+//return to that address and probably crash
 defcode ">R",2,,TOR //(n -- )
 	pop %rax
 	PUSHRSP %rax
@@ -472,7 +486,7 @@ defcode "R>",2,,FROMR //( -- n)
 	push %rax
 	NEXT
 
-//these words actually get and set the return stack pointer
+//these words actually get and set the return stack pointer (rbp)
 defcode "RSP@",4,,RSPFETCH //( -- n)
 	push %rbp
 	NEXT
@@ -495,8 +509,9 @@ defcode "DSP!",4,,DSPSTORE
 	pop %rsp
 	NEXT
 
-//we're approaching a fully functional forth system here.  All the basic mechanics are in place, and all that is left is to make it user-interactive instead of a fixed program.
-//this is where the assembly gets bigger than ~5 instructions.
+//we're approaching a fully functional forth system here.  All the basic mechanics are in place, and all 
+//that is left is to make it user-interactive instead of a fixed program.
+//this is where we get to the big boy stuff.
 
 //read a byte from stdin and push it on the stack.
 defcode "KEY",3,,KEY
@@ -518,7 +533,7 @@ _KEY:
 	xor %rax, %rax //read syscall
 	xor %rdi, %rdi //use stdin
 	mov $buffer, %rsi
-	mov %rsi, currkey //?????
+	mov %rsi, currkey
 	mov $BUFFER_SIZE, %rdx
 	syscall
 	
@@ -559,7 +574,7 @@ _EMIT:
 emit_byte:
 	.space 1 //scratch byte
 
-//get a word (search for a space)
+//get a valid word (search for a space)
 defcode "WORD",4,,WORD
 	mov %rsi, %r14 //save rsi again
 	call _WORD
@@ -598,7 +613,7 @@ word_buffer: //forth words can only be 64 bytes long!
 	.space 64
 
 //parse a numeric string and push the result
-//this would benefit from a C library linking
+//this would benefit from a libc linking...
 defcode "NUMBER",6,,NUMBER
 	pop %rcx
 	pop %rdi
@@ -656,8 +671,7 @@ _NUMBER:
 	ret
 
 //have enough infastructure to be able to read and parse text from the command line, and now we need to implement the dictonary that ties everything together.
-
-//this could be a hash table, but collisions between unrelated words could be a problem
+//this could be a hash table, but is a linked list for now.
 defcode "FIND",4,,FIND
 	pop %rcx
 	pop %rdi
@@ -683,7 +697,7 @@ _FIND:
 	push %rcx //lengths are the same, compare the strings in detail
 	push %rdi
 	lea 9(%rdx), %rsi
-	repe cmpsb
+	repe cmpsb //this is a really cool x86 instruction that compares bytes in a loop!
 	pop %rdi
 	pop %rcx
 	jne 2f //not the same
@@ -718,6 +732,7 @@ _TCFA:
 	ret
 
 //just >CFA minus the DOCOL
+//notice that we're defining a Forth word here, not actual assembly code
 defword ">DFA",4,,TDFA
 	.quad TCFA
 	.quad INCR8
@@ -756,6 +771,8 @@ _COMMA:
 	movq %rdi, var_HERE
 	ret
 
+//these are to force the compiler to execute Forth words until it sees a ']'
+//this is how we let the user extend the compiler
 defcode "[",1,F_IMMED,LBRAC
 	xor %rax, %rax
 	movq %rax, var_STATE //set state to 0
@@ -765,6 +782,7 @@ defcode "]",1,,RBRAC
 	movq $1, var_STATE
 	NEXT
 
+//Forth word for creating a new Forth word
 defword ":",1,,COLON
 	.quad WORD //get name
 	.quad CREATE //make space for it
@@ -773,25 +791,28 @@ defword ":",1,,COLON
 	.quad RBRAC //go into 
 	.quad EXIT
 
+//stop creating a Forth word
 defword ";",1,F_IMMED,SEMICOLON
 	.quad LIT, EXIT, COMMA //append an exit so word will return
 	.quad LATEST, FETCH, HIDDEN //toggle hidden flag
 	.quad LBRAC //go to immediate mode
 	.quad EXIT //ret
 
-//this word makes the defined word immediate, which allows you to extend the compiler
+//this word makes the defined word immediate
 defcode "IMMEDIATE",9,F_IMMED,IMMEDIATE
 	movq var_LATEST, %rdi
 	addq $8, %rdi
 	xorb $F_IMMED, (%rdi)
 	NEXT
 
+//this is to let Forth know that this is not a user word and is reserved for the system only
 defcode "HIDDEN",6,,HIDDEN
 	pop %rdi
 	addq $8, %rdi
 	xorb $F_HIDDEN, (%rdi)
 	NEXT
 
+//hide a word
 defword "HIDE",4,,HIDE
 	.quad WORD
 	.quad FIND
@@ -804,7 +825,7 @@ defcode "'",1,,TICK
 	pushq %rax
 	NEXT
 
-//jmp instruction
+//jmp instruction in Forth
 defcode "BRANCH",6,,BRANCH
 	add (%rsi), %rsi //add offset to ip
 	NEXT
@@ -817,6 +838,7 @@ defcode "0BRANCH",7,,ZBRANCH
 	lodsq
 	NEXT
 
+//this does something?
 defcode "LITSTRING",9,,LITSTRING
 	lodsq
 	push %rsi
@@ -836,6 +858,7 @@ defcode "TELL",4,,TELL
 	mov %r14, %rsi
 	NEXT
 
+//this is the actual interpreter loop we talked about before
 defword "QUIT",4,,QUIT
 	.quad RZ, RSPSTORE
 	.quad INTERPRET
@@ -843,21 +866,20 @@ defword "QUIT",4,,QUIT
 
 //and finally, we have the holy grail of interpreters: the interpret function
 defcode "INTERPRET",9,,INTERPRET
-	//note: these things are workarounds.  Fix them.
 	mov %rsi, %r14
-	call _WORD
+	call _WORD //get a word
 	mov %r14, %rsi
 	
 	xor %rax, %rax
 	movq %rax, interpret_is_lit
-	call _FIND
+	call _FIND //find it in the internal dictionary
 	test %rax, %rax
 	jz 1f
 	
 	mov %rax, %rdi
 	movb 8(%rdi), %al
 	push %ax
-	call _TCFA
+	call _TCFA //?
 	pop %ax
 	andb $F_IMMED, %al
 	mov %rdi, %rax
@@ -901,7 +923,7 @@ defcode "INTERPRET",9,,INTERPRET
 	mov $1, %rax //write actual error message
 	syscall
 	
-	mov (currkey), %rsi
+	mov (currkey), %rsi //throw some context into error message
 	mov %rsi, %rdx
 	sub $buffer, %rdx
 	cmp $40, %rdx
@@ -928,7 +950,7 @@ errmsgnl: .ascii "\n"
 interpret_is_lit:
 	.quad 0
 
-//misc stuff to add
+//?
 defcode "CHAR",4,,CHAR
 	call _WORD
 	xor %rax, %rax
@@ -936,10 +958,12 @@ defcode "CHAR",4,,CHAR
 	push %rax
 	NEXT
 
+//execute whatever is in *rax
 defcode "EXECUTE",7,,EXECUTE
 	pop %rax
 	jmp *(%rax)
 
+//Forth wrappers for syscalls with different numbers of parameters
 defcode "SYSCALL3",8,,SYSCALL3
 	mov %rsi, %r14 //save rsi
 	pop %rax
@@ -974,6 +998,7 @@ defcode "SYSCALL0",8,,SYSCALL0
 	push %rax
 	NEXT
 
+//this allocates 64K of memory for the user
 .text
 	.set INITIAL_DATA_SEGMENT_SIZE, 65536
 set_up_data_segment:
