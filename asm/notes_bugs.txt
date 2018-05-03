@@ -1,0 +1,8 @@
+Bugs noticed:
+	
+	: stuff 1 2 . . CR ;
+	: things stuff stuff ; //prints 2 1
+	: stuff 4 5 . . CR ;
+	things //still prints 2 1 even though stuff was updated
+	
+	(the online repl.it does this too, might be a part of the language...)
