@@ -6,7 +6,7 @@
 `define WORD_BITS (8 * `WORD_SIZE) - 1
 
 `define NUM_REGS 16
-`define REGS_BITS 3 //hard coded, fix
+`define REGS_BITS 2 //hard coded, fix [2:0]
 //module main(input sysclk, input [3:0] in, output reg [3:0] out);
     
 //endmodule
@@ -15,7 +15,7 @@
     Harvard architecture.
     64K address space.
 */
-module processor(input clk, input rst, output reg [15:0] ir_addr, input [`WORD_BITS:0] ir_data, output reg [15:0] data_addr, input [15:0] data_data, input data_rw);
+module processor(input clk, input rst, output reg [15:0] ir_addr, input [`WORD_BITS:0] ir_data, output reg [15:0] data_addr, input [15:0] data_data, input data_rw, output reg [15:0] dbg_out);
     
     reg en_regfile = 0;
     reg en_alu = 0;
@@ -59,11 +59,11 @@ module processor(input clk, input rst, output reg [15:0] ir_addr, input [`WORD_B
     /*
         Instruction decodings:
         
-        16 15 14 13 12 11 10 9  8  7  6  5  4  3  2  1
-        |      11-bit imm              |     opcode   |  jr x (jump relative to pc)
-        |xxxxx|  dest  |  srcB  | srcA |     opcode   |  add r0, r1, r2
-        |xxxxxxxxxxxxxx|  dest  | srcA |     opcode   |  mv r0, r1
-        |xxxxxxxxxxxxxxxxxxxxxxx| srcA |     opcode   |  push r0
+        16 15|14 13 12 11 10 9  8  7  6  5  4  3  2  1
+        |       11-bit imm              |   opcode   |  jr x (jump relative to pc)
+        |xxxx|  dest  |  srcB  |  srcA  |   opcode   |  add r0, r1, r2
+        |xxxxxxxxxxxxx|  dest  |  srcA  |   opcode   |  mv r0, r1
+        |xxxxxxxxxxxxxxxxxxxxxxx  srcA  |   opcode   |  push r0
        
     */
     always @(posedge rst) begin
@@ -80,26 +80,51 @@ module processor(input clk, input rst, output reg [15:0] ir_addr, input [`WORD_B
         en_pc <= 1;
         
         data_addr <= 0;
+        
+        dbg_out <= 0;
+        
+        //should cycle clock a bunch of times to flush out pipeline stages, at least 5 times
     end
     
-    always @(posedge clk) begin
+    always @(posedge clk) begin //instruction fetch
         ir_addr <= pc;
-        ir <= ir_data;
+        ir <= ir_data; 
+    end
+    
+    always @(posedge clk) begin //instruction decode
         case (ir[5:0])
-            6'h0: ; // nop
+            6'h0: begin   // nop
+                @(posedge clk); //track the opcode as it goes through the pipeline, instead of having an expensive buffer
+                @(posedge clk);
+                @(posedge clk); //three stages after this one
+                dbg_out[0] <= 1;
+            end
             6'h1: begin   // mv reg, reg
-                    reg_in <= ir_data[31:15];
-                    load_store <= `REGFILE_LOAD;
-                    en_regfile <= 1;
-                    @(posedge clk);
-                    // track the opcode as it goes through the pipeline, instead of having a weird buffer thing
-                    @(posedge clk);
-                    //...
-                end
-                
-                
-                
+                //set up register load
+                @(posedge clk);
+                //pass register through ALU
+                @(posedge clk);
+                //pass register through memory write
+                @(posedge clk);
+                //write register
+            end
+            6'h2: begin   // ld reg, $addr
+                //load register from address
+                @(posedge clk);
+            end
         endcase
+    end
+    
+    always @(posedge clk) begin //execution
+        //no control settings here
+    end
+    
+    always @(posedge clk) begin //memory rw
+        
+    end
+    
+    always @(posedge clk) begin //regfile rw
+        
     end
 endmodule
 
@@ -107,13 +132,13 @@ endmodule
     To add
         Hazard detection and resolution unit
             Use nops in between instructions until this is built
+        Structural hazards
+            processor has to stall itself, or add redundant hardware
+            Use nops in between instructions until this is built
         Branch prediction?
         More instructions - multiply/divide support?
         Sign extension
         PC follow-through for jump instructions
-        
-        
-        
     To optimize
         Instruction decoding - wasting 50% of word if no immediate is used... not a good use of space
 */
@@ -165,7 +190,7 @@ endmodule
 */
 module alu(input clk, input en, input rst, input [15:0] reg_a, input [15:0] reg_b, output reg [15:0] out, input [2:0] op);
     always @(posedge clk && en) begin
-        out <= op == 1 ? reg_a + reg_b : reg_a - reg_b;
+        out <= (op == 1) ? reg_a + reg_b : reg_a - reg_b;
     end
     
     always @(posedge rst) begin
