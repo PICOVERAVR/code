@@ -93,6 +93,9 @@ module processor(input clk, input rst, output reg [15:0] ir_addr, input [`WORD_B
     
     always @(posedge clk) begin //instruction decode
         case (ir[5:0])
+            
+            //the way to solve units getting written by everything is to mux the shit out of everything... I think.
+            
             6'h0: begin   // nop
                 @(posedge clk); //track the opcode as it goes through the pipeline, instead of having an expensive buffer
                 @(posedge clk); //two stages after this one
