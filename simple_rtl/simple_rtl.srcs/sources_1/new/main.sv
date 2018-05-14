@@ -28,6 +28,7 @@ module processor(input clk, input rst, output reg [15:0] ir_addr, input [`WORD_B
     reg load_store = `REGFILE_READ;
     reg [3:0] sel_a = 0;
     reg [3:0] sel_b = 0;
+    reg [3:0] sel_write = 0;
     reg [15:0] reg_in = 0;
     wire [15:0] out_a;
     wire [15:0] out_b;
@@ -46,20 +47,19 @@ module processor(input clk, input rst, output reg [15:0] ir_addr, input [`WORD_B
     
     //0 for data read, 1 for data write
    
-    //module regfile(input clk, input en, input load_store, input [2:0] sel_a, input [2:0] sel_b, input [15:0] reg_in, output reg [15:0] out_a, reg [15:0] out_b);
+    //module regfile(input clk, input en, input rst, input load_store, input [`REGS_BITS:0] sel_a, input [`REGS_BITS:0] sel_b, input [`REGS_BITS:0] sel_write, input [15:0] reg_in, output reg [15:0] out_a, output reg [15:0] out_b);
     //module alu(input clk, input en, input rst, input [15:0] reg_a, input [15:0] reg_b, output reg [15:0] out, input [2:0] op);
     //module branch(input [2:0] cond, input [15:0] op_a, input [15:0] op_b, output branch);
     //module pc(input clk, input en, input rst, input load_count, input [15:0] load, output reg [15:0] pc);
    
-    regfile r(.clk(clk), .en(en_regfile), .rst(rst_regfile), .load_store(load_store), .sel_a(sel_a), .sel_b(sel_b), .reg_in(reg_in), .out_a(out_a), .out_b(out_b));
+    regfile r(.clk(clk), .en(en_regfile), .rst(rst_regfile), .load_store(load_store), .sel_a(sel_a), .sel_b(sel_b), .reg_in(reg_in), .out_a(out_a), .out_b(out_b), .sel_write(sel_write));
     alu a(.clk(clk), .en(en_alu), .rst(rst_alu), .reg_a(out_a), .reg_b(out_b), .out(out), .op(op));
     branch b(.cond(cond), .op_a(out_a), .op_b(out_b), .branch(branch));
     pc p(.clk(clk), .en(en_pc), .rst(rst_pc), .load_count(load_count), .load(load), .pc(pc));
     
     /*
         Instruction decodings:
-        
-        16 15|14 13 12 11 10 9  8  7  6  5  4  3  2  1
+        16 15 14 13 12 11 10 9  8  7  6  5  4  3  2  1
         |       11-bit imm              |   opcode   |  jr x (jump relative to pc)
         |xxxx|  dest  |  srcB  |  srcA  |   opcode   |  add r0, r1, r2
         |xxxxxxxxxxxxx|  dest  |  srcA  |   opcode   |  mv r0, r1
@@ -93,18 +93,18 @@ module processor(input clk, input rst, output reg [15:0] ir_addr, input [`WORD_B
     
     always @(posedge clk) begin //instruction decode
         case (ir[5:0])
+            
+            //the way to solve units getting written by everything is to mux the shit out of everything... I think.
+            
             6'h0: begin   // nop
                 @(posedge clk); //track the opcode as it goes through the pipeline, instead of having an expensive buffer
-                @(posedge clk);
-                @(posedge clk); //three stages after this one
+                @(posedge clk); //two stages after this one
                 dbg_out[0] <= 1;
             end
             6'h1: begin   // mv reg, reg
                 //set up register load
                 @(posedge clk);
                 //pass register through ALU
-                @(posedge clk);
-                //pass register through memory write
                 @(posedge clk);
                 //write register
             end
@@ -119,11 +119,7 @@ module processor(input clk, input rst, output reg [15:0] ir_addr, input [`WORD_B
         //no control settings here
     end
     
-    always @(posedge clk) begin //memory rw
-        
-    end
-    
-    always @(posedge clk) begin //regfile rw
+    always @(posedge clk) begin //memory and regfile rw
         
     end
 endmodule
@@ -138,9 +134,10 @@ endmodule
         Branch prediction?
         More instructions - multiply/divide support?
         Sign extension
-        PC follow-through for jump instructions
+        Correct PC behavior when used in RMW operations
     To optimize
-        Instruction decoding - wasting 50% of word if no immediate is used... not a good use of space
+        Instruction decoding - wasting 50% of word if no immediate is used... not a good use of space:
+            align everything to word boundary, aligned regardless of immediate op usage
 */
 
 /*
@@ -164,17 +161,14 @@ endmodule
 /*
     Register file - sync. load/store.
 */
-module regfile(input clk, input en, input rst, input load_store, input [`REGS_BITS:0] sel_a, input [`REGS_BITS:0] sel_b, input [15:0] reg_in, output reg [15:0] out_a, output reg [15:0] out_b);
+module regfile(input clk, input en, input rst, input load_store, input [`REGS_BITS:0] sel_a, input [`REGS_BITS:0] sel_b, input [`REGS_BITS:0] sel_write, input [15:0] reg_in, output reg [15:0] out_a, output reg [15:0] out_b);
     reg [15:0] regfile [2:0];
     always @(posedge clk && en) begin
-        if (load_store) begin
-            out_a <= regfile[sel_a];
-            out_b <= regfile[sel_b];
-        end else begin
-            regfile[sel_a] <= reg_in;
-            out_a <= 16'h0000;
-            out_b <= 16'h0000;
+        if (!load_store) begin
+            regfile[sel_write] <= reg_in;
         end
+        out_a <= regfile[sel_a];
+        out_b <= regfile[sel_b];
     end
     
     always @(posedge rst) begin
