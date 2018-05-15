@@ -12,8 +12,11 @@
 //endmodule
 
 /*
-    Harvard architecture.
-    64K address space.
+    Cause a bubble by:
+	disabling register fetch and decode (hold old values)
+	flush ALU
+	Should work...
+
 */
 module processor(input clk, input rst, output reg [15:0] ir_addr, input [`WORD_BITS:0] ir_data, output reg [15:0] data_addr, input [15:0] data_data, input data_rw, output reg [15:0] dbg_out);
     
@@ -160,6 +163,10 @@ endmodule
 
 /*
     Register file - sync. load/store.
+    To change:
+	Make a read happen on negedge, write happen on posedge.
+	This resolves a structural hazard with the register file.
+	Do the same thing with the memory code.
 */
 module regfile(input clk, input en, input rst, input load_store, input [`REGS_BITS:0] sel_a, input [`REGS_BITS:0] sel_b, input [`REGS_BITS:0] sel_write, input [15:0] reg_in, output reg [15:0] out_a, output reg [15:0] out_b);
     reg [15:0] regfile [2:0];
