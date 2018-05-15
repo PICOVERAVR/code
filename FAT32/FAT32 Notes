@@ -1,0 +1,12 @@
+At MBR:
+	Verify boot signature
+	look for only one partition pls
+	recognize filesystem
+	assume 512 byte blocks, jmp to 512 * #_sectors_to_Volume
+
+At Volume header:
+	Verify boot signature
+	find sectors per cluster (4 in test case)
+	find number of reserved sectors (1 in test case)
+	find number of sectors per fat (254345344 in test case)
+	find address to root cluster (542397253 in test case)
