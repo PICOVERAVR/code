@@ -16,7 +16,6 @@
 	disabling register fetch and decode (hold old values)
 	flush ALU
 	Should work...
-
 */
 module processor(input clk, input rst, output reg [15:0] ir_addr, input [`WORD_BITS:0] ir_data, output reg [15:0] data_addr, input [15:0] data_data, input data_rw, output reg [15:0] dbg_out);
     
@@ -105,11 +104,13 @@ module processor(input clk, input rst, output reg [15:0] ir_addr, input [`WORD_B
                 dbg_out[0] <= 1;
             end
             6'h1: begin   // mv reg, reg
-                //set up register load
+                //set regfile to read
+		//set register to read from
                 @(posedge clk);
                 //pass register through ALU
                 @(posedge clk);
-                //write register
+		//set regfile to write
+		//mux in ALU output
             end
             6'h2: begin   // ld reg, $addr
                 //load register from address
@@ -174,9 +175,14 @@ module regfile(input clk, input en, input rst, input load_store, input [`REGS_BI
         if (!load_store) begin
             regfile[sel_write] <= reg_in;
         end
+    end
+    
+    //NOTE: this has not been tested
+    always @(negedge clk && en) begin
         out_a <= regfile[sel_a];
         out_b <= regfile[sel_b];
     end
+    
     
     always @(posedge rst) begin
         integer i;
@@ -191,7 +197,15 @@ endmodule
 */
 module alu(input clk, input en, input rst, input [15:0] reg_a, input [15:0] reg_b, output reg [15:0] out, input [2:0] op);
     always @(posedge clk && en) begin
-        out <= (op == 1) ? reg_a + reg_b : reg_a - reg_b;
+	case (op)
+		3'h0: out <= reg_a + reg_b;
+		3'h1: out <= reg_a - reg_b;
+		3'h2: out <= reg_a;
+		3'h3: out <= reg_a & reg_b;
+		3'h4: out <= reg_a | reg_b;
+		3'h5: out <= reg_a ^ reg_b;
+		3'h6: out <= ~reg_a;
+	endcase
     end
     
     always @(posedge rst) begin
