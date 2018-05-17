@@ -8,7 +8,8 @@ module main_testbench();
     reg[31:0] ir_data = 0;
     
     wire [15:0] data_addr;
-    reg [15:0] data_data = 0;
+    wire [15:0] data_out;
+    reg [15:0] data_in = 0;
     
     reg data_rw = 0;
     
@@ -19,19 +20,19 @@ module main_testbench();
     
     integer i;
     
-    //module processor(input clk, input rst, output reg [`WORD_BITS:0] ir_addr, input [`WORD_BITS:0] ir_data, output reg [15:0] data_addr, input [`WORD_BITS:0] data_data, input data_rw);
-    processor p(.clk(clk), .rst(rst), .ir_addr(ir_addr), .ir_data(ir_data), .data_addr(data_addr), .data_data(data_data), .data_rw(data_rw), .dbg_out(dbg_out));
+    //module processor(input clk, input rst, output reg [15:0] ir_addr, input [`WORD_BITS:0] ir_data, output reg [15:0] data_addr, input [15:0] data_in, output reg [15:0] data_out, output reg data_rw, output reg [15:0] dbg_out);
+    processor p(.clk(clk), .rst(rst), .ir_addr(ir_addr), .ir_data(ir_data), .data_addr(data_addr), .data_in(data_in), .data_out(data_out), .data_rw(data_rw), .dbg_out(dbg_out));
     
     always #(1) begin
         clk <= ~clk;
     end
     
-    always @(clk) begin //feed memory to the processor every clock cycle
+    always @(clk) begin //feed memory to the processor every clock cycle, memory is as fast as processor!
         ir_data <= instruction_mem[ir_addr];
         if (data_rw) begin
-            data_mem[data_addr] <= data_data;
+            data_mem[data_addr] <= data_out;
         end
-        data_data <= data_mem[data_addr];
+        data_in <= data_mem[data_addr];
     end
     
     /*
@@ -46,14 +47,14 @@ module main_testbench();
     
     initial begin
         rst <= 1;
-        
-        for (i = 0; i < 16; i = i + 1) begin //init instruction memory
-            instruction_mem[i] <= 0;
-            data_mem[i] <= 0;
+        for (i = 0; i < 128; i = i + 1) begin //init instruction memory
+            instruction_mem[i] <= 32'h0;
+            data_mem[i] <= 16'h0;
         end
         
-        instruction_mem[1] <= {16'hFFFF, 16'b000000000000_000_00010}; //ld r0, 0x????
-        instruction_mem[8] <= {16'hFFFF, 16'b000000000_001_000_00001}; //mv r1, r0
+        instruction_mem[1] <= {16'hFFFF, 16'b000000000000_000_00010}; //ld r0, 0x----
+        instruction_mem[5] <= {16'hFFFF, 16'b000000000_001_000_00001}; //mv r1, r0
+        instruction_mem[10] <= {16'hFFFF, 16'b000000000000_001_00011}; //st $1, r1
         
         @(posedge clk); //reset all internal registers
         rst <= 0;

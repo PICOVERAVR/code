@@ -17,7 +17,7 @@
 	flush ALU
 	Should work...
 */
-module processor(input clk, input rst, output reg [15:0] ir_addr, input [`WORD_BITS:0] ir_data, output reg [15:0] data_addr, input [15:0] data_data, input data_rw, output reg [15:0] dbg_out);
+module processor(input clk, input rst, output reg [15:0] ir_addr, input [`WORD_BITS:0] ir_data, output reg [15:0] data_addr, input [15:0] data_in, output reg [15:0] data_out, output reg data_rw, output reg [15:0] dbg_out);
     
     reg en_regfile = 0;
     reg en_alu = 0;
@@ -36,7 +36,7 @@ module processor(input clk, input rst, output reg [15:0] ir_addr, input [`WORD_B
     wire [15:0] out_b;
     
     wire [15:0] out;
-    reg [2:0] op = 1;
+    reg [2:0] op = 2;
     
     reg [2:0] cond = 0;
     wire branch;
@@ -80,23 +80,32 @@ module processor(input clk, input rst, output reg [15:0] ir_addr, input [`WORD_B
         
         load_count <= 1;
         en_pc <= 1;
+        en_regfile <= 1;
+        en_alu <= 1;
         
         data_addr <= 0;
+        data_out <= 0;
         
         dbg_out <= 0;
         
         //should cycle clock a bunch of times to flush out pipeline stages, at least 5 times
     end
     
+    always @(clk) begin
+        //$monitor("%h", ir_data);
+        
+    end
+    
     always @(posedge clk) begin //instruction fetch
         ir_addr <= pc;
+        dbg_out <= ir_data[15:0];
         ir <= ir_data; 
     end
     
     always @(posedge clk) begin //instruction decode
+        //dbg_out <= ir[15:0];
         case (ir[4:0])
             
-            //the way to solve units getting written by everything is to mux the shit out of everything... I think.
             
             6'h0: begin   // nop
                 //register/memory read stage
@@ -104,6 +113,7 @@ module processor(input clk, input rst, output reg [15:0] ir_addr, input [`WORD_B
                 //ALU stage
                 @(posedge clk);
                 //register/memory write stage
+                
             end
             6'h1: begin   // mv reg, reg
                 load_store <= `REGFILE_READ;
@@ -114,16 +124,30 @@ module processor(input clk, input rst, output reg [15:0] ir_addr, input [`WORD_B
                 load_store <= `REGFILE_LOAD;
                 sel_write <= ir[10:8];
                 reg_in <= out;
-                
+                @(posedge clk);
+                @(posedge clk);
             end
             6'h2: begin   // ld reg, $addr
+                dbg_out <= 1;
                 @(posedge clk);
+                dbg_out <= 2;
                 @(posedge clk);
+                dbg_out <= 3;
                 load_store <= `REGFILE_LOAD;
                 sel_write <= ir[7:5];
                 reg_in <= 16'hFFAF;
+                @(posedge clk);
+                @(posedge clk);
             end
             6'h3: begin   // st $addr, reg
+                load_store <= `REGFILE_READ;
+                sel_a <= ir[7:5];
+                @(posedge clk);
+                op <= 2;
+                @(posedge clk);
+                data_addr <= 1;
+                data_out <= out;
+                data_rw <= 1; //1: write, 0: read
                 @(posedge clk);
                 @(posedge clk);
                 
@@ -137,6 +161,13 @@ module processor(input clk, input rst, output reg [15:0] ir_addr, input [`WORD_B
     
     always @(posedge clk) begin //memory and regfile rw
         
+    end
+    
+    always @(clk) begin
+        $monitor("data_out is %h", data_addr);
+        $monitor("ir is %h", ir[4:0]);
+        //UPDATE: registers are being written, but nothing is coming out of the processor?
+        //never reaching a point?
     end
 endmodule
 
@@ -195,6 +226,10 @@ module regfile(input clk, input en, input rst, input load_store, input [`REGS_BI
         end
     end
     
+    always @(clk) begin
+        $monitor("regfile[0] is %h", regfile[0]);
+        
+    end
     
     always @(posedge rst) begin
         integer i;

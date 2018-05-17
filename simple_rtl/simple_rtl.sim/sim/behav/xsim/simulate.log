@@ -1,2 +1,7 @@
 Vivado Simulator 2017.4
 Time resolution is 1 ps
+regfile[0] is 0000
+data_out is xxxx
+ir is 00
+data_out is 0000
+ir is xx
