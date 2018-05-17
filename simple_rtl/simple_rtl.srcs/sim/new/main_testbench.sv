@@ -34,6 +34,16 @@ module main_testbench();
         data_data <= data_mem[data_addr];
     end
     
+    /*
+        Instruction decodings:
+        15 14 13 12 11 10 9  8  7  6  5  4  3  2  1  0
+        |       11-bit imm              |   opcode   |  jr x (jump relative to pc)
+        |xxxx|  dest  |  srcB  |  srcA  |   opcode   |  add r0, r1, r2
+        |xxxxxxxxxxxxx|  dest  |  srcA  |   opcode   |  mv r0, r1
+        |xxxxxxxxxxxxxxxxxxxxxxx  srcA  |   opcode   |  push r0
+       
+    */
+    
     initial begin
         rst <= 1;
         
@@ -41,6 +51,9 @@ module main_testbench();
             instruction_mem[i] <= 0;
             data_mem[i] <= 0;
         end
+        
+        instruction_mem[1] <= {16'hFFFF, 16'b000000000000_000_00010}; //ld r0, 0x????
+        instruction_mem[8] <= {16'hFFFF, 16'b000000000_001_000_00001}; //mv r1, r0
         
         @(posedge clk); //reset all internal registers
         rst <= 0;
