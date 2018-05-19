@@ -91,67 +91,28 @@ module processor(input clk, input rst, output reg [15:0] ir_addr, input [`WORD_B
         //should cycle clock a bunch of times to flush out pipeline stages, at least 5 times
     end
     
-    always @(clk) begin
-        //$monitor("%h", ir_data);
-        
-    end
-    
     always @(posedge clk) begin //instruction fetch
         ir_addr <= pc;
-        dbg_out <= ir_data[15:0];
         ir <= ir_data; 
     end
     
+    
+    /*
+        Most of the below modules will have to be re-written to handle stalls elegantly
+        The decoder needs to set global state, and other modules should pull from that state
+        use input wire instead of input
+        
+        
+        
+    */
+    
     always @(posedge clk) begin //instruction decode
-        //dbg_out <= ir[15:0];
+        $monitor("%d", ir[4:0]);
         case (ir[4:0])
             
             
-            6'h0: begin   // nop
-                //register/memory read stage
-                @(posedge clk);
-                //ALU stage
-                @(posedge clk);
-                //register/memory write stage
-                
-            end
-            6'h1: begin   // mv reg, reg
-                load_store <= `REGFILE_READ;
-		        sel_a <= ir[7:5];
-                @(posedge clk);
-                op <= 2; //pass A through
-                @(posedge clk);
-                load_store <= `REGFILE_LOAD;
-                sel_write <= ir[10:8];
-                reg_in <= out;
-                @(posedge clk);
-                @(posedge clk);
-            end
-            6'h2: begin   // ld reg, $addr
-                dbg_out <= 1;
-                @(posedge clk);
-                dbg_out <= 2;
-                @(posedge clk);
-                dbg_out <= 3;
-                load_store <= `REGFILE_LOAD;
-                sel_write <= ir[7:5];
-                reg_in <= 16'hFFAF;
-                @(posedge clk);
-                @(posedge clk);
-            end
-            6'h3: begin   // st $addr, reg
-                load_store <= `REGFILE_READ;
-                sel_a <= ir[7:5];
-                @(posedge clk);
-                op <= 2;
-                @(posedge clk);
-                data_addr <= 1;
-                data_out <= out;
-                data_rw <= 1; //1: write, 0: read
-                @(posedge clk);
-                @(posedge clk);
-                
-            end
+            
+            
         endcase
     end
     
@@ -163,11 +124,9 @@ module processor(input clk, input rst, output reg [15:0] ir_addr, input [`WORD_B
         
     end
     
-    always @(clk) begin
-        $monitor("data_out is %h", data_addr);
-        $monitor("ir is %h", ir[4:0]);
-        //UPDATE: registers are being written, but nothing is coming out of the processor?
-        //never reaching a point?
+    always @(clk) begin //for debugging
+//        $monitor("data_out is %h", data_addr);
+//        $monitor("data_addr is %h", data_addr);
     end
 endmodule
 
@@ -227,8 +186,7 @@ module regfile(input clk, input en, input rst, input load_store, input [`REGS_BI
     end
     
     always @(clk) begin
-        $monitor("regfile[0] is %h", regfile[0]);
-        
+        $monitor("regfile is %h %h %h %h", regfile[0], regfile[1], regfile[2], regfile[3]);
     end
     
     always @(posedge rst) begin

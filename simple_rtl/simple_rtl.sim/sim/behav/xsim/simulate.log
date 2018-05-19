@@ -1,7 +1,10 @@
 Vivado Simulator 2017.4
 Time resolution is 1 ps
-regfile[0] is 0000
-data_out is xxxx
-ir is 00
-data_out is 0000
-ir is xx
+regfile is 0000 0000 0000 xxxx
+ 0
+ 2
+ 0
+regfile is ffaf 0000 0000 xxxx
+ 2
+ 0
+ x

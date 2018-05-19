@@ -13,12 +13,12 @@ module main_testbench();
     
     reg data_rw = 0;
     
-    reg [31:0] instruction_mem [15:0]; //toy amount of memory for testing
-    reg [15:0] data_mem [15:0];
+    reg [31:0] instruction_mem [63:0]; //toy amount of memory for testing
+    reg [15:0] data_mem [63:0];
     
     wire [15:0] dbg_out;
     
-    integer i;
+    integer init;
     
     //module processor(input clk, input rst, output reg [15:0] ir_addr, input [`WORD_BITS:0] ir_data, output reg [15:0] data_addr, input [15:0] data_in, output reg [15:0] data_out, output reg data_rw, output reg [15:0] dbg_out);
     processor p(.clk(clk), .rst(rst), .ir_addr(ir_addr), .ir_data(ir_data), .data_addr(data_addr), .data_in(data_in), .data_out(data_out), .data_rw(data_rw), .dbg_out(dbg_out));
@@ -47,14 +47,15 @@ module main_testbench();
     
     initial begin
         rst <= 1;
-        for (i = 0; i < 128; i = i + 1) begin //init instruction memory
-            instruction_mem[i] <= 32'h0;
-            data_mem[i] <= 16'h0;
+        for (init = 0; init < 64; init = init + 1) begin //init instruction memory
+            instruction_mem[init] <= 32'h0;
+            data_mem[init] <= 16'h0;
         end
         
         instruction_mem[1] <= {16'hFFFF, 16'b000000000000_000_00010}; //ld r0, 0x----
-        instruction_mem[5] <= {16'hFFFF, 16'b000000000_001_000_00001}; //mv r1, r0
-        instruction_mem[10] <= {16'hFFFF, 16'b000000000000_001_00011}; //st $1, r1
+        instruction_mem[9] <= {16'hFFFF, 16'b000000000000_001_00010}; //ld r1, 0x----
+        instruction_mem[17] <= {16'hFFFF, 16'b000000000_001_000_00001}; //mv r1, r0
+        instruction_mem[25] <= {16'hFFFF, 16'b000000000000_001_00011}; //st $1, r1
         
         @(posedge clk); //reset all internal registers
         rst <= 0;
