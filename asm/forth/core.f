@@ -715,6 +715,335 @@
 
  ( C strings are a thing! )
 
+( WARNING - this code is copy pasted.  Does not work on a 64-bit system. )
+
+: Z" IMMEDIATE
+	STATE @ IF	( compiling? )
+		' LITSTRING ,	( compile LITSTRING )
+		HERE @		( save the address of the length word on the stack )
+		0 ,		( dummy length - we don't know what it is yet )
+		BEGIN
+			KEY 		( get next character of the string )
+			DUP '"' <>
+		WHILE
+			HERE @ C!	( store the character in the compiled image )
+			1 HERE +!	( increment HERE pointer by 1 byte )
+		REPEAT
+		0 HERE @ C!	( add the ASCII NUL byte )
+		1 HERE +!
+		DROP		( drop the double quote character at the end )
+		DUP		( get the saved address of the length word )
+		HERE @ SWAP -	( calculate the length )
+		8-		( subtract 4 (because we measured from the start of the length word) )
+		SWAP !		( and back-fill the length location )
+		ALIGN		( round up to next multiple of 4 bytes for the remaining code )
+		' DROP ,	( compile DROP (to drop the length) )
+	ELSE		( immediate mode )
+		HERE @		( get the start address of the temporary space )
+		BEGIN
+			KEY
+			DUP '"' <>
+		WHILE
+			OVER C!		( save next character )
+			1+		( increment address )
+		REPEAT
+		DROP		( drop the final " character )
+		0 SWAP C!	( store final ASCII NUL )
+		HERE @		( push the start address )
+	THEN
+;
+
+: STRLEN 	( str -- len )
+	DUP		( save start address )
+	BEGIN
+		DUP C@ 0<>	( zero byte found? )
+	WHILE
+		1+
+	REPEAT
+
+	SWAP -		( calculate the length )
+;
+
+: CSTRING	( addr len -- c-addr )
+	SWAP OVER	( len saddr len )
+	HERE @ SWAP	( len saddr daddr len )
+	CMOVE		( len )
+
+	HERE @ +	( daddr+len )
+	0 SWAP C!	( store terminating NUL char )
+
+	HERE @ 		( push start address )
+;
+
+: ARGC
+	S0 @ @
+;
+
+: ARGV ( n -- str u )
+	1+ CELLS S0 @ +	( get the address of argv[n] entry )
+	@		( get the address of the string )
+	DUP STRLEN	( and get its length / turn it into a FORTH string )
+;
+
+: ENVIRON	( -- addr )
+	ARGC		( number of command line parameters on the stack to skip )
+	2 +		( skip command line count and NULL pointer after the command line args )
+	CELLS		( convert to an offset )
+	S0 @ +		( add to base stack address )
+;
 
 
-." KForth, by Kyle Neil." CR
+: BYE		( -- )
+	0		( return code (0) )
+	SYS_EXIT	( system call number )
+	SYSCALL1
+;
+
+: GET-BRK	( -- brkpoint )
+	0 SYS_BRK SYSCALL1	( call brk(0) )
+;
+
+: UNUSED	( -- n )
+	GET-BRK		( get end of data segment according to the kernel )
+	HERE @		( get current position in data segment )
+	-
+	8 /		( returns number of cells )
+;
+
+(
+	MORECORE increases the data segment by the specified number of (4 byte) cells.
+
+	NB. The number of cells requested should normally be a multiple of 1024.  The
+	reason is that Linux can't extend the data segment by less than a single page
+	(4096 bytes or 1024 cells).
+
+	This FORTH doesn't automatically increase the size of the data segment "on demand"
+	(ie. when , (COMMA), ALLOT, CREATE, and so on are used).  Instead the programmer
+	needs to be aware of how much space a large allocation will take, check UNUSED, and
+	call MORECORE if necessary.  A simple programming exercise is to change the
+	implementation of the data segment so that MORECORE is called automatically if
+	the program needs more memory.
+)
+: BRK		( brkpoint -- )
+	SYS_BRK SYSCALL1
+;
+
+: MORECORE	( cells -- )
+	CELLS GET-BRK + BRK
+;
+
+(
+	Standard FORTH provides some simple file access primitives which we model on
+	top of Linux syscalls.
+
+	The main complication is converting FORTH strings (address & length) into C
+	strings for the Linux kernel.
+
+	Notice there is no buffering in this implementation.
+)
+
+: R/O ( -- fam ) O_RDONLY ;
+: R/W ( -- fam ) O_RDWR ;
+
+: OPEN-FILE	( addr u fam -- fd 0 (if successful) | c-addr u fam -- fd errno (if there was an error) )
+	-ROT		( fam addr u )
+	CSTRING		( fam cstring )
+	SYS_OPEN SYSCALL2 ( open (filename, flags) )
+	DUP		( fd fd )
+	DUP 0< IF	( errno? )
+		NEGATE		( fd errno )
+	ELSE
+		DROP 0		( fd 0 )
+	THEN
+;
+
+: CREATE-FILE	( addr u fam -- fd 0 (if successful) | c-addr u fam -- fd errno (if there was an error) )
+	O_CREAT OR
+	O_TRUNC OR
+	-ROT		( fam addr u )
+	CSTRING		( fam cstring )
+	420 -ROT	( 0644 fam cstring )
+	SYS_OPEN SYSCALL3 ( open (filename, flags|O_TRUNC|O_CREAT, 0644) )
+	DUP		( fd fd )
+	DUP 0< IF	( errno? )
+		NEGATE		( fd errno )
+	ELSE
+		DROP 0		( fd 0 )
+	THEN
+;
+
+: CLOSE-FILE	( fd -- 0 (if successful) | fd -- errno (if there was an error) )
+	SYS_CLOSE SYSCALL1
+	NEGATE
+;
+
+: READ-FILE	( addr u fd -- u2 0 (if successful) | addr u fd -- 0 0 (if EOF) | addr u fd -- u2 errno (if error) )
+	>R SWAP R>	( u addr fd )
+	SYS_READ SYSCALL3
+
+	DUP		( u2 u2 )
+	DUP 0< IF	( errno? )
+		NEGATE		( u2 errno )
+	ELSE
+		DROP 0		( u2 0 )
+	THEN
+;
+
+(
+	PERROR prints a message for an errno, similar to C's perror(3) but we don't have the extensive
+	list of strerror strings available, so all we can do is print the errno.
+)
+: PERROR	( errno addr u -- )
+	TELL
+	':' EMIT SPACE
+	." ERRNO="
+	. CR
+;
+
+(
+	ASSEMBLER CODE ----------------------------------------------------------------------
+
+	This is just the outline of a simple assembler, allowing you to write FORTH primitives
+	in assembly language.
+
+	Assembly primitives begin ': NAME' in the normal way, but are ended with ;CODE.  ;CODE
+	updates the header so that the codeword isn't DOCOL, but points instead to the assembled
+	code (in the DFA part of the word).
+
+	We provide a convenience macro NEXT (you guessed what it does).  However you don't need to
+	use it because ;CODE will put a NEXT at the end of your word.
+
+	The rest consists of some immediate words which expand into machine code appended to the
+	definition of the word.  Only a very tiny part of the i386 assembly space is covered, just
+	enough to write a few assembler primitives below.
+)
+
+HEX
+
+( Equivalent to the NEXT macro )
+: NEXT IMMEDIATE AD C, FF C, 20 C, ;
+
+: ;CODE IMMEDIATE
+	[COMPILE] NEXT		( end the word with NEXT macro )
+	ALIGN			( machine code is assembled in bytes so isn't necessarily aligned at the end )
+	LATEST @ DUP
+	HIDDEN			( unhide the word )
+	DUP >DFA SWAP >CFA !	( change the codeword to point to the data area )
+	[COMPILE] [		( go back to immediate mode )
+;
+
+( The i386 registers )
+: EAX IMMEDIATE 0 ;
+: ECX IMMEDIATE 1 ;
+: EDX IMMEDIATE 2 ;
+: EBX IMMEDIATE 3 ;
+: ESP IMMEDIATE 4 ;
+: EBP IMMEDIATE 5 ;
+: ESI IMMEDIATE 6 ;
+: EDI IMMEDIATE 7 ;
+
+( i386 stack instructions )
+: PUSH IMMEDIATE 50 + C, ;
+: POP IMMEDIATE 58 + C, ;
+
+( RDTSC instruction )
+: RDTSC IMMEDIATE 0F C, 31 C, ;
+
+DECIMAL
+
+(
+	RDTSC is an assembler primitive which reads the Pentium timestamp counter (a very fine-
+	grained counter which counts processor clock cycles).  Because the TSC is 64 bits wide
+	we have to push it onto the stack in two slots.
+)
+: RDTSC		( -- lsb msb )
+	RDTSC		( writes the result in %edx:%eax )
+	EAX PUSH	( push lsb )
+	EDX PUSH	( push msb )
+;CODE
+
+(
+	INLINE can be used to inline an assembler primitive into the current (assembler)
+	word.
+
+	For example:
+
+		: 2DROP INLINE DROP INLINE DROP ;CODE
+
+	will build an efficient assembler word 2DROP which contains the inline assembly code
+	for DROP followed by DROP (eg. two 'pop %eax' instructions in this case).
+
+	Another example.  Consider this ordinary FORTH definition:
+
+		: C@++ ( addr -- addr+1 byte ) DUP 1+ SWAP C@ ;
+
+	(it is equivalent to the C operation '*p++' where p is a pointer to char).  If we
+	notice that all of the words used to define C@++ are in fact assembler primitives,
+	then we can write a faster (but equivalent) definition like this:
+
+		: C@++ INLINE DUP INLINE 1+ INLINE SWAP INLINE C@ ;CODE
+
+	One interesting point to note is that this "concatenative" style of programming
+	allows you to write assembler words portably.  The above definition would work
+	for any CPU architecture.
+
+	There are several conditions that must be met for INLINE to be used successfully:
+
+	(1) You must be currently defining an assembler word (ie. : ... ;CODE).
+
+	(2) The word that you are inlining must be known to be an assembler word.  If you try
+	to inline a FORTH word, you'll get an error message.
+
+	(3) The assembler primitive must be position-independent code and must end with a
+	single NEXT macro.
+
+	Exercises for the reader: (a) Generalise INLINE so that it can inline FORTH words when
+	building FORTH words. (b) Further generalise INLINE so that it does something sensible
+	when you try to inline FORTH into assembler and vice versa.
+
+	The implementation of INLINE is pretty simple.  We find the word in the dictionary,
+	check it's an assembler word, then copy it into the current definition, byte by byte,
+	until we reach the NEXT macro (which is not copied).
+)
+HEX
+: =NEXT		( addr -- next? )
+	   DUP C@ AD <> IF DROP FALSE EXIT THEN
+	1+ DUP C@ FF <> IF DROP FALSE EXIT THEN
+	1+     C@ 20 <> IF      FALSE EXIT THEN
+	TRUE
+;
+DECIMAL
+
+( (INLINE) is the lowlevel inline function. )
+: (INLINE)	( cfa -- )
+	@			( remember codeword points to the code )
+	BEGIN			( copy bytes until we hit NEXT macro )
+		DUP =NEXT NOT
+	WHILE
+		DUP C@ C,
+		1+
+	REPEAT
+	DROP
+;
+
+: INLINE IMMEDIATE
+	WORD FIND		( find the word in the dictionary )
+	>CFA			( codeword )
+
+	DUP @ DOCOL = IF	( check codeword <> DOCOL (ie. not a FORTH word) )
+		." Cannot INLINE FORTH words" CR ABORT
+	THEN
+
+	(INLINE)
+;
+
+HIDE =NEXT
+
+: WELCOME
+	." Kforth, version " VERSION . CR
+	UNUSED . ." cells remaining." CR
+	." ok "
+;
+
+WELCOME
+HIDE WELCOME
