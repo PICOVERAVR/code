@@ -17,7 +17,7 @@
 	flush ALU
 	Should work...
 */
-module processor(input clk, input rst, output reg [15:0] ir_addr, input [`WORD_BITS:0] ir_data, output reg [15:0] data_addr, input [15:0] data_data, input data_rw, output reg [15:0] dbg_out);
+module processor(input clk, input rst, output reg [15:0] ir_addr, input [`WORD_BITS:0] ir_data, output reg [15:0] data_addr, input [15:0] data_in, output reg [15:0] data_out, output reg data_rw, output reg [15:0] dbg_out);
     
     reg en_regfile = 0;
     reg en_alu = 0;
@@ -36,7 +36,7 @@ module processor(input clk, input rst, output reg [15:0] ir_addr, input [`WORD_B
     wire [15:0] out_b;
     
     wire [15:0] out;
-    reg [2:0] op = 1;
+    reg [2:0] op = 2;
     
     reg [2:0] cond = 0;
     wire branch;
@@ -61,7 +61,7 @@ module processor(input clk, input rst, output reg [15:0] ir_addr, input [`WORD_B
     
     /*
         Instruction decodings:
-        16 15 14 13 12 11 10 9  8  7  6  5  4  3  2  1
+        15 14 13 12 11 10 9  8  7  6  5  4  3  2  1  0
         |       11-bit imm              |   opcode   |  jr x (jump relative to pc)
         |xxxx|  dest  |  srcB  |  srcA  |   opcode   |  add r0, r1, r2
         |xxxxxxxxxxxxx|  dest  |  srcA  |   opcode   |  mv r0, r1
@@ -80,8 +80,11 @@ module processor(input clk, input rst, output reg [15:0] ir_addr, input [`WORD_B
         
         load_count <= 1;
         en_pc <= 1;
+        en_regfile <= 1;
+        en_alu <= 1;
         
         data_addr <= 0;
+        data_out <= 0;
         
         dbg_out <= 0;
         
@@ -93,29 +96,23 @@ module processor(input clk, input rst, output reg [15:0] ir_addr, input [`WORD_B
         ir <= ir_data; 
     end
     
+    
+    /*
+        Most of the below modules will have to be re-written to handle stalls elegantly
+        The decoder needs to set global state, and other modules should pull from that state
+        use input wire instead of input
+        
+        
+        
+    */
+    
     always @(posedge clk) begin //instruction decode
-        case (ir[5:0])
+        $monitor("%d", ir[4:0]);
+        case (ir[4:0])
             
-            //the way to solve units getting written by everything is to mux the shit out of everything... I think.
             
-            6'h0: begin   // nop
-                @(posedge clk); //track the opcode as it goes through the pipeline, instead of having an expensive buffer
-                @(posedge clk); //two stages after this one
-                dbg_out[0] <= 1;
-            end
-            6'h1: begin   // mv reg, reg
-                //set regfile to read
-		//set register to read from
-                @(posedge clk);
-                //pass register through ALU
-                @(posedge clk);
-		//set regfile to write
-		//mux in ALU output
-            end
-            6'h2: begin   // ld reg, $addr
-                //load register from address
-                @(posedge clk);
-            end
+            
+            
         endcase
     end
     
@@ -125,6 +122,11 @@ module processor(input clk, input rst, output reg [15:0] ir_addr, input [`WORD_B
     
     always @(posedge clk) begin //memory and regfile rw
         
+    end
+    
+    always @(clk) begin //for debugging
+//        $monitor("data_out is %h", data_addr);
+//        $monitor("data_addr is %h", data_addr);
     end
 endmodule
 
@@ -171,18 +173,21 @@ endmodule
 */
 module regfile(input clk, input en, input rst, input load_store, input [`REGS_BITS:0] sel_a, input [`REGS_BITS:0] sel_b, input [`REGS_BITS:0] sel_write, input [15:0] reg_in, output reg [15:0] out_a, output reg [15:0] out_b);
     reg [15:0] regfile [2:0];
+    
     always @(posedge clk && en) begin
+            out_a <= regfile[sel_a];
+            out_b <= regfile[sel_b];
+    end
+    
+    always @(negedge clk && en) begin
         if (!load_store) begin
             regfile[sel_write] <= reg_in;
         end
     end
     
-    //NOTE: this has not been tested
-    always @(negedge clk && en) begin
-        out_a <= regfile[sel_a];
-        out_b <= regfile[sel_b];
+    always @(clk) begin
+        $monitor("regfile is %h %h %h %h", regfile[0], regfile[1], regfile[2], regfile[3]);
     end
-    
     
     always @(posedge rst) begin
         integer i;
