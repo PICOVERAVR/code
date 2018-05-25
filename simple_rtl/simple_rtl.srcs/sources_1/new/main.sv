@@ -47,7 +47,51 @@ module processor(input clk, input rst, output reg [15:0] ir_addr, input [`WORD_B
     
     reg [`WORD_BITS:0] ir = 0;
     
-    //0 for data read, 1 for data write
+    reg [31:0] control_register = 0;
+/*
+	[0] - en_regfile
+	[1] - en_alu
+	[2] - en_pc
+	[3] - rst_alu
+	[4] - rst_pc
+	[5] - rst_regfile
+	[6] - load_store
+	[7:9] - sel_a
+	[10:12] - sel_b
+	[13:15] - sel_write
+	reg_in
+	[1] - en_alu
+	[2] - en_pc
+	[3] - rst_alu
+	[4] - rst_pc
+	[5] - rst_regfile
+	[6] - load_store
+	[7:9] - sel_a
+	[10:12] - sel_b
+	[13:15] - sel_write
+	reg_i	[1] - en_alu
+	[2] - en_pc
+	[3] - rst_alu
+	[4] - rst_pc
+	[5] - rst_regfile
+	[6] - load_store
+	[7:9] - sel_a
+	[10:12] - sel_b
+	[13:15] - sel_write
+	reg_inn
+
+
+
+
+*/    
+
+
+
+
+
+
+
+//0 for data read, 1 for data write
    
     //module regfile(input clk, input en, input rst, input load_store, input [`REGS_BITS:0] sel_a, input [`REGS_BITS:0] sel_b, input [`REGS_BITS:0] sel_write, input [15:0] reg_in, output reg [15:0] out_a, output reg [15:0] out_b);
     //module alu(input clk, input en, input rst, input [15:0] reg_a, input [15:0] reg_b, output reg [15:0] out, input [2:0] op);
