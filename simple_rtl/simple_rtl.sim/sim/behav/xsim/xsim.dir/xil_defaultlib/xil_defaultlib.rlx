@@ -3,6 +3,12 @@
 Jan 30 2018
 15:48:17
 C:/Users/kyle/Desktop/dev/main/simple_rtl/simple_rtl.sim/sim/behav/xsim/glbl.v,1526344592,verilog,,,,glbl,,xil_defaultlib,,,,,,
-C:/Users/kyle/Desktop/dev/main/simple_rtl/simple_rtl.srcs/sim/new/main_testbench.sv,1526604470,systemVerilog,,C:/Users/kyle/Desktop/dev/main/simple_rtl/simple_rtl.srcs/sources_1/new/main.sv,,main_testbench,,xil_defaultlib,C:/Xilinx/Vivado/2017.4/data/xilinx_vip/include,,,,,
+C:/Users/kyle/Desktop/dev/main/simple_rtl/simple_rtl.srcs/sim/new/main_testbench.sv,1527312032,systemVerilog,,C:/Users/kyle/Desktop/dev/main/simple_rtl/simple_rtl.srcs/sources_1/new/main.sv,,main_testbench,,xil_defaultlib,C:/Xilinx/Vivado/2017.4/data/xilinx_vip/include,,,,,
 C:/Users/kyle/Desktop/dev/main/simple_rtl/simple_rtl.srcs/sim/new/notes.sv,1526531116,systemVerilog,,,,notes,,xil_defaultlib,C:/Xilinx/Vivado/2017.4/data/xilinx_vip/include,,,,,
-C:/Users/kyle/Desktop/dev/main/simple_rtl/simple_rtl.srcs/sources_1/new/main.sv,1526604424,systemVerilog,,C:/Users/kyle/Desktop/dev/main/simple_rtl/simple_rtl.srcs/sim/new/notes.sv,,alu;branch;pc;processor;regfile,,xil_defaultlib,C:/Xilinx/Vivado/2017.4/data/xilinx_vip/include,,,,,
+C:/Users/kyle/Desktop/dev/main/simple_rtl/simple_rtl.srcs/sources_1/new/alu.v,1527296609,verilog,,C:/Users/kyle/Desktop/dev/main/simple_rtl/simple_rtl.srcs/sources_1/new/memory.v,,alu,,xil_defaultlib,C:/Xilinx/Vivado/2017.4/data/xilinx_vip/include,,,,,
+C:/Users/kyle/Desktop/dev/main/simple_rtl/simple_rtl.srcs/sources_1/new/branch.v,1527296630,verilog,,C:/Users/kyle/Desktop/dev/main/simple_rtl/simple_rtl.srcs/sources_1/new/pc.v,,branch,,xil_defaultlib,C:/Xilinx/Vivado/2017.4/data/xilinx_vip/include,,,,,
+C:/Users/kyle/Desktop/dev/main/simple_rtl/simple_rtl.srcs/sources_1/new/fetch.v,1527311974,verilog,,C:/Users/kyle/Desktop/dev/main/simple_rtl/simple_rtl.srcs/sources_1/new/regfile.v,,fetch,,xil_defaultlib,C:/Xilinx/Vivado/2017.4/data/xilinx_vip/include,,,,,
+C:/Users/kyle/Desktop/dev/main/simple_rtl/simple_rtl.srcs/sources_1/new/main.sv,1527297530,systemVerilog,,C:/Users/kyle/Desktop/dev/main/simple_rtl/simple_rtl.srcs/sim/new/notes.sv,,processor,,xil_defaultlib,C:/Xilinx/Vivado/2017.4/data/xilinx_vip/include,,,,,
+C:/Users/kyle/Desktop/dev/main/simple_rtl/simple_rtl.srcs/sources_1/new/memory.v,1527311453,verilog,,C:/Users/kyle/Desktop/dev/main/simple_rtl/simple_rtl.srcs/sources_1/new/branch.v,,memory,,xil_defaultlib,C:/Xilinx/Vivado/2017.4/data/xilinx_vip/include,,,,,
+C:/Users/kyle/Desktop/dev/main/simple_rtl/simple_rtl.srcs/sources_1/new/pc.v,1527298777,verilog,,,,pc,,xil_defaultlib,C:/Xilinx/Vivado/2017.4/data/xilinx_vip/include,,,,,
+C:/Users/kyle/Desktop/dev/main/simple_rtl/simple_rtl.srcs/sources_1/new/regfile.v,1527296782,verilog,,C:/Users/kyle/Desktop/dev/main/simple_rtl/simple_rtl.srcs/sources_1/new/alu.v,,regfile,,xil_defaultlib,C:/Xilinx/Vivado/2017.4/data/xilinx_vip/include,,,,,
