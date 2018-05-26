@@ -1,0 +1,25 @@
+# minimal dockerfile for a minimal distro
+# not maintained, just for fun
+# small-size version of ubuntu
+
+FROM alpine:latest
+
+WORKDIR /root
+
+RUN apk add --no-cache bash gcc g++ gdb make vim git python3 man
+
+SHELL ["/bin/bash", "-c"]
+
+EXPOSE 80
+EXPOSE 22
+
+#RUN git config --global user.email "kyle@johnneil.net"
+#RUN git config --global user.name "Kyle Neil"
+
+#RUN git config --global alias.st status
+#RUN git config --global alias.last 'log -1 HEAD --oneline'
+#RUN git config --global alias.hist 'log -15 --pretty=format:"> %h @ %ar, \"%s\"" --graph --decorate'
+
+# docker build -f C:\Users\kyle\Desktop\docker\Dockerfile_Alpine -t alpine_base .
+# docker run -it --rm -v C:\Users\kyle\Desktop\dev\:/root/ -v C:\Users\kyle\:/mnt --privileged --name alpine_base alpine_base bash
+# docker system prune
