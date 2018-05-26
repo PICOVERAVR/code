@@ -715,6 +715,3 @@
 
  ( C strings are a thing! )
 
-
-
-." KForth, by Kyle Neil." CR
