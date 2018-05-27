@@ -11,8 +11,10 @@ int main(void) {
     
     asm("nop");
     tft_str(0, 0, "TFT test screen");
+    char buf_x[15];
     
     for(;;) {
+        //menu items here idk
         
         
         
