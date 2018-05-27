@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project>
+  <executable name="dist/default/production/PIC8Proj_Assist_LM.X.production.hex">
+    <memory name="program">
+      <units>words</units>
+      <length>2048</length>
+      <used>371</used>
+      <free>1677</free>
+    </memory>
+    <memory name="data">
+      <units>bytes</units>
+      <length>256</length>
+      <used>27</used>
+      <free>229</free>
+    </memory>
+  </executable>
+</project>

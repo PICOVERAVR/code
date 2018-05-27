@@ -1,0 +1,380 @@
+[p LITE_MODE AUTOSTATIC LFSROK EMI_WORD ]
+[d version 1.1 ]
+[d edition pro ]
+[d chip 18F4685 ]
+[d frameptr 4065 ]
+"62 /Applications/microchip/xc8/v1.43/sources/common/float.c
+[v ___ftpack __ftpack `(f  1 e 3 0 ]
+"86 /Applications/microchip/xc8/v1.43/sources/common/ftadd.c
+[v ___ftadd __ftadd `(f  1 e 3 0 ]
+"54 /Applications/microchip/xc8/v1.43/sources/common/ftdiv.c
+[v ___ftdiv __ftdiv `(f  1 e 3 0 ]
+"62 /Applications/microchip/xc8/v1.43/sources/common/ftmul.c
+[v ___ftmul __ftmul `(f  1 e 3 0 ]
+"20 /Applications/microchip/xc8/v1.43/sources/common/ftsub.c
+[v ___ftsub __ftsub `(f  1 e 3 0 ]
+"4 /Applications/microchip/xc8/v1.43/sources/common/itoa.c
+[v _itoa itoa `(*.39uc  1 e 2 0 ]
+"17
+[v _utoa utoa `(*.39uc  1 e 2 0 ]
+"8 /Applications/microchip/xc8/v1.43/sources/common/lwdiv.c
+[v ___lwdiv __lwdiv `(ui  1 e 2 0 ]
+"8 /Applications/microchip/xc8/v1.43/sources/common/lwmod.c
+[v ___lwmod __lwmod `(ui  1 e 2 0 ]
+"10 /Applications/microchip/xc8/v1.43/sources/common/sprcadd.c
+[v ___fladd __fladd `(d  1 e 3 0 ]
+"245
+[v ___flsub __flsub `(d  1 e 3 0 ]
+"11 /Applications/microchip/xc8/v1.43/sources/common/sprcdiv.c
+[v ___fldiv __fldiv `(d  1 e 3 0 ]
+"8 /Applications/microchip/xc8/v1.43/sources/common/sprcmul.c
+[v ___flmul __flmul `(d  1 e 3 0 ]
+"4 /Applications/microchip/xc8/v1.43/sources/common/strlen.c
+[v _strlen strlen `(ui  1 e 2 0 ]
+"15 /Applications/microchip/xc8/v1.43/sources/common/Umul32.c
+[v ___lmul __lmul `(ul  1 e 4 0 ]
+"5 /Users/kneil/MPLABXProjects/Pic8Proj_IO.X/core.c
+[v _setup setup `(v  1 e 1 0 ]
+"19
+[v _uart_setup uart_setup `(v  1 e 1 0 ]
+"40
+[v _uart_send uart_send `(v  1 e 1 0 ]
+"47
+[v _uart_print uart_print `(v  1 e 1 0 ]
+"53
+[v _uart_printd uart_printd `T(v  1 e 1 0 ]
+"12 /Users/kneil/MPLABXProjects/Pic8Proj_IO.X/main.c
+[v _keypad_setup keypad_setup `T(v  1 e 1 0 ]
+"19
+[v _keypad_map keypad_map `(i  1 e 2 0 ]
+"38
+[v _kpd_read kpd_read `(i  1 e 2 0 ]
+"53
+[v _main main `(v  1 e 1 0 ]
+[s S125 . 1 `uc 1 RA0 1 0 :1:0 
+`uc 1 RA1 1 0 :1:1 
+`uc 1 RA2 1 0 :1:2 
+`uc 1 RA3 1 0 :1:3 
+`uc 1 RA4 1 0 :1:4 
+`uc 1 RA5 1 0 :1:5 
+`uc 1 RA6 1 0 :1:6 
+`uc 1 RA7 1 0 :1:7 
+]
+"25561 /Applications/microchip/xc8/v1.43/include/pic18f4685.h
+[s S134 . 1 `uc 1 AN0 1 0 :1:0 
+`uc 1 AN1 1 0 :1:1 
+`uc 1 AN2 1 0 :1:2 
+`uc 1 AN3 1 0 :1:3 
+`uc 1 T0CKI 1 0 :1:4 
+`uc 1 AN4 1 0 :1:5 
+`uc 1 OSC2 1 0 :1:6 
+`uc 1 OSC1 1 0 :1:7 
+]
+[s S143 . 1 `uc 1 CVREF 1 0 :1:0 
+`uc 1 . 1 0 :1:1 
+`uc 1 VREFM 1 0 :1:2 
+`uc 1 VREFP 1 0 :1:3 
+`uc 1 . 1 0 :1:4 
+`uc 1 HLVDIN 1 0 :1:5 
+`uc 1 CLKO 1 0 :1:6 
+`uc 1 CLKI 1 0 :1:7 
+]
+[s S152 . 1 `uc 1 . 1 0 :5:0 
+`uc 1 LVDIN 1 0 :1:5 
+]
+[s S155 . 1 `uc 1 . 1 0 :5:0 
+`uc 1 SS 1 0 :1:5 
+]
+[s S158 . 1 `uc 1 . 1 0 :5:0 
+`uc 1 NOT_SS 1 0 :1:5 
+]
+[s S161 . 1 `uc 1 . 1 0 :5:0 
+`uc 1 nSS 1 0 :1:5 
+]
+[s S164 . 1 `uc 1 ULPWUIN 1 0 :1:0 
+`uc 1 . 1 0 :6:1 
+`uc 1 RJPU 1 0 :1:7 
+]
+[u S168 . 1 `S125 1 . 1 0 `S134 1 . 1 0 `S143 1 . 1 0 `S152 1 . 1 0 `S155 1 . 1 0 `S158 1 . 1 0 `S161 1 . 1 0 `S164 1 . 1 0 ]
+[v _PORTAbits PORTAbits `VES168  1 e 1 @3968 ]
+"26050
+[v _PORTD PORTD `VEuc  1 e 1 @3971 ]
+[s S221 . 1 `uc 1 TRISA0 1 0 :1:0 
+`uc 1 TRISA1 1 0 :1:1 
+`uc 1 TRISA2 1 0 :1:2 
+`uc 1 TRISA3 1 0 :1:3 
+`uc 1 TRISA4 1 0 :1:4 
+`uc 1 TRISA5 1 0 :1:5 
+`uc 1 TRISA6 1 0 :1:6 
+`uc 1 TRISA7 1 0 :1:7 
+]
+"26938
+[u S239 . 1 `S221 1 . 1 0 `S125 1 . 1 0 ]
+[v _TRISAbits TRISAbits `VES239  1 e 1 @3986 ]
+[s S315 . 1 `uc 1 TRISC0 1 0 :1:0 
+`uc 1 TRISC1 1 0 :1:1 
+`uc 1 TRISC2 1 0 :1:2 
+`uc 1 TRISC3 1 0 :1:3 
+`uc 1 TRISC4 1 0 :1:4 
+`uc 1 TRISC5 1 0 :1:5 
+`uc 1 TRISC6 1 0 :1:6 
+`uc 1 TRISC7 1 0 :1:7 
+]
+"27382
+[s S324 . 1 `uc 1 RC0 1 0 :1:0 
+`uc 1 RC1 1 0 :1:1 
+`uc 1 RC2 1 0 :1:2 
+`uc 1 RC3 1 0 :1:3 
+`uc 1 RC4 1 0 :1:4 
+`uc 1 RC5 1 0 :1:5 
+`uc 1 RC6 1 0 :1:6 
+`uc 1 RC7 1 0 :1:7 
+]
+[u S333 . 1 `S315 1 . 1 0 `S324 1 . 1 0 ]
+[v _TRISCbits TRISCbits `VES333  1 e 1 @3988 ]
+"27572
+[v _TRISD TRISD `VEuc  1 e 1 @3989 ]
+[s S95 . 1 `uc 1 TUN 1 0 :5:0 
+`uc 1 . 1 0 :1:5 
+`uc 1 PLLEN 1 0 :1:6 
+`uc 1 INTSRC 1 0 :1:7 
+]
+"27968
+[s S100 . 1 `uc 1 TUN0 1 0 :1:0 
+`uc 1 TUN1 1 0 :1:1 
+`uc 1 TUN2 1 0 :1:2 
+`uc 1 TUN3 1 0 :1:3 
+`uc 1 TUN4 1 0 :1:4 
+`uc 1 . 1 0 :2:5 
+`uc 1 INTSCR 1 0 :1:7 
+]
+[u S108 . 1 `S95 1 . 1 0 `S100 1 . 1 0 ]
+[v _OSCTUNEbits OSCTUNEbits `VES108  1 e 1 @3995 ]
+[s S443 . 1 `uc 1 TMR1IE 1 0 :1:0 
+`uc 1 TMR2IE 1 0 :1:1 
+`uc 1 CCP1IE 1 0 :1:2 
+`uc 1 SSPIE 1 0 :1:3 
+`uc 1 TXIE 1 0 :1:4 
+`uc 1 RCIE 1 0 :1:5 
+`uc 1 ADIE 1 0 :1:6 
+`uc 1 PSPIE 1 0 :1:7 
+]
+"28040
+[s S452 . 1 `uc 1 . 1 0 :4:0 
+`uc 1 TX1IE 1 0 :1:4 
+`uc 1 RC1IE 1 0 :1:5 
+]
+[u S456 . 1 `S443 1 . 1 0 `S452 1 . 1 0 ]
+[v _PIE1bits PIE1bits `VES456  1 e 1 @3997 ]
+[s S261 . 1 `uc 1 RX9D 1 0 :1:0 
+`uc 1 OERR 1 0 :1:1 
+`uc 1 FERR 1 0 :1:2 
+`uc 1 ADDEN 1 0 :1:3 
+`uc 1 CREN 1 0 :1:4 
+`uc 1 SREN 1 0 :1:5 
+`uc 1 RX9 1 0 :1:6 
+`uc 1 SPEN 1 0 :1:7 
+]
+"28896
+[s S270 . 1 `uc 1 . 1 0 :3:0 
+`uc 1 ADEN 1 0 :1:3 
+]
+[s S273 . 1 `uc 1 . 1 0 :5:0 
+`uc 1 SRENA 1 0 :1:5 
+]
+[s S276 . 1 `uc 1 . 1 0 :6:0 
+`uc 1 RC8_9 1 0 :1:6 
+]
+[s S279 . 1 `uc 1 . 1 0 :6:0 
+`uc 1 RC9 1 0 :1:6 
+]
+[s S282 . 1 `uc 1 RCD8 1 0 :1:0 
+]
+[u S284 . 1 `S261 1 . 1 0 `S270 1 . 1 0 `S273 1 . 1 0 `S276 1 . 1 0 `S279 1 . 1 0 `S282 1 . 1 0 ]
+[v _RCSTAbits RCSTAbits `VES284  1 e 1 @4011 ]
+[s S355 . 1 `uc 1 TX9D 1 0 :1:0 
+`uc 1 TRMT 1 0 :1:1 
+`uc 1 BRGH 1 0 :1:2 
+`uc 1 SENDB 1 0 :1:3 
+`uc 1 SYNC 1 0 :1:4 
+`uc 1 TXEN 1 0 :1:5 
+`uc 1 TX9 1 0 :1:6 
+`uc 1 CSRC 1 0 :1:7 
+]
+"29104
+[s S364 . 1 `uc 1 TX9D1 1 0 :1:0 
+`uc 1 TRMT1 1 0 :1:1 
+`uc 1 BRGH1 1 0 :1:2 
+`uc 1 SENDB1 1 0 :1:3 
+`uc 1 SYNC1 1 0 :1:4 
+`uc 1 TXEN1 1 0 :1:5 
+`uc 1 TX91 1 0 :1:6 
+`uc 1 CSRC1 1 0 :1:7 
+]
+[s S373 . 1 `uc 1 . 1 0 :6:0 
+`uc 1 TX8_9 1 0 :1:6 
+]
+[s S376 . 1 `uc 1 TXD8 1 0 :1:0 
+]
+[u S378 . 1 `S355 1 . 1 0 `S364 1 . 1 0 `S373 1 . 1 0 `S376 1 . 1 0 ]
+[v _TXSTAbits TXSTAbits `VES378  1 e 1 @4012 ]
+"29321
+[v _TXREG TXREG `VEuc  1 e 1 @4013 ]
+"29345
+[v _SPBRG SPBRG `VEuc  1 e 1 @4015 ]
+[s S407 . 1 `uc 1 ABDEN 1 0 :1:0 
+`uc 1 WUE 1 0 :1:1 
+`uc 1 . 1 0 :1:2 
+`uc 1 BRG16 1 0 :1:3 
+`uc 1 TXCKP 1 0 :1:4 
+`uc 1 . 1 0 :1:5 
+`uc 1 RCIDL 1 0 :1:6 
+`uc 1 ABDOVF 1 0 :1:7 
+]
+"29869
+[s S416 . 1 `uc 1 . 1 0 :4:0 
+`uc 1 SCKP 1 0 :1:4 
+]
+[s S419 . 1 `uc 1 . 1 0 :1:0 
+`uc 1 W4E 1 0 :1:1 
+]
+[u S422 . 1 `S407 1 . 1 0 `S416 1 . 1 0 `S419 1 . 1 0 ]
+[v _BAUDCONbits BAUDCONbits `VES422  1 e 1 @4024 ]
+[s S65 . 1 `uc 1 SCS 1 0 :2:0 
+`uc 1 IOFS 1 0 :1:2 
+`uc 1 OSTS 1 0 :1:3 
+`uc 1 IRCF 1 0 :3:4 
+`uc 1 IDLEN 1 0 :1:7 
+]
+"31629
+[s S71 . 1 `uc 1 SCS0 1 0 :1:0 
+`uc 1 SCS1 1 0 :1:1 
+`uc 1 . 1 0 :2:2 
+`uc 1 IRCF0 1 0 :1:4 
+`uc 1 IRCF1 1 0 :1:5 
+`uc 1 IRCF2 1 0 :1:6 
+]
+[u S78 . 1 `S65 1 . 1 0 `S71 1 . 1 0 ]
+[v _OSCCONbits OSCCONbits `VES78  1 e 1 @4051 ]
+"53 /Users/kneil/MPLABXProjects/Pic8Proj_IO.X/main.c
+[v _main main `(v  1 e 1 0 ]
+{
+"60
+[v main@x x `i  1 a 2 52 ]
+"65
+} 0
+"19 /Users/kneil/MPLABXProjects/Pic8Proj_IO.X/core.c
+[v _uart_setup uart_setup `(v  1 e 1 0 ]
+{
+[v uart_setup@baud baud `ui  1 p 2 0 ]
+"38
+} 0
+"53
+[v _uart_printd uart_printd `T(v  1 e 1 0 ]
+{
+"54
+[v uart_printd@buf buf `[24]uc  1 a 24 28 ]
+"53
+[v uart_printd@d d `ui  1 p 2 24 ]
+[v uart_printd@b b `i  1 p 2 26 ]
+"57
+} 0
+"47
+[v _uart_print uart_print `(v  1 e 1 0 ]
+{
+"48
+[v uart_print@i i `ui  1 a 2 10 ]
+"47
+[v uart_print@c c `*.34Cuc  1 p 2 6 ]
+"51
+} 0
+"40
+[v _uart_send uart_send `(v  1 e 1 0 ]
+{
+[v uart_send@c c `uc  1 a 1 wreg ]
+[v uart_send@c c `uc  1 a 1 wreg ]
+[v uart_send@c c `uc  1 a 1 0 ]
+"43
+} 0
+"4 /Applications/microchip/xc8/v1.43/sources/common/strlen.c
+[v _strlen strlen `(ui  1 e 2 0 ]
+{
+"6
+[v strlen@cp cp `*.34Cuc  1 a 2 4 ]
+"4
+[v strlen@s s `*.34Cuc  1 p 2 0 ]
+"13
+} 0
+"4 /Applications/microchip/xc8/v1.43/sources/common/itoa.c
+[v _itoa itoa `(*.39uc  1 e 2 0 ]
+{
+"6
+[v itoa@cp cp `*.39uc  1 a 2 22 ]
+"4
+[v itoa@buf buf `*.39uc  1 p 2 16 ]
+[v itoa@val val `i  1 p 2 18 ]
+[v itoa@base base `i  1 p 2 20 ]
+"14
+} 0
+"17
+[v _utoa utoa `(*.39uc  1 e 2 0 ]
+{
+"19
+[v utoa@v v `ui  1 a 2 13 ]
+"20
+[v utoa@c c `uc  1 a 1 15 ]
+"17
+[v utoa@buf buf `*.39uc  1 p 2 7 ]
+[v utoa@val val `ui  1 p 2 9 ]
+[v utoa@base base `i  1 p 2 11 ]
+"37
+} 0
+"8 /Applications/microchip/xc8/v1.43/sources/common/lwmod.c
+[v ___lwmod __lwmod `(ui  1 e 2 0 ]
+{
+"11
+[v ___lwmod@counter counter `uc  1 a 1 4 ]
+"8
+[v ___lwmod@dividend dividend `ui  1 p 2 0 ]
+[v ___lwmod@divisor divisor `ui  1 p 2 2 ]
+"26
+} 0
+"8 /Applications/microchip/xc8/v1.43/sources/common/lwdiv.c
+[v ___lwdiv __lwdiv `(ui  1 e 2 0 ]
+{
+"11
+[v ___lwdiv@quotient quotient `ui  1 a 2 4 ]
+"12
+[v ___lwdiv@counter counter `uc  1 a 1 6 ]
+"8
+[v ___lwdiv@dividend dividend `ui  1 p 2 0 ]
+[v ___lwdiv@divisor divisor `ui  1 p 2 2 ]
+"31
+} 0
+"5 /Users/kneil/MPLABXProjects/Pic8Proj_IO.X/core.c
+[v _setup setup `(v  1 e 1 0 ]
+{
+"17
+} 0
+"38 /Users/kneil/MPLABXProjects/Pic8Proj_IO.X/main.c
+[v _kpd_read kpd_read `(i  1 e 2 0 ]
+{
+"45
+[v kpd_read@temp temp `i  1 a 2 10 ]
+"41
+[v kpd_read@i i `uc  1 a 1 12 ]
+"40
+[v kpd_read@total total `i  1 a 2 8 ]
+"49
+} 0
+"19
+[v _keypad_map keypad_map `(i  1 e 2 0 ]
+{
+[v keypad_map@num num `i  1 p 2 0 ]
+"32
+} 0
+"12
+[v _keypad_setup keypad_setup `T(v  1 e 1 0 ]
+{
+"16
+} 0

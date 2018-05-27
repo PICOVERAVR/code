@@ -1,0 +1,2092 @@
+Disassembly Listing for PIC24Proj_Scratch
+Generated From:
+/Users/kneil/MPLABXProjects/PIC24Proj_Scratch.X/dist/default/debug/PIC24Proj_Scratch.X.debug.elf
+Sep 13, 2017 4:32:37 PM
+
+---  mcc_generated_files/mcc.h  -------------------------------------------------------------------------
+000BCC  200F21     MOV #0xF2, W1
+000BCE  800222     MOV CORCON, W2
+000BD0  608082     AND W1, W2, W1
+000BD2  708080     IOR W1, W0, W1
+000BD4  880221     MOV W1, CORCON
+000BD6  060000     RETURN
+---  /Users/kneil/MPLABXProjects/PIC24Proj_Scratch.X/oled.c  --------------------------------------------
+1:                 #include "oled.h"
+2:                 
+3:                 unsigned char oled_gbuf[OLED_HEIGHT * OLED_WIDTH / 8]; //originally declared in header file
+4:                 //should be 1K of memory for 128x64!
+5:                 //possible to malloc this if enabled, macro hack
+6:                 
+7:                 //font copied from adafruit for ease of use, might make my own in the future
+8:                 const static uint8_t font[] = { //should get a list of all the stuff in here at some point
+9:                     0x00, 0x00, 0x00, 0x00, 0x00,   
+10:                	0x3E, 0x5B, 0x4F, 0x5B, 0x3E, 	
+11:                	0x3E, 0x6B, 0x4F, 0x6B, 0x3E, 	
+12:                	0x1C, 0x3E, 0x7C, 0x3E, 0x1C, 
+13:                	0x18, 0x3C, 0x7E, 0x3C, 0x18, 
+14:                	0x1C, 0x57, 0x7D, 0x57, 0x1C, 
+15:                	0x1C, 0x5E, 0x7F, 0x5E, 0x1C, 
+16:                	0x00, 0x18, 0x3C, 0x18, 0x00, 
+17:                	0xFF, 0xE7, 0xC3, 0xE7, 0xFF, 
+18:                	0x00, 0x18, 0x24, 0x18, 0x00, 
+19:                	0xFF, 0xE7, 0xDB, 0xE7, 0xFF, 
+20:                	0x30, 0x48, 0x3A, 0x06, 0x0E, 
+21:                	0x26, 0x29, 0x79, 0x29, 0x26, 
+22:                	0x40, 0x7F, 0x05, 0x05, 0x07, 
+23:                	0x40, 0x7F, 0x05, 0x25, 0x3F, 
+24:                	0x5A, 0x3C, 0xE7, 0x3C, 0x5A, 
+25:                	0x7F, 0x3E, 0x1C, 0x1C, 0x08, 
+26:                	0x08, 0x1C, 0x1C, 0x3E, 0x7F, 
+27:                	0x14, 0x22, 0x7F, 0x22, 0x14, 
+28:                	0x5F, 0x5F, 0x00, 0x5F, 0x5F, 
+29:                	0x06, 0x09, 0x7F, 0x01, 0x7F, 
+30:                	0x00, 0x66, 0x89, 0x95, 0x6A, 
+31:                	0x60, 0x60, 0x60, 0x60, 0x60, 
+32:                	0x94, 0xA2, 0xFF, 0xA2, 0x94, 
+33:                	0x08, 0x04, 0x7E, 0x04, 0x08, 
+34:                	0x10, 0x20, 0x7E, 0x20, 0x10, 
+35:                	0x08, 0x08, 0x2A, 0x1C, 0x08, 
+36:                	0x08, 0x1C, 0x2A, 0x08, 0x08, 
+37:                	0x1E, 0x10, 0x10, 0x10, 0x10, 
+38:                	0x0C, 0x1E, 0x0C, 0x1E, 0x0C, 
+39:                	0x30, 0x38, 0x3E, 0x38, 0x30, 
+40:                	0x06, 0x0E, 0x3E, 0x0E, 0x06, 
+41:                	0x00, 0x00, 0x00, 0x00, 0x00, 
+42:                	0x00, 0x00, 0x5F, 0x00, 0x00, 
+43:                	0x00, 0x07, 0x00, 0x07, 0x00, 
+44:                	0x14, 0x7F, 0x14, 0x7F, 0x14, 
+45:                	0x24, 0x2A, 0x7F, 0x2A, 0x12, 
+46:                	0x23, 0x13, 0x08, 0x64, 0x62, 
+47:                	0x36, 0x49, 0x56, 0x20, 0x50, 
+48:                	0x00, 0x08, 0x07, 0x03, 0x00, 
+49:                	0x00, 0x1C, 0x22, 0x41, 0x00, 
+50:                	0x00, 0x41, 0x22, 0x1C, 0x00, 
+51:                	0x2A, 0x1C, 0x7F, 0x1C, 0x2A, 
+52:                	0x08, 0x08, 0x3E, 0x08, 0x08, 
+53:                	0x00, 0x80, 0x70, 0x30, 0x00, 
+54:                	0x08, 0x08, 0x08, 0x08, 0x08, 
+55:                	0x00, 0x00, 0x60, 0x60, 0x00, 
+56:                	0x20, 0x10, 0x08, 0x04, 0x02, 
+57:                	0x3E, 0x51, 0x49, 0x45, 0x3E, 
+58:                	0x00, 0x42, 0x7F, 0x40, 0x00, 
+59:                	0x72, 0x49, 0x49, 0x49, 0x46, 
+60:                	0x21, 0x41, 0x49, 0x4D, 0x33, 
+61:                	0x18, 0x14, 0x12, 0x7F, 0x10, 
+62:                	0x27, 0x45, 0x45, 0x45, 0x39, 
+63:                	0x3C, 0x4A, 0x49, 0x49, 0x31, 
+64:                	0x41, 0x21, 0x11, 0x09, 0x07, 
+65:                	0x36, 0x49, 0x49, 0x49, 0x36, 
+66:                	0x46, 0x49, 0x49, 0x29, 0x1E, 
+67:                	0x00, 0x00, 0x14, 0x00, 0x00, 
+68:                	0x00, 0x40, 0x34, 0x00, 0x00, 
+69:                	0x00, 0x08, 0x14, 0x22, 0x41, 
+70:                	0x14, 0x14, 0x14, 0x14, 0x14, 
+71:                	0x00, 0x41, 0x22, 0x14, 0x08, 
+72:                	0x02, 0x01, 0x59, 0x09, 0x06, 
+73:                	0x3E, 0x41, 0x5D, 0x59, 0x4E, 
+74:                	0x7C, 0x12, 0x11, 0x12, 0x7C, 
+75:                	0x7F, 0x49, 0x49, 0x49, 0x36, 
+76:                	0x3E, 0x41, 0x41, 0x41, 0x22, 
+77:                	0x7F, 0x41, 0x41, 0x41, 0x3E, 
+78:                	0x7F, 0x49, 0x49, 0x49, 0x41, 
+79:                	0x7F, 0x09, 0x09, 0x09, 0x01, 
+80:                	0x3E, 0x41, 0x41, 0x51, 0x73, 
+81:                	0x7F, 0x08, 0x08, 0x08, 0x7F, 
+82:                	0x00, 0x41, 0x7F, 0x41, 0x00, 
+83:                	0x20, 0x40, 0x41, 0x3F, 0x01, 
+84:                	0x7F, 0x08, 0x14, 0x22, 0x41, 
+85:                	0x7F, 0x40, 0x40, 0x40, 0x40, 
+86:                	0x7F, 0x02, 0x1C, 0x02, 0x7F, 
+87:                	0x7F, 0x04, 0x08, 0x10, 0x7F, 
+88:                	0x3E, 0x41, 0x41, 0x41, 0x3E, 
+89:                	0x7F, 0x09, 0x09, 0x09, 0x06, 
+90:                	0x3E, 0x41, 0x51, 0x21, 0x5E, 
+91:                	0x7F, 0x09, 0x19, 0x29, 0x46, 
+92:                	0x26, 0x49, 0x49, 0x49, 0x32, 
+93:                	0x03, 0x01, 0x7F, 0x01, 0x03, 
+94:                	0x3F, 0x40, 0x40, 0x40, 0x3F, 
+95:                	0x1F, 0x20, 0x40, 0x20, 0x1F, 
+96:                	0x3F, 0x40, 0x38, 0x40, 0x3F, 
+97:                	0x63, 0x14, 0x08, 0x14, 0x63, 
+98:                	0x03, 0x04, 0x78, 0x04, 0x03, 
+99:                	0x61, 0x59, 0x49, 0x4D, 0x43, 
+100:               	0x00, 0x7F, 0x41, 0x41, 0x41, 
+101:               	0x02, 0x04, 0x08, 0x10, 0x20, 
+102:               	0x00, 0x41, 0x41, 0x41, 0x7F, 
+103:               	0x04, 0x02, 0x01, 0x02, 0x04, 
+104:               	0x40, 0x40, 0x40, 0x40, 0x40, 
+105:               	0x00, 0x03, 0x07, 0x08, 0x00, 
+106:               	0x20, 0x54, 0x54, 0x78, 0x40, 
+107:               	0x7F, 0x28, 0x44, 0x44, 0x38, 
+108:               	0x38, 0x44, 0x44, 0x44, 0x28, 
+109:               	0x38, 0x44, 0x44, 0x28, 0x7F, 
+110:               	0x38, 0x54, 0x54, 0x54, 0x18, 
+111:               	0x00, 0x08, 0x7E, 0x09, 0x02, 
+112:               	0x18, 0xA4, 0xA4, 0x9C, 0x78, 
+113:               	0x7F, 0x08, 0x04, 0x04, 0x78, 
+114:               	0x00, 0x44, 0x7D, 0x40, 0x00, 
+115:               	0x20, 0x40, 0x40, 0x3D, 0x00, 
+116:               	0x7F, 0x10, 0x28, 0x44, 0x00, 
+117:               	0x00, 0x41, 0x7F, 0x40, 0x00, 
+118:               	0x7C, 0x04, 0x78, 0x04, 0x78, 
+119:               	0x7C, 0x08, 0x04, 0x04, 0x78, 
+120:               	0x38, 0x44, 0x44, 0x44, 0x38, 
+121:               	0xFC, 0x18, 0x24, 0x24, 0x18, 
+122:               	0x18, 0x24, 0x24, 0x18, 0xFC, 
+123:               	0x7C, 0x08, 0x04, 0x04, 0x08, 
+124:               	0x48, 0x54, 0x54, 0x54, 0x24, 
+125:               	0x04, 0x04, 0x3F, 0x44, 0x24, 
+126:               	0x3C, 0x40, 0x40, 0x20, 0x7C, 
+127:               	0x1C, 0x20, 0x40, 0x20, 0x1C, 
+128:               	0x3C, 0x40, 0x30, 0x40, 0x3C, 
+129:               	0x44, 0x28, 0x10, 0x28, 0x44, 
+130:               	0x4C, 0x90, 0x90, 0x90, 0x7C, 
+131:               	0x44, 0x64, 0x54, 0x4C, 0x44, 
+132:               	0x00, 0x08, 0x36, 0x41, 0x00, 
+133:               	0x00, 0x00, 0x77, 0x00, 0x00, 
+134:               	0x00, 0x41, 0x36, 0x08, 0x00, 
+135:               	0x02, 0x01, 0x02, 0x04, 0x02, 
+136:               	0x3C, 0x26, 0x23, 0x26, 0x3C, 
+137:               	0x1E, 0xA1, 0xA1, 0x61, 0x12, 
+138:               	0x3A, 0x40, 0x40, 0x20, 0x7A, 
+139:               	0x38, 0x54, 0x54, 0x55, 0x59, 
+140:               	0x21, 0x55, 0x55, 0x79, 0x41, 
+141:               	0x21, 0x54, 0x54, 0x78, 0x41, 
+142:               	0x21, 0x55, 0x54, 0x78, 0x40, 
+143:               	0x20, 0x54, 0x55, 0x79, 0x40, 
+144:               	0x0C, 0x1E, 0x52, 0x72, 0x12, 
+145:               	0x39, 0x55, 0x55, 0x55, 0x59, 
+146:               	0x39, 0x54, 0x54, 0x54, 0x59, 
+147:               	0x39, 0x55, 0x54, 0x54, 0x58, 
+148:               	0x00, 0x00, 0x45, 0x7C, 0x41, 
+149:               	0x00, 0x02, 0x45, 0x7D, 0x42, 
+150:               	0x00, 0x01, 0x45, 0x7C, 0x40, 
+151:               	0xF0, 0x29, 0x24, 0x29, 0xF0, 
+152:               	0xF0, 0x28, 0x25, 0x28, 0xF0, 
+153:               	0x7C, 0x54, 0x55, 0x45, 0x00, 
+154:               	0x20, 0x54, 0x54, 0x7C, 0x54, 
+155:               	0x7C, 0x0A, 0x09, 0x7F, 0x49, 
+156:               	0x32, 0x49, 0x49, 0x49, 0x32, 
+157:               	0x32, 0x48, 0x48, 0x48, 0x32, 
+158:               	0x32, 0x4A, 0x48, 0x48, 0x30, 
+159:               	0x3A, 0x41, 0x41, 0x21, 0x7A, 
+160:               	0x3A, 0x42, 0x40, 0x20, 0x78, 
+161:               	0x00, 0x9D, 0xA0, 0xA0, 0x7D, 
+162:               	0x39, 0x44, 0x44, 0x44, 0x39, 
+163:               	0x3D, 0x40, 0x40, 0x40, 0x3D, 
+164:               	0x3C, 0x24, 0xFF, 0x24, 0x24, 
+165:               	0x48, 0x7E, 0x49, 0x43, 0x66, 
+166:               	0x2B, 0x2F, 0xFC, 0x2F, 0x2B, 
+167:               	0xFF, 0x09, 0x29, 0xF6, 0x20, 
+168:               	0xC0, 0x88, 0x7E, 0x09, 0x03, 
+169:               	0x20, 0x54, 0x54, 0x79, 0x41, 
+170:               	0x00, 0x00, 0x44, 0x7D, 0x41, 
+171:               	0x30, 0x48, 0x48, 0x4A, 0x32, 
+172:               	0x38, 0x40, 0x40, 0x22, 0x7A, 
+173:               	0x00, 0x7A, 0x0A, 0x0A, 0x72, 
+174:               	0x7D, 0x0D, 0x19, 0x31, 0x7D, 
+175:               	0x26, 0x29, 0x29, 0x2F, 0x28, 
+176:               	0x26, 0x29, 0x29, 0x29, 0x26, 
+177:               	0x30, 0x48, 0x4D, 0x40, 0x20, 
+178:               	0x38, 0x08, 0x08, 0x08, 0x08, 
+179:               	0x08, 0x08, 0x08, 0x08, 0x38, 
+180:               	0x2F, 0x10, 0xC8, 0xAC, 0xBA, 
+181:               	0x2F, 0x10, 0x28, 0x34, 0xFA, 
+182:               	0x00, 0x00, 0x7B, 0x00, 0x00, 
+183:               	0x08, 0x14, 0x2A, 0x14, 0x22, 
+184:               	0x22, 0x14, 0x2A, 0x14, 0x08, 
+185:               	0xAA, 0x00, 0x55, 0x00, 0xAA, 
+186:               	0xAA, 0x55, 0xAA, 0x55, 0xAA, 
+187:               	0x00, 0x00, 0x00, 0xFF, 0x00, 
+188:               	0x10, 0x10, 0x10, 0xFF, 0x00, 
+189:               	0x14, 0x14, 0x14, 0xFF, 0x00, 
+190:               	0x10, 0x10, 0xFF, 0x00, 0xFF, 
+191:               	0x10, 0x10, 0xF0, 0x10, 0xF0, 
+192:               	0x14, 0x14, 0x14, 0xFC, 0x00, 
+193:               	0x14, 0x14, 0xF7, 0x00, 0xFF, 
+194:               	0x00, 0x00, 0xFF, 0x00, 0xFF, 
+195:               	0x14, 0x14, 0xF4, 0x04, 0xFC, 
+196:               	0x14, 0x14, 0x17, 0x10, 0x1F, 
+197:               	0x10, 0x10, 0x1F, 0x10, 0x1F, 
+198:               	0x14, 0x14, 0x14, 0x1F, 0x00, 
+199:               	0x10, 0x10, 0x10, 0xF0, 0x00, 
+200:               	0x00, 0x00, 0x00, 0x1F, 0x10, 
+201:               	0x10, 0x10, 0x10, 0x1F, 0x10, 
+202:               	0x10, 0x10, 0x10, 0xF0, 0x10, 
+203:               	0x00, 0x00, 0x00, 0xFF, 0x10, 
+204:               	0x10, 0x10, 0x10, 0x10, 0x10, 
+205:               	0x10, 0x10, 0x10, 0xFF, 0x10, 
+206:               	0x00, 0x00, 0x00, 0xFF, 0x14, 
+207:               	0x00, 0x00, 0xFF, 0x00, 0xFF, 
+208:               	0x00, 0x00, 0x1F, 0x10, 0x17, 
+209:               	0x00, 0x00, 0xFC, 0x04, 0xF4, 
+210:               	0x14, 0x14, 0x17, 0x10, 0x17, 
+211:               	0x14, 0x14, 0xF4, 0x04, 0xF4, 
+212:               	0x00, 0x00, 0xFF, 0x00, 0xF7, 
+213:               	0x14, 0x14, 0x14, 0x14, 0x14, 
+214:               	0x14, 0x14, 0xF7, 0x00, 0xF7, 
+215:               	0x14, 0x14, 0x14, 0x17, 0x14, 
+216:               	0x10, 0x10, 0x1F, 0x10, 0x1F, 
+217:               	0x14, 0x14, 0x14, 0xF4, 0x14, 
+218:               	0x10, 0x10, 0xF0, 0x10, 0xF0, 
+219:               	0x00, 0x00, 0x1F, 0x10, 0x1F, 
+220:               	0x00, 0x00, 0x00, 0x1F, 0x14, 
+221:               	0x00, 0x00, 0x00, 0xFC, 0x14, 
+222:               	0x00, 0x00, 0xF0, 0x10, 0xF0, 
+223:               	0x10, 0x10, 0xFF, 0x10, 0xFF, 
+224:               	0x14, 0x14, 0x14, 0xFF, 0x14, 
+225:               	0x10, 0x10, 0x10, 0x1F, 0x00, 
+226:               	0x00, 0x00, 0x00, 0xF0, 0x10, 
+227:               	0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 
+228:               	0xF0, 0xF0, 0xF0, 0xF0, 0xF0, 
+229:               	0xFF, 0xFF, 0xFF, 0x00, 0x00, 
+230:               	0x00, 0x00, 0x00, 0xFF, 0xFF, 
+231:               	0x0F, 0x0F, 0x0F, 0x0F, 0x0F, 
+232:               	0x38, 0x44, 0x44, 0x38, 0x44, 
+233:               	0x7C, 0x2A, 0x2A, 0x3E, 0x14, 
+234:               	0x7E, 0x02, 0x02, 0x06, 0x06, 
+235:               	0x02, 0x7E, 0x02, 0x7E, 0x02, 
+236:               	0x63, 0x55, 0x49, 0x41, 0x63, 
+237:               	0x38, 0x44, 0x44, 0x3C, 0x04, 
+238:               	0x40, 0x7E, 0x20, 0x1E, 0x20, 
+239:               	0x06, 0x02, 0x7E, 0x02, 0x02, 
+240:               	0x99, 0xA5, 0xE7, 0xA5, 0x99, 
+241:               	0x1C, 0x2A, 0x49, 0x2A, 0x1C, 
+242:               	0x4C, 0x72, 0x01, 0x72, 0x4C, 
+243:               	0x30, 0x4A, 0x4D, 0x4D, 0x30, 
+244:               	0x30, 0x48, 0x78, 0x48, 0x30, 
+245:               	0xBC, 0x62, 0x5A, 0x46, 0x3D, 
+246:               	0x3E, 0x49, 0x49, 0x49, 0x00, 
+247:               	0x7E, 0x01, 0x01, 0x01, 0x7E, 
+248:               	0x2A, 0x2A, 0x2A, 0x2A, 0x2A, 
+249:               	0x44, 0x44, 0x5F, 0x44, 0x44, 
+250:               	0x40, 0x51, 0x4A, 0x44, 0x40, 
+251:               	0x40, 0x44, 0x4A, 0x51, 0x40, 
+252:               	0x00, 0x00, 0xFF, 0x01, 0x03, 
+253:               	0xE0, 0x80, 0xFF, 0x00, 0x00, 
+254:               	0x08, 0x08, 0x6B, 0x6B, 0x08,
+255:               	0x36, 0x12, 0x36, 0x24, 0x36, 
+256:               	0x06, 0x0F, 0x09, 0x0F, 0x06, 
+257:               	0x00, 0x00, 0x18, 0x18, 0x00, 
+258:               	0x00, 0x00, 0x10, 0x10, 0x00, 
+259:               	0x30, 0x40, 0xFF, 0x01, 0x01, 
+260:               	0x00, 0x1F, 0x01, 0x01, 0x1E, 
+261:               	0x00, 0x19, 0x1D, 0x17, 0x12, 
+262:               	0x00, 0x3C, 0x3C, 0x3C, 0x3C, 
+263:               	0x00, 0x00, 0x00, 0x00, 0x00, 
+264:               };
+265:               
+266:               void oled_command(uint8_t x) {
+000000  040200     GOTO __resetPRI, __reset
+267:                   i2c_start();
+000004  0002FE     NOP
+268:                   i2c_send(OLED_WRITE_ADDR); //write address onto bus
+000006  000310     NOP
+000008  000328     NOP
+269:                   i2c_send(0x00); //command, not data
+00000A  000306     NOP
+00000C  000318     NOP
+270:                   i2c_send(x); //write actual command
+00000E  000320     NOP
+271:                   i2c_stop();
+000012  00034C     NOP
+272:               }
+000014  00034C     NOP
+273:               
+274:               void oled_data(uint8_t x) {
+000018  00034C     NOP
+275:                   i2c_start();
+00001C  00034C     NOP
+276:                   i2c_send(OLED_WRITE_ADDR); //write address
+00001E  00034C     NOP
+277:                   i2c_send(0x40); //data, not command
+000022  00034C     NOP
+000024  000348     NOP
+278:                   i2c_send(x); //actual data
+000026  00034C     NOP
+279:                   i2c_stop();
+00002A  00034C     NOP
+280:               }
+00002C  00034C     NOP
+00002E  00034C     NOP
+281:               
+282:               //initialize oled screen, size can be adjusted, relies on internal Vcc using charge pumps
+283:               //mostly copied from adafruit SSD1306 driver
+284:               void oled_init(void) {
+285:                   delay_poll(0x1732); //delay for ~100ms, needed to reset oled module
+0000C4  00034C     NOP
+0000C6  00034C     NOP
+286:                   oled_displayoff();
+0000C8  00034C     NOP
+0000CA  00034C     NOP
+287:                   oled_command(0xD5); //set display clock div
+0000CC  00034C     NOP
+0000CE  00034C     NOP
+288:                   oled_command(0x80); //clock ratio of 0x80
+0000D0  00034C     NOP
+0000D2  00034C     NOP
+289:                   oled_command(0xA8); //set multiplex
+0000D4  00034C     NOP
+0000D6  00034C     NOP
+290:                   oled_command(OLED_HEIGHT-1); //relies on height
+0000D8  00034C     NOP
+0000DA  00034C     NOP
+291:                   oled_command(0xD3); //set display offset
+0000DC  00034C     NOP
+0000DE  00034C     NOP
+292:                   oled_command(0x00); //no offset
+0000E0  00034C     NOP
+0000E2  00034C     NOP
+293:                   oled_command(0x40); //set start line to line 0
+0000E4  00034C     NOP
+0000E6  00034C     NOP
+294:                   oled_command(0x8D); //set charge pumps
+0000E8  00034C     NOP
+0000EA  00034C     NOP
+295:                   oled_command(0x14); //no external Vcc, generate voltage internally
+0000EC  00034C     NOP
+0000EE  00034C     NOP
+296:                   oled_command(0x20); //set memory mode
+0000F0  00034C     NOP
+0000F2  00034C     NOP
+297:                   oled_command(0x00); //horizontal addressing mode
+0000F4  00034C     NOP
+0000F6  00034C     NOP
+298:                   oled_command(0xA1); //??
+0000F8  00034C     NOP
+0000FA  00034C     NOP
+299:                   oled_command(0xC8); //scan descending
+0000FC  00034C     NOP
+0000FE  00034C     NOP
+300:                   oled_command(0xDA); //set com pins?
+000100  00034C     NOP
+000102  00034C     NOP
+301:                   oled_command(0x12); //??
+000104  00034C     NOP
+000106  00034C     NOP
+302:                   oled_command(0x81); //set contrast
+000108  00034C     NOP
+00010A  00034C     NOP
+303:                   oled_command(0xCF); //related to Vcc for some reason
+00010C  00034C     NOP
+00010E  00034C     NOP
+304:                   oled_command(0xD9); //set precharge detect?
+000110  00034C     NOP
+000112  00034C     NOP
+305:                   oled_command(0xF1); //internal Vcc
+000114  00034C     NOP
+000116  00034C     NOP
+306:                   oled_command(0xDB); //v com detect
+000118  00034C     NOP
+00011A  00034C     NOP
+307:                   oled_command(0x40); //?
+00011C  00034C     NOP
+00011E  00034C     NOP
+308:                   oled_command(0xA4); //resume display
+000120  00034C     NOP
+000122  00034C     NOP
+309:                   oled_command(0xA6); //normal display
+000124  00034C     NOP
+000126  00034C     NOP
+310:                   oled_command(0x2E); //deactivate scroll
+000128  00034C     NOP
+00012A  00034C     NOP
+311:                   oled_clear();
+00012C  00034C     NOP
+312:                   oled_displayon();
+00012E  00034C     NOP
+000130  00034C     NOP
+313:               }
+000132  00034C     NOP
+314:               //note: all operations operate on an internal buffer
+315:               //changes have to be written out to take effect
+316:               
+317:               //same ops as in header.h, rewritten for clarity
+318:               //these operations abstract away from weird internal storage method
+319:               void oled_setpixel(uint16_t x, uint16_t y) {
+320:                   oled_gbuf[(x) + (((y) / 8) * OLED_WIDTH)] |= (1 << ((y) & 7));
+000030  00034C     NOP
+321:               }
+000042  00034C     NOP
+322:               
+323:               void oled_clearpixel(uint16_t x, uint16_t y) {
+324:                   oled_gbuf[(x) + (((y) / 8) * OLED_WIDTH)] &= ~(1 << ((y) & 7));
+000044  00034C     NOP
+000046  00034C     NOP
+325:               }
+000058  00034C     NOP
+326:               
+327:               void oled_togglepixel(uint16_t x, uint16_t y) {
+328:                   oled_gbuf[(x) + (((y) / 8) * OLED_WIDTH)] ^= (1 << ((y) & 7));
+00005A  00034C     NOP
+00005C  00034C     NOP
+00005E  00034C     NOP
+000060  00034C     NOP
+000062  00034C     NOP
+000064  00034C     NOP
+000066  00034C     NOP
+000068  00034C     NOP
+00006A  00034C     NOP
+329:               }
+00006C  00034C     NOP
+330:               
+331:               void oled_flush(void) {
+00006E  00034C     NOP
+000070  00034C     NOP
+000072  00034C     NOP
+00008E  00034C     NOP
+000090  00034C     NOP
+00009C  00034C     NOP
+332:                   oled_command(0x21); //select column address
+000074  00034C     NOP
+000076  00034C     NOP
+333:                   oled_command(0x00); //set start address to 0
+000078  00034C     NOP
+00007A  00034C     NOP
+334:                   oled_command(OLED_WIDTH-1); //set end to end of display
+00007C  00034C     NOP
+00007E  00034C     NOP
+335:                   
+336:                   oled_command(0x22); //select page address
+000080  00034C     NOP
+000082  00034C     NOP
+337:                   oled_command(0x00); //set start to 0
+000084  00034C     NOP
+000086  00034C     NOP
+338:                   oled_command(0x07); //set end to page 7
+000088  00034C     NOP
+00008A  00034C     NOP
+00008C  00034C     NOP
+339:                   
+340:                   //write out entire buffer to screen, in one transmission
+341:                   //applies only to screen using settings listed above
+342:                   for (int i = 0; i < (OLED_WIDTH * OLED_HEIGHT / 8); i++) {
+0000AC  00034C     NOP
+0000AE  00034C     NOP
+0000B0  00034C     NOP
+343:                       i2c_start();
+000092  00034C     NOP
+344:                       i2c_send(OLED_WRITE_ADDR);
+000094  00034C     NOP
+000096  00034C     NOP
+345:                       i2c_send(0x40); //data transmission, not command transmission
+000098  00034C     NOP
+00009A  00034C     NOP
+00009E  00034C     NOP
+346:                       for (int j = 0; j < 16; j++) {
+0000A4  00034C     NOP
+0000A6  00034C     NOP
+347:                           i2c_send(oled_gbuf[i++]);
+0000A0  00034C     NOP
+0000A2  00034C     NOP
+348:                       }
+349:                       i--; //??
+350:                       i2c_stop();
+0000A8  00034C     NOP
+0000AA  00034C     NOP
+351:                   }
+352:               }
+0000B2  00034C     NOP
+0000B4  00034C     NOP
+0000B6  00034C     NOP
+0000B8  00034C     NOP
+353:               
+354:               void oled_clear(void) {
+355:                   memset(oled_gbuf, 0x00, sizeof(unsigned char) * (OLED_WIDTH * OLED_HEIGHT / 8)); //clear internal buffer
+0000BA  00034C     NOP
+0000BC  00034C     NOP
+0000BE  00034C     NOP
+356:                   oled_flush();
+0000C0  00034C     NOP
+357:               }
+0000C2  00034C     NOP
+358:               
+359:               //bresnham's algorithm, used to draw accurate lines cheaply
+360:               //pulled from google
+361:               void oled_line(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1) {
+000134  00034C     NOP
+362:                 int dx = abs(x1-x0), sx = x0<x1 ? 1 : -1;
+363:                 int dy = abs(y1-y0), sy = y0<y1 ? 1 : -1; //dy = delta of y0 to y1, sy = sign
+364:                 int err = (dx>dy ? dx : -dy)/2, e2; //adjust for inverse lines
+365:                
+366:                 for(;;) {
+367:                   oled_setpixel(x0, y0);
+368:                   if (x0==x1 && y0==y1) break; //are we finished?
+369:                   e2 = err; //accumulate error over time... pretty cool
+370:                   if (e2 >-dx) { err -= dy; x0 += sx; } //which way are we going?
+371:                   if (e2 < dy) { err += dx; y0 += sy; }
+372:                 }
+373:               }
+374:               
+375:               void oled_char(char c) {
+376:                   //characters are stored as a multiple of 5 of the ascii value in array
+377:                   for (int i = (c * 5); i < ((c+1) * 5); i++) oled_data(font[i]); //write the 5*7 character to screen
+378:               }
+379:               
+380:               void oled_str(char *s) { //does not include null term for screen
+381:                   for (int cursor = 0; cursor <= strlen(s)-1; cursor++) { //writes directly to screen, may want to fix this?
+00020A  E00000     CP0 W0
+00020C  320002     BRA Z, CORCON_RESET
+00020E  200100     MOV #0x10, W0
+000210  880220     MOV W0, CORCON
+000212  070014     RCALL __psv_init
+000214  0700CF     RCALL __crt_start_mode, __crt_start_mode_normal
+000216  E00000     CP0 W0
+382:                       if (cursor == 25) { //is cursor at edge of screen?
+383:                           for (int j = 0; j < 3; j++) {
+384:                               oled_data(NULL); //just enough whitespace to roll over to next line
+385:                           }
+386:                       }
+387:                       oled_char(s[cursor]);
+000204  88010E     MOV W14, SPLIM
+000206  000000     NOP
+000208  200000     MOV #0x0, W0
+388:                   }
+389:               }
+000218  3A0003     BRA NZ, 0x220
+00021A  20C940     MOV #0xC94, W0
+00021C  200001     MOV #0x0, W1
+390:               
+391:               void oled_clearrow(int row) {
+00023E  E00000     CP0 W0
+392:                   oled_setrow(row);
+000240  320002     BRA Z, 0x246
+000242  202000     MOV #0x200, W0
+393:                   
+394:                   for (int i = 0; i < OLED_WIDTH; i++) {
+00024C  EB0000     CLR W0
+395:                       oled_data(NULL); //i2c overhead here could be fixed
+000244  880190     MOV W0, DSRPAG
+000246  060000     RETURN
+000248  8802A1     MOV W1, TBLPAG
+00024A  780480     MOV W0, W9
+396:                   }
+397:               }
+00024E  37001F     BRA 0x28E
+000250  4484E2     ADD W9, #0x2, W9
+398:               
+399:               void oled_setrow(int row) {
+00021E  370002     BRA 0x224
+000220  200000     MOV #0x0, W0
+400:                   oled_command(0x21);
+000222  200001     MOV #0x0, W1
+000224  700F81     IOR W0, W1, [W15]
+401:                   oled_command(0);
+000226  320001     BRA Z, 0x22A
+000228  07000F     RCALL __data_init, __data_init_extended
+402:                   oled_command(OLED_WIDTH-1); //set max col width
+00022A  200000     MOV #0x0, W0
+00022C  E00000     CP0 W0
+403:                   
+404:                   oled_command(0x22);
+00022E  320002     BRA Z, 0x234
+000230  020000     CALL delay_poll
+405:                   oled_command(row);
+000232  000000     NOP
+000234  020D38     CALL main
+406:                   oled_command(row);
+000236  000000     NOP
+000238  DA4000     BREAK
+407:               }
+00023A  FE0000     RESET
+00023C  200680     MOV #0x68, W0
+---  /Users/kneil/MPLABXProjects/PIC24Proj_Scratch.X/mcc_generated_files/uart1.c  -----------------------
+1:                 /**
+2:                   UART1 Generated Driver File
+3:                 
+4:                   @Company
+5:                     Microchip Technology Inc.
+6:                 
+7:                   @File Name
+8:                     uart1.c
+9:                 
+10:                  @Summary
+11:                    This is the generated driver implementation file for the UART1 driver using MPLAB(c) Code Configurator
+12:                
+13:                  @Description
+14:                    This header file provides implementations for driver APIs for UART1.
+15:                    Generation Information :
+16:                        Product Revision  :  MPLAB(c) Code Configurator - pic24-dspic-pic32mm : v1.35
+17:                        Device            :  PIC24EP512GP202
+18:                    The generated drivers are tested against the following:
+19:                        Compiler          :  XC16 1.31
+20:                        MPLAB             :  MPLAB X 3.60
+21:                */
+22:                
+23:                /*
+24:                    (c) 2016 Microchip Technology Inc. and its subsidiaries. You may use this
+25:                    software and any derivatives exclusively with Microchip products.
+26:                
+27:                    THIS SOFTWARE IS SUPPLIED BY MICROCHIP "AS IS". NO WARRANTIES, WHETHER
+28:                    EXPRESS, IMPLIED OR STATUTORY, APPLY TO THIS SOFTWARE, INCLUDING ANY IMPLIED
+29:                    WARRANTIES OF NON-INFRINGEMENT, MERCHANTABILITY, AND FITNESS FOR A
+30:                    PARTICULAR PURPOSE, OR ITS INTERACTION WITH MICROCHIP PRODUCTS, COMBINATION
+31:                    WITH ANY OTHER PRODUCTS, OR USE IN ANY APPLICATION.
+32:                
+33:                    IN NO EVENT WILL MICROCHIP BE LIABLE FOR ANY INDIRECT, SPECIAL, PUNITIVE,
+34:                    INCIDENTAL OR CONSEQUENTIAL LOSS, DAMAGE, COST OR EXPENSE OF ANY KIND
+35:                    WHATSOEVER RELATED TO THE SOFTWARE, HOWEVER CAUSED, EVEN IF MICROCHIP HAS
+36:                    BEEN ADVISED OF THE POSSIBILITY OR THE DAMAGES ARE FORESEEABLE. TO THE
+37:                    FULLEST EXTENT ALLOWED BY LAW, MICROCHIP'S TOTAL LIABILITY ON ALL CLAIMS IN
+38:                    ANY WAY RELATED TO THIS SOFTWARE WILL NOT EXCEED THE AMOUNT OF FEES, IF ANY,
+39:                    THAT YOU HAVE PAID DIRECTLY TO MICROCHIP FOR THIS SOFTWARE.
+40:                
+41:                    MICROCHIP PROVIDES THIS SOFTWARE CONDITIONALLY UPON YOUR ACCEPTANCE OF THESE
+42:                    TERMS.
+43:                */
+44:                
+45:                /**
+46:                  Section: Included Files
+47:                */
+48:                #include "uart1.h"
+49:                
+50:                /**
+51:                  Section: UART1 APIs
+52:                */
+53:                
+54:                void UART1_Initialize(void)
+55:                {
+56:                /**    
+57:                     Set the UART1 module to the options selected in the user interface.
+58:                     Make sure to set LAT bit corresponding to TxPin as high before UART initialization
+59:                */
+60:                    // STSEL 1; IREN disabled; PDSEL 8N; UARTEN enabled; RTSMD disabled; USIDL disabled; WAKE disabled; ABAUD disabled; LPBACK disabled; BRGH enabled; URXINV disabled; UEN TX_RX; 
+61:                    U1MODE = (0x8008 & ~(1<<15));  // disabling UARTEN bit   
+000E60  200080     MOV #0x8, W0
+000E62  881100     MOV W0, U1MODE
+62:                    // UTXISEL0 TX_ONE_CHAR; UTXINV disabled; OERR NO_ERROR_cleared; URXISEL RX_ONE_CHAR; UTXBRK COMPLETED; UTXEN disabled; ADDEN disabled; 
+63:                    U1STA = 0x0000;
+000E64  EF2222     CLR U1STA
+64:                    // BaudRate = 9600; Frequency = 16006718 Hz; BRG 416; 
+65:                    U1BRG = 0x01A0;
+000E66  201A00     MOV #0x1A0, W0
+000E68  881140     MOV W0, U1BRG
+66:                    
+67:                    U1MODEbits.UARTEN = 1;  // enabling UARTEN bit
+000E6A  A8E221     BSET 0x221, #7
+68:                    U1STAbits.UTXEN = 1; 
+000E6C  A84223     BSET 0x223, #2
+69:                   
+70:                }
+000E6E  060000     RETURN
+71:                
+72:                
+73:                uint8_t UART1_Read(void)
+74:                {
+75:                    while(!(U1STAbits.URXDA == 1))
+000E70  AB0222     BTST U1STA, #0
+000E72  32FFFE     BRA Z, UART1_Read
+76:                    {
+77:                        
+78:                    }
+79:                
+80:                    if ((U1STAbits.OERR == 1))
+000E74  AB2222     BTST U1STA, #1
+000E76  320001     BRA Z, 0xE7A
+81:                    {
+82:                        U1STAbits.OERR = 0;
+000E78  A92222     BCLR U1STA, #1
+83:                    }
+84:                
+85:                    
+86:                
+87:                    return U1RXREG;
+000E7A  801130     MOV U1RXREG, W0
+88:                }
+000E7C  060000     RETURN
+89:                
+90:                void UART1_Write(uint8_t txData)
+91:                {
+92:                    while(U1STAbits.UTXBF == 1)
+000E7E  202002     MOV #0x200, W2
+000E80  801113     MOV U1STA, W3
+000E82  610083     AND W2, W3, W1
+000E84  3AFFFD     BRA NZ, 0xE80
+93:                    {
+94:                        
+95:                    }
+96:                
+97:                    U1TXREG = txData;    // Write the data byte to the USART.
+000E86  FB8000     ZE W0, W0
+000E88  881120     MOV W0, U1TXREG
+98:                }
+000E8A  060000     RETURN
+99:                
+100:               UART1_STATUS UART1_StatusGet (void)
+101:               {
+102:                   return U1STA;
+000E8C  801110     MOV U1STA, W0
+103:               }
+000E8E  060000     RETURN
+104:               
+105:               int __attribute__((__section__(".libc.write"))) write(int handle, void *buffer, unsigned int len) {
+106:                   int i;
+107:                   while(U1STAbits.TRMT == 0);  
+000392  201004     MOV #0x100, W4
+000394  801110     MOV U1STA, W0
+000396  620180     AND W4, W0, W3
+000398  32FFFD     BRA Z, 0x394
+108:                   for (i = len; i; --i)
+00039A  780002     MOV W2, W0
+00039C  E00000     CP0 W0
+00039E  320009     BRA Z, 0x3B2
+0003A0  780280     MOV W0, W5
+0003AE  E90285     DEC W5, W5
+0003B0  3AFFF9     BRA NZ, 0x3A4
+109:                   {
+110:                       while(U1STAbits.TRMT == 0);
+0003A2  201004     MOV #0x100, W4
+0003A4  801112     MOV U1STA, W2
+0003A6  620182     AND W4, W2, W3
+0003A8  32FFFD     BRA Z, 0x3A4
+111:                       U1TXREG = *(char*)buffer++;        
+0003AA  FB01B1     SE [W1++], W3
+0003AC  881123     MOV W3, U1TXREG
+112:                   }
+113:                   return(len);
+114:               }
+0003B2  060000     RETURN
+115:               
+116:               /**
+117:                 End of File
+118:               */
+---  /Users/kneil/MPLABXProjects/PIC24Proj_Scratch.X/mcc_generated_files/traps.c  -----------------------
+1:                 /**
+2:                   System Traps Generated Driver File 
+3:                 
+4:                   @Company:
+5:                     Microchip Technology Inc.
+6:                 
+7:                   @File Name:
+8:                     traps.h
+9:                 
+10:                  @Summary:
+11:                    This is the generated driver implementation file for handling traps
+12:                    using MPLAB(c) Code Configurator
+13:                
+14:                  @Description:
+15:                    This source file provides implementations for MPLAB(c) Code Configurator traps.
+16:                    Generation Information : 
+17:                        Product Revision  :  MPLAB(c) Code Configurator - pic24-dspic-pic32mm : v1.35
+18:                        Device            :  PIC24EP512GP202
+19:                    The generated drivers are tested against the following:
+20:                        Compiler          :  XC16 1.31
+21:                        MPLAB             :  MPLAB X 3.60
+22:                */
+23:                /*
+24:                    (c) 2016 Microchip Technology Inc. and its subsidiaries. You may use this
+25:                    software and any derivatives exclusively with Microchip products.
+26:                
+27:                    THIS SOFTWARE IS SUPPLIED BY MICROCHIP "AS IS". NO WARRANTIES, WHETHER
+28:                    EXPRESS, IMPLIED OR STATUTORY, APPLY TO THIS SOFTWARE, INCLUDING ANY IMPLIED
+29:                    WARRANTIES OF NON-INFRINGEMENT, MERCHANTABILITY, AND FITNESS FOR A
+30:                    PARTICULAR PURPOSE, OR ITS INTERACTION WITH MICROCHIP PRODUCTS, COMBINATION
+31:                    WITH ANY OTHER PRODUCTS, OR USE IN ANY APPLICATION.
+32:                
+33:                    IN NO EVENT WILL MICROCHIP BE LIABLE FOR ANY INDIRECT, SPECIAL, PUNITIVE,
+34:                    INCIDENTAL OR CONSEQUENTIAL LOSS, DAMAGE, COST OR EXPENSE OF ANY KIND
+35:                    WHATSOEVER RELATED TO THE SOFTWARE, HOWEVER CAUSED, EVEN IF MICROCHIP HAS
+36:                    BEEN ADVISED OF THE POSSIBILITY OR THE DAMAGES ARE FORESEEABLE. TO THE
+37:                    FULLEST EXTENT ALLOWED BY LAW, MICROCHIP'S TOTAL LIABILITY ON ALL CLAIMS IN
+38:                    ANY WAY RELATED TO THIS SOFTWARE WILL NOT EXCEED THE AMOUNT OF FEES, IF ANY,
+39:                    THAT YOU HAVE PAID DIRECTLY TO MICROCHIP FOR THIS SOFTWARE.
+40:                
+41:                    MICROCHIP PROVIDES THIS SOFTWARE CONDITIONALLY UPON YOUR ACCEPTANCE OF THESE
+42:                    TERMS.
+43:                */
+44:                
+45:                /**
+46:                    Section: Includes
+47:                */
+48:                #include <xc.h>
+49:                #include "traps.h"
+50:                
+51:                #define ERROR_HANDLER __attribute__((interrupt,no_auto_psv))
+52:                #define ERROR_HANDLER_NORETURN ERROR_HANDLER __attribute__((noreturn))
+53:                #define FAILSAFE_STACK_GUARDSIZE 8
+54:                
+55:                #include <stdio.h>
+56:                
+57:                /**
+58:                 * a private place to store the error code if we run into a severe error
+59:                 */
+60:                static uint16_t TRAPS_error_code = -1;
+61:                
+62:                /**
+63:                 * Halts 
+64:                 * 
+65:                 * @param code error code
+66:                 */
+67:                void __attribute__((naked, noreturn, weak)) TRAPS_halt_on_error(uint16_t code)
+68:                {
+69:                    TRAPS_error_code = code;
+000E9A  8882A0     MOV W0, 0x1054
+000E9C  DA4000     BREAK
+70:                #ifdef __DEBUG    
+71:                    __builtin_software_breakpoint();
+72:                    /* If we are in debug mode, cause a software breakpoint in the debugger */
+73:                #endif
+74:                    printf("Trap encountered - error code %d", TRAPS_error_code);
+000E9E  781F80     MOV W0, [W15++]
+000EA0  28BAA0     MOV #0x8BAA, W0
+000EA2  781F80     MOV W0, [W15++]
+000EA4  07FA88     RCALL __printf_cdnopuxX, __printf_cdnopsuxX
+000EA6  5787E4     SUB W15, #0x4, W15
+000EA8  37FFFF     BRA 0xEA8
+75:                    while(1);
+76:                    
+77:                //    copied from header defn
+78:                //    TRAPS_OSC_FAIL = 0, /** Oscillator Fail Trap vector */
+79:                //    TRAPS_STACK_ERR = 1, /** Stack Error Trap Vector */
+80:                //    TRAPS_ADDRESS_ERR = 2, /** Address error Trap vector */
+81:                //    TRAPS_MATH_ERR = 3, /** Math Error Trap vector */
+82:                //    TRAPS_DMAC_ERR = 4, /** DMAC Error Trap vector */
+83:                //    TRAPS_HARD_ERR = 7, /** Generic Hard Trap vector */
+84:                //    TRAPS_DAE_ERR = 9, /** Generic Soft Trap vector */
+85:                //    TRAPS_DOOVR_ERR = 10, /** Generic Soft Trap vector */
+86:                    
+87:                }
+88:                
+89:                /**
+90:                 * Sets the stack pointer to a backup area of memory, in case we run into
+91:                 * a stack error (in which case we can't really trust the stack pointer)
+92:                 */
+93:                inline static void use_failsafe_stack(void)
+94:                {
+95:                    static uint8_t failsafe_stack[32];
+96:                    asm volatile (
+000E90  210CE0     MOV #0x10CE, W0
+000E92  780780     MOV W0, W15
+97:                        "   mov    %[pstack], W15\n"
+98:                        :
+99:                        : [pstack]"r"(failsafe_stack)
+100:                   );
+101:               /* Controls where the stack pointer limit is, relative to the end of the
+102:                * failsafe stack
+103:                */    
+104:                   SPLIM = (uint16_t)(((uint8_t *)failsafe_stack) + sizeof(failsafe_stack) 
+000E94  400078     ADD W0, #0x18, W0
+000E96  880100     MOV W0, SPLIM
+105:                           - FAILSAFE_STACK_GUARDSIZE);
+106:               }
+000E98  060000     RETURN
+107:               
+108:               /** Oscillator Fail Trap vector**/
+109:               void ERROR_HANDLER_NORETURN _OscillatorFail(void)
+110:               {
+0002FE  F80036     PUSH RCOUNT
+111:                   INTCON1bits.OSCFAIL = 0;  //Clear the trap flag
+000300  A928C0     BCLR INTCON1, #1
+112:                   TRAPS_halt_on_error(TRAPS_OSC_FAIL);
+000302  EB0000     CLR W0
+000304  0705CA     RCALL TRAPS_halt_on_error
+113:               }
+114:               /** Stack Error Trap Vector**/
+115:               void ERROR_HANDLER_NORETURN _StackError(void)
+116:               {
+000306  F80036     PUSH RCOUNT
+117:                   /* We use a failsafe stack: the presence of a stack-pointer error
+118:                    * means that we cannot trust the stack to operate correctly unless
+119:                    * we set the stack pointer to a safe place.
+120:                    */
+121:                   use_failsafe_stack(); 
+000308  0705C3     RCALL _use_failsafe_stack
+122:                   INTCON1bits.STKERR = 0;  //Clear the trap flag
+00030A  A948C0     BCLR INTCON1, #2
+123:                   TRAPS_halt_on_error(TRAPS_STACK_ERR);
+00030C  200010     MOV #0x1, W0
+00030E  0705C5     RCALL TRAPS_halt_on_error
+124:               }
+125:               /** Address error Trap vector**/
+126:               void ERROR_HANDLER_NORETURN _AddressError(void)
+127:               {
+000310  F80036     PUSH RCOUNT
+128:                   INTCON1bits.ADDRERR = 0;  //Clear the trap flag
+000312  A968C0     BCLR INTCON1, #3
+129:                   TRAPS_halt_on_error(TRAPS_ADDRESS_ERR);
+000314  200020     MOV #0x2, W0
+000316  0705C1     RCALL TRAPS_halt_on_error
+130:               }
+131:               /** Math Error Trap vector**/
+132:               void ERROR_HANDLER_NORETURN _MathError(void)
+133:               {
+000318  F80036     PUSH RCOUNT
+134:                   INTCON1bits.MATHERR = 0;  //Clear the trap flag
+00031A  A988C0     BCLR INTCON1, #4
+135:                   TRAPS_halt_on_error(TRAPS_MATH_ERR);
+00031C  200030     MOV #0x3, W0
+00031E  0705BD     RCALL TRAPS_halt_on_error
+136:               }
+137:               /** DMAC Error Trap vector**/
+138:               void ERROR_HANDLER_NORETURN _DMACError(void)
+139:               {
+000320  F80036     PUSH RCOUNT
+140:                   INTCON1bits.DMACERR = 0;  //Clear the trap flag
+000322  A9A8C0     BCLR INTCON1, #5
+141:                   TRAPS_halt_on_error(TRAPS_DMAC_ERR);
+000324  200040     MOV #0x4, W0
+000326  0705B9     RCALL TRAPS_halt_on_error
+142:               }
+143:               /** Generic Hard Trap vector**/
+144:               void ERROR_HANDLER_NORETURN _HardTrapError(void)
+145:               {
+000328  F80036     PUSH RCOUNT
+146:                   INTCON4bits.SGHT = 0;  //Clear the trap flag
+00032A  A908C6     BCLR INTCON4, #0
+147:                   TRAPS_halt_on_error(TRAPS_HARD_ERR);
+00032C  200070     MOV #0x7, W0
+00032E  0705B5     RCALL TRAPS_halt_on_error
+148:               }
+149:               /** Generic Soft Trap vector**/
+150:               void ERROR_HANDLER_NORETURN _SoftTrapError(void)
+151:               {
+000330  F80036     PUSH RCOUNT
+152:                   if(INTCON3bits.DAE)
+000332  ABA8C4     BTST INTCON3, #5
+000334  320003     BRA Z, 0x33C
+153:                   {
+154:                     INTCON3bits.DAE = 0;  //Clear the trap flag
+000336  A9A8C4     BCLR INTCON3, #5
+155:                     TRAPS_halt_on_error(TRAPS_DAE_ERR);
+000338  200090     MOV #0x9, W0
+00033A  0705AF     RCALL TRAPS_halt_on_error
+156:                   }
+157:                   if(INTCON3bits.DOOVR)
+00033C  AB88C4     BTST INTCON3, #4
+00033E  320003     BRA Z, 0x346
+158:                   {
+159:                     INTCON3bits.DOOVR = 0;  //Clear the trap flag
+000340  A988C4     BCLR INTCON3, #4
+160:                     TRAPS_halt_on_error(TRAPS_DOOVR_ERR);
+000342  2000A0     MOV #0xA, W0
+000344  0705AA     RCALL TRAPS_halt_on_error
+000346  37FFFF     BRA 0x346
+161:                   }
+162:                   while(1);
+163:               }
+---  /Users/kneil/MPLABXProjects/PIC24Proj_Scratch.X/mcc_generated_files/tmr2.c  ------------------------
+1:                 
+2:                 /**
+3:                   TMR2 Generated Driver API Source File 
+4:                 
+5:                   @Company
+6:                     Microchip Technology Inc.
+7:                 
+8:                   @File Name
+9:                     tmr2.c
+10:                
+11:                  @Summary
+12:                    This is the generated source file for the TMR2 driver using MPLAB(c) Code Configurator
+13:                
+14:                  @Description
+15:                    This source file provides APIs for driver for TMR2. 
+16:                    Generation Information : 
+17:                        Product Revision  :  MPLAB(c) Code Configurator - pic24-dspic-pic32mm : v1.35
+18:                        Device            :  PIC24EP512GP202
+19:                    The generated drivers are tested against the following:
+20:                        Compiler          :  XC16 1.31
+21:                        MPLAB 	          :  MPLAB X 3.60
+22:                */
+23:                
+24:                /*
+25:                    (c) 2016 Microchip Technology Inc. and its subsidiaries. You may use this
+26:                    software and any derivatives exclusively with Microchip products.
+27:                
+28:                    THIS SOFTWARE IS SUPPLIED BY MICROCHIP "AS IS". NO WARRANTIES, WHETHER
+29:                    EXPRESS, IMPLIED OR STATUTORY, APPLY TO THIS SOFTWARE, INCLUDING ANY IMPLIED
+30:                    WARRANTIES OF NON-INFRINGEMENT, MERCHANTABILITY, AND FITNESS FOR A
+31:                    PARTICULAR PURPOSE, OR ITS INTERACTION WITH MICROCHIP PRODUCTS, COMBINATION
+32:                    WITH ANY OTHER PRODUCTS, OR USE IN ANY APPLICATION.
+33:                
+34:                    IN NO EVENT WILL MICROCHIP BE LIABLE FOR ANY INDIRECT, SPECIAL, PUNITIVE,
+35:                    INCIDENTAL OR CONSEQUENTIAL LOSS, DAMAGE, COST OR EXPENSE OF ANY KIND
+36:                    WHATSOEVER RELATED TO THE SOFTWARE, HOWEVER CAUSED, EVEN IF MICROCHIP HAS
+37:                    BEEN ADVISED OF THE POSSIBILITY OR THE DAMAGES ARE FORESEEABLE. TO THE
+38:                    FULLEST EXTENT ALLOWED BY LAW, MICROCHIP'S TOTAL LIABILITY ON ALL CLAIMS IN
+39:                    ANY WAY RELATED TO THIS SOFTWARE WILL NOT EXCEED THE AMOUNT OF FEES, IF ANY,
+40:                    THAT YOU HAVE PAID DIRECTLY TO MICROCHIP FOR THIS SOFTWARE.
+41:                
+42:                    MICROCHIP PROVIDES THIS SOFTWARE CONDITIONALLY UPON YOUR ACCEPTANCE OF THESE
+43:                    TERMS.
+44:                */
+45:                
+46:                /**
+47:                  Section: Included Files
+48:                */
+49:                
+50:                #include <xc.h>
+51:                #include "tmr2.h"
+52:                
+53:                /**
+54:                  Section: Data Type Definitions
+55:                */
+56:                
+57:                /** TMR Driver Hardware Instance Object
+58:                
+59:                  @Summary
+60:                    Defines the object required for the maintainence of the hardware instance.
+61:                
+62:                  @Description
+63:                    This defines the object required for the maintainence of the hardware
+64:                    instance. This object exists once per hardware instance of the peripheral.
+65:                
+66:                  Remarks:
+67:                    None.
+68:                */
+69:                
+70:                typedef struct _TMR_OBJ_STRUCT
+71:                {
+72:                    /* Timer Elapsed */
+73:                    bool                                                    timerElapsed;
+74:                    /*Software Counter value*/
+75:                    uint8_t                                                 count;
+76:                
+77:                } TMR_OBJ;
+78:                
+79:                static TMR_OBJ tmr2_obj;
+80:                
+81:                /**
+82:                  Section: Driver Interface
+83:                */
+84:                
+85:                
+86:                void TMR2_Initialize (void)
+87:                {
+88:                    //TMR3 0; 
+89:                    TMR3 = 0x0000;
+000D96  EF210A     CLR TMR3
+90:                    //PR3 0; 
+91:                    PR3 = 0x0000;
+000D98  EF210E     CLR PR3
+92:                    //TMR2 0; 
+93:                    TMR2 = 0x0000;
+000D9A  EF2106     CLR TMR2
+94:                    //Period = 0.4999980633 s; Frequency = 16006718 Hz; PR2 31264; 
+95:                    PR2 = 0x7A20;
+000D9C  27A200     MOV #0x7A20, W0
+000D9E  880860     MOV W0, PR2
+96:                    //TCKPS 1:256; T32 32 Bit; TON enabled; TSIDL disabled; TCS FOSC/2; TGATE disabled; 
+97:                    T2CON = 0x8038;
+000DA0  280380     MOV #0x8038, W0
+000DA2  880880     MOV W0, T2CON
+98:                
+99:                    
+100:                   IFS0bits.T3IF = false;
+000DA4  A90801     BCLR 0x801, #0
+101:                   IEC0bits.T3IE = true;
+000DA6  A80821     BSET 0x821, #0
+102:               	
+103:                   tmr2_obj.timerElapsed = false;
+000DA8  211040     MOV #0x1104, W0
+000DAA  EB4800     CLR.B [W0]
+104:               
+105:               }
+000DAC  060000     RETURN
+106:               
+107:               
+108:               //void __attribute__ ( ( interrupt, no_auto_psv ) ) _T3Interrupt (  )
+109:               //{
+110:               //    /* Check if the Timer Interrupt/Status is set */
+111:               //
+112:               //    //***User Area Begin
+113:               //
+114:               //    // ticker function call;
+115:               //    // ticker is 1 -> Callback function gets called everytime this ISR executes
+116:               //    TMR2_CallBack();
+117:               //
+118:               //    //***User Area End
+119:               //
+120:               //    tmr2_obj.count++;
+121:               //    tmr2_obj.timerElapsed = true;
+122:               //    IFS0bits.T3IF = false;
+123:               //}
+124:               
+125:               
+126:               
+127:               void TMR2_Period32BitSet( uint32_t value )
+128:               {
+129:                   /* Update the counter values */
+130:                   PR2 = (value & 0x0000FFFF);
+000DAE  880860     MOV W0, PR2
+131:                   PR3 = ((value & 0xFFFF0000)>>16);
+000DB0  880871     MOV W1, PR3
+132:               }
+000DB2  060000     RETURN
+133:               
+134:               uint32_t TMR2_Period32BitGet( void )
+135:               {
+136:                   uint32_t periodVal = 0xFFFFFFFF;
+137:               
+138:                   /* get the timer period value and return it */
+139:                   periodVal = (((uint32_t)PR3 <<16) | PR2);
+000DB4  800870     MOV PR3, W0
+000DB6  800862     MOV PR2, W2
+000DB8  EB0080     CLR W1
+000DBA  DD00C0     SL W0, #0, W1
+000DBC  200000     MOV #0x0, W0
+000DBE  EB0180     CLR W3
+000DC0  700002     IOR W0, W2, W0
+000DC2  708083     IOR W1, W3, W1
+140:               
+141:                   return( periodVal );
+142:               
+143:               }
+000DC4  060000     RETURN
+144:               
+145:               void TMR2_Counter32BitSet( uint32_t value )
+146:               {
+147:                   /* Update the counter values */
+148:                  TMR3HLD = ((value & 0xFFFF0000)>>16);
+000DC6  880841     MOV W1, TMR3HLD
+149:                  TMR2 = (value & 0x0000FFFF);
+000DC8  880830     MOV W0, TMR2
+150:               
+151:               }
+000DCA  060000     RETURN
+152:               
+153:               uint32_t TMR2_Counter32BitGet( void )
+154:               {
+155:                   uint32_t countVal = 0xFFFFFFFF;
+156:                   uint16_t countValUpper;
+157:                   uint16_t countValLower;
+158:               
+159:                   countValLower = TMR2;
+000DCC  800832     MOV TMR2, W2
+160:                   countValUpper = TMR3HLD;
+000DCE  800840     MOV TMR3HLD, W0
+161:               
+162:                   /* get the current counter value and return it */
+163:                   countVal = (((uint32_t)countValUpper<<16)| countValLower );
+000DD0  EB0080     CLR W1
+000DD2  DD00C0     SL W0, #0, W1
+000DD4  200000     MOV #0x0, W0
+000DD6  EB0180     CLR W3
+000DD8  700002     IOR W0, W2, W0
+000DDA  708083     IOR W1, W3, W1
+164:               
+165:                   return( countVal );
+166:               
+167:               }
+000DDC  060000     RETURN
+168:               
+169:               
+170:               void __attribute__ ((weak)) TMR2_CallBack(void)
+171:               {
+172:                   // Add your custom callback code here
+173:               }
+000DDE  060000     RETURN
+174:               
+175:               void TMR2_Start( void )
+176:               {
+177:                   /* Reset the status information */
+178:                   tmr2_obj.timerElapsed = false;
+000DE0  211040     MOV #0x1104, W0
+000DE2  EB4800     CLR.B [W0]
+179:               
+180:                   /*Enable the interrupt*/
+181:                   IEC0bits.T3IE = true;
+000DE4  A80821     BSET 0x821, #0
+182:               
+183:                   /* Start the Timer */
+184:                   T2CONbits.TON = 1;
+000DE6  A8E111     BSET 0x111, #7
+185:               }
+000DE8  060000     RETURN
+186:               
+187:               void TMR2_Stop( void )
+188:               {
+189:                   /* Stop the Timer */
+190:                   T2CONbits.TON = false;
+000DEA  A9E111     BCLR 0x111, #7
+191:               
+192:                   /*Disable the interrupt*/
+193:                   IEC0bits.T3IE = false;
+000DEC  A90821     BCLR 0x821, #0
+194:               }
+000DEE  060000     RETURN
+195:               
+196:               bool TMR2_GetElapsedThenClear(void)
+197:               {
+198:                   bool status;
+199:                   
+200:                   status = tmr2_obj.timerElapsed;
+000DF0  211040     MOV #0x1104, W0
+000DF2  784010     MOV.B [W0], W0
+201:               
+202:                   if(status == true)
+000DF4  E00400     CP0.B W0
+000DF6  320002     BRA Z, 0xDFC
+203:                   {
+204:                       tmr2_obj.timerElapsed = false;
+000DF8  211041     MOV #0x1104, W1
+000DFA  EB4880     CLR.B [W1]
+205:                   }
+206:                   return status;
+207:               }
+000DFC  060000     RETURN
+208:               
+209:               int TMR2_SoftwareCounterGet(void)
+210:               {
+211:                   return tmr2_obj.count;
+000DFE  211050     MOV #0x1105, W0
+000E00  FB8010     ZE [W0], W0
+212:               }
+000E02  060000     RETURN
+213:               
+214:               void TMR2_SoftwareCounterClear(void)
+215:               {
+216:                   tmr2_obj.count = 0; 
+000E04  211050     MOV #0x1105, W0
+000E06  EB4800     CLR.B [W0]
+217:               }
+000E08  060000     RETURN
+218:               
+219:               /**
+220:                End of File
+221:               */
+---  /Users/kneil/MPLABXProjects/PIC24Proj_Scratch.X/mcc_generated_files/pin_manager.c  -----------------
+1:                 /**
+2:                   System Interrupts Generated Driver File 
+3:                 
+4:                   @Company:
+5:                     Microchip Technology Inc.
+6:                 
+7:                   @File Name:
+8:                     pin_manager.c
+9:                 
+10:                  @Summary:
+11:                    This is the generated manager file for the MPLAB(c) Code Configurator device.  This manager
+12:                    configures the pins direction, initial state, analog setting.
+13:                    The peripheral pin select, PPS, configuration is also handled by this manager.
+14:                
+15:                  @Description:
+16:                    This source file provides implementations for MPLAB(c) Code Configurator interrupts.
+17:                    Generation Information : 
+18:                        Product Revision  :  MPLAB(c) Code Configurator - 4.15.3
+19:                        Device            :  PIC24EP512GP202
+20:                    The generated drivers are tested against the following:
+21:                        Compiler          :  XC16 1.31
+22:                        MPLAB             :  MPLAB X 3.60
+23:                
+24:                    Copyright (c) 2013 - 2015 released Microchip Technology Inc.  All rights reserved.
+25:                
+26:                    Microchip licenses to you the right to use, modify, copy and distribute
+27:                    Software only when embedded on a Microchip microcontroller or digital signal
+28:                    controller that is integrated into your product or third party product
+29:                    (pursuant to the sublicense terms in the accompanying license agreement).
+30:                
+31:                    You should refer to the license agreement accompanying this Software for
+32:                    additional information regarding your rights and obligations.
+33:                
+34:                    SOFTWARE AND DOCUMENTATION ARE PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND,
+35:                    EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION, ANY WARRANTY OF
+36:                    MERCHANTABILITY, TITLE, NON-INFRINGEMENT AND FITNESS FOR A PARTICULAR PURPOSE.
+37:                    IN NO EVENT SHALL MICROCHIP OR ITS LICENSORS BE LIABLE OR OBLIGATED UNDER
+38:                    CONTRACT, NEGLIGENCE, STRICT LIABILITY, CONTRIBUTION, BREACH OF WARRANTY, OR
+39:                    OTHER LEGAL EQUITABLE THEORY ANY DIRECT OR INDIRECT DAMAGES OR EXPENSES
+40:                    INCLUDING BUT NOT LIMITED TO ANY INCIDENTAL, SPECIAL, INDIRECT, PUNITIVE OR
+41:                    CONSEQUENTIAL DAMAGES, LOST PROFITS OR LOST DATA, COST OF PROCUREMENT OF
+42:                    SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
+43:                    (INCLUDING BUT NOT LIMITED TO ANY DEFENSE THEREOF), OR OTHER SIMILAR COSTS.
+44:                
+45:                */
+46:                
+47:                
+48:                /**
+49:                    Section: Includes
+50:                */
+51:                #include <xc.h>
+52:                #include "pin_manager.h"
+53:                
+54:                /**
+55:                    void PIN_MANAGER_Initialize(void)
+56:                */
+57:                void PIN_MANAGER_Initialize(void)
+58:                {
+59:                    /****************************************************************************
+60:                     * Setting the Output Latch SFR(s)
+61:                     ***************************************************************************/
+62:                    LATA = 0x0000;
+000E0A  EF2E04     CLR LATA
+63:                    LATB = 0x2080;
+000E0C  220800     MOV #0x2080, W0
+000E0E  8870A0     MOV W0, LATB
+64:                
+65:                    /****************************************************************************
+66:                     * Setting the GPIO Direction SFR(s)
+67:                     ***************************************************************************/
+68:                    TRISA = 0x001F;
+000E10  2001F0     MOV #0x1F, W0
+000E12  887000     MOV W0, TRISA
+69:                    TRISB = 0xFB7F;
+000E14  2FB7F0     MOV #0xFB7F, W0
+000E16  887080     MOV W0, TRISB
+70:                
+71:                    /****************************************************************************
+72:                     * Setting the Weak Pull Up and Weak Pull Down SFR(s)
+73:                     ***************************************************************************/
+74:                    CNPDA = 0x0000;
+000E18  EF2E0C     CLR CNPDA
+75:                    CNPDB = 0x0000;
+000E1A  EF2E1C     CLR CNPDB
+76:                    CNPUA = 0x0000;
+000E1C  EF2E0A     CLR CNPUA
+77:                    CNPUB = 0x0000;
+000E1E  EF2E1A     CLR CNPUB
+78:                
+79:                    /****************************************************************************
+80:                     * Setting the Open Drain SFR(s)
+81:                     ***************************************************************************/
+82:                    ODCA = 0x0000;
+000E20  EF2E06     CLR ODCA
+83:                    ODCB = 0x0000;
+000E22  EF2E16     CLR ODCB
+84:                
+85:                    /****************************************************************************
+86:                     * Setting the Analog/Digital Configuration SFR(s)
+87:                     ***************************************************************************/
+88:                    ANSELA = 0x0013;
+000E24  200130     MOV #0x13, W0
+000E26  887070     MOV W0, ANSELA
+89:                    ANSELB = 0x010C;
+000E28  2010C0     MOV #0x10C, W0
+000E2A  8870F0     MOV W0, ANSELB
+90:                
+91:                    /****************************************************************************
+92:                     * Set the PPS
+93:                     ***************************************************************************/
+94:                    __builtin_write_OSCCONL(OSCCON & 0xbf); // unlock PPS
+000E2C  200BF2     MOV #0xBF, W2
+000E2E  803A10     MOV OSCCON, W0
+000E30  610100     AND W2, W0, W2
+000E32  200460     MOV #0x46, W0
+000E34  200571     MOV #0x57, W1
+000E36  207423     MOV #0x742, W3
+000E38  784980     MOV.B W0, [W3]
+000E3A  784981     MOV.B W1, [W3]
+000E3C  784982     MOV.B W2, [W3]
+95:                
+96:                    RPOR2bits.RP39R = 0x0001;   //RB7->UART1:U1TX;
+000E3E  2C0FF2     MOV #0xC0FF, W2
+000E40  803423     MOV RPOR2, W3
+000E42  610103     AND W2, W3, W2
+000E44  A08002     BSET W2, #8
+000E46  883422     MOV W2, RPOR2
+97:                    RPINR18bits.U1RXR = 0x0026;   //RB6->UART1:U1RX;
+000E48  2FF802     MOV #0xFF80, W2
+000E4A  803623     MOV RPINR18, W3
+000E4C  610103     AND W2, W3, W2
+000E4E  B30262     IOR #0x26, W2
+000E50  883622     MOV W2, RPINR18
+98:                
+99:                    __builtin_write_OSCCONL(OSCCON | 0x40); // lock   PPS
+000E52  803A12     MOV OSCCON, W2
+000E54  A06002     BSET W2, #6
+000E56  207423     MOV #0x742, W3
+000E58  784980     MOV.B W0, [W3]
+000E5A  784981     MOV.B W1, [W3]
+000E5C  784982     MOV.B W2, [W3]
+100:               
+101:               }
+000E5E  060000     RETURN
+102:               
+---  /Users/kneil/MPLABXProjects/PIC24Proj_Scratch.X/mcc_generated_files/mcc.c  -------------------------
+1:                 /**
+2:                   @Generated MPLAB(c) Code Configurator Source File
+3:                 
+4:                   @Company:
+5:                     Microchip Technology Inc.
+6:                 
+7:                   @File Name:
+8:                     mcc.c
+9:                 
+10:                  @Summary:
+11:                    This is the mcc.c file generated using MPLAB(c) Code Configurator
+12:                
+13:                  @Description:
+14:                    This header file provides implementations for driver APIs for all modules selected in the GUI.
+15:                    Generation Information :
+16:                        Product Revision  :  MPLAB(c) Code Configurator - pic24-dspic-pic32mm : v1.35
+17:                        Device            :  PIC24EP512GP202
+18:                    The generated drivers are tested against the following:
+19:                        Compiler          :  XC16 1.31
+20:                        MPLAB             :  MPLAB X 3.60
+21:                */
+22:                
+23:                /*
+24:                    (c) 2016 Microchip Technology Inc. and its subsidiaries. You may use this
+25:                    software and any derivatives exclusively with Microchip products.
+26:                
+27:                    THIS SOFTWARE IS SUPPLIED BY MICROCHIP "AS IS". NO WARRANTIES, WHETHER
+28:                    EXPRESS, IMPLIED OR STATUTORY, APPLY TO THIS SOFTWARE, INCLUDING ANY IMPLIED
+29:                    WARRANTIES OF NON-INFRINGEMENT, MERCHANTABILITY, AND FITNESS FOR A
+30:                    PARTICULAR PURPOSE, OR ITS INTERACTION WITH MICROCHIP PRODUCTS, COMBINATION
+31:                    WITH ANY OTHER PRODUCTS, OR USE IN ANY APPLICATION.
+32:                
+33:                    IN NO EVENT WILL MICROCHIP BE LIABLE FOR ANY INDIRECT, SPECIAL, PUNITIVE,
+34:                    INCIDENTAL OR CONSEQUENTIAL LOSS, DAMAGE, COST OR EXPENSE OF ANY KIND
+35:                    WHATSOEVER RELATED TO THE SOFTWARE, HOWEVER CAUSED, EVEN IF MICROCHIP HAS
+36:                    BEEN ADVISED OF THE POSSIBILITY OR THE DAMAGES ARE FORESEEABLE. TO THE
+37:                    FULLEST EXTENT ALLOWED BY LAW, MICROCHIP'S TOTAL LIABILITY ON ALL CLAIMS IN
+38:                    ANY WAY RELATED TO THIS SOFTWARE WILL NOT EXCEED THE AMOUNT OF FEES, IF ANY,
+39:                    THAT YOU HAVE PAID DIRECTLY TO MICROCHIP FOR THIS SOFTWARE.
+40:                
+41:                    MICROCHIP PROVIDES THIS SOFTWARE CONDITIONALLY UPON YOUR ACCEPTANCE OF THESE
+42:                    TERMS.
+43:                */
+44:                
+45:                // Configuration bits: selected in the GUI
+46:                
+47:                // FICD
+48:                #pragma config ICS = PGD3    // ICD Communication Channel Select bits->Communicate on PGEC3 and PGED3
+49:                #pragma config JTAGEN = OFF    // JTAG Enable bit->JTAG is disabled
+50:                
+51:                // FPOR
+52:                #pragma config ALTI2C1 = ON    // Alternate I2C1 pins->I2C1 mapped to ASDA1/ASCL1 pins
+53:                #pragma config ALTI2C2 = ON    // Alternate I2C2 pins->I2C2 mapped to ASDA2/ASCL2 pins
+54:                #pragma config WDTWIN = WIN25    // Watchdog Window Select bits->WDT Window is 25% of WDT period
+55:                
+56:                // FWDT
+57:                #pragma config WDTPOST = PS32768    // Watchdog Timer Postscaler bits->1:32768
+58:                #pragma config WDTPRE = PR128    // Watchdog Timer Prescaler bit->1:128
+59:                #pragma config PLLKEN = ON    // PLL Lock Enable bit->Clock switch to PLL source will wait until the PLL lock signal is valid.
+60:                #pragma config WINDIS = OFF    // Watchdog Timer Window Enable bit->Watchdog Timer in Non-Window mode
+61:                #pragma config FWDTEN = OFF    // Watchdog Timer Enable bit->Watchdog timer enabled/disabled by user software
+62:                
+63:                // FOSC
+64:                #pragma config POSCMD = NONE    // Primary Oscillator Mode Select bits->Primary Oscillator disabled
+65:                #pragma config OSCIOFNC = ON    // OSC2 Pin Function bit->OSC2 is general purpose digital I/O pin
+66:                #pragma config IOL1WAY = OFF    // Peripheral pin select configuration->Allow multiple reconfigurations
+67:                #pragma config FCKSM = CSDCMD    // Clock Switching Mode bits->Both Clock switching and Fail-safe Clock Monitor are disabled
+68:                
+69:                // FOSCSEL
+70:                #pragma config FNOSC = FRCPLL    // Oscillator Source Selection->Fast RC Oscillator with divide-by-N with PLL module (FRCPLL)
+71:                #pragma config IESO = ON    // Two-speed Oscillator Start-up Enable bit->Start up device with FRC, then switch to user-selected oscillator source
+72:                
+73:                // FGS
+74:                #pragma config GWRP = OFF    // General Segment Write-Protect bit->General Segment may be written
+75:                #pragma config GCP = OFF    // General Segment Code-Protect bit->General Segment Code protect is Disabled
+76:                
+77:                #include "mcc.h"
+78:                
+79:                /**
+80:                 Section: Local Variables
+81:                */
+82:                
+83:                /**
+84:                 Section: Function prototypes
+85:                */
+86:                bool SYSTEM_ResetCauseFromSoftware(uint16_t resetCause);
+87:                bool SYSTEM_ResetCauseFromWatchdogTimer(uint16_t resetCause);
+88:                bool SYSTEM_ResetCauseFromConfigurationMismatch(uint16_t resetCause);
+89:                bool SYSTEM_ResetCauseFromIllegalOpcode(uint16_t resetCause);
+90:                bool SYSTEM_ResetCauseFromExternal(uint16_t resetCause);
+91:                bool SYSTEM_ResetCauseFromTrap(uint16_t resetCause);
+92:                void SYSTEM_ResetCauseClear(RESET_MASKS resetFlagMask);
+93:                
+94:                /**
+95:                * a private place to store the error code if we run into a severe error
+96:                */
+97:                
+98:                void SYSTEM_Initialize(void)
+99:                {
+100:                   PIN_MANAGER_Initialize();
+000BFC  070106     RCALL PIN_MANAGER_Initialize
+101:                   INTERRUPT_Initialize();
+000BFE  070155     RCALL INTERRUPT_Initialize
+102:                   OSCILLATOR_Initialize();
+000C00  07FFEB     RCALL OSCILLATOR_Initialize
+103:                   TMR2_Initialize();
+000C02  0700C9     RCALL TMR2_Initialize
+104:                   UART1_Initialize();
+000C04  07012D     RCALL UART1_Initialize
+105:                   CORCON_ModeOperatingSet(CORCON_MODE_PORVALUES);
+000C06  200200     MOV #0x20, W0
+000C08  07FFE1     RCALL _CORCON_ModeOperatingSet
+106:               }
+000C0A  060000     RETURN
+107:               
+108:               void OSCILLATOR_Initialize(void)
+109:               {
+110:                   // CF no clock failure; NOSC FRCPLL; CLKLOCK unlocked; OSWEN Switch is Complete; 
+111:                   __builtin_write_OSCCONL((uint8_t) (0x0100 & 0x00FF));
+000BD8  200571     MOV #0x57, W1
+000BDA  EB0100     CLR W2
+000BDC  200460     MOV #0x46, W0
+000BDE  207423     MOV #0x742, W3
+000BE0  784980     MOV.B W0, [W3]
+000BE2  784981     MOV.B W1, [W3]
+000BE4  784982     MOV.B W2, [W3]
+112:                   // FRCDIV FRC/1; PLLPRE 4; DOZE 1:8; PLLPOST 1:8; DOZEN disabled; ROI disabled; 
+113:                   CLKDIV = 0x30C2;
+000BE6  230C20     MOV #0x30C2, W0
+000BE8  883A20     MOV W0, CLKDIV
+114:                   // TUN Center frequency; 
+115:                   OSCTUN = 0x0000;
+000BEA  EF2748     CLR OSCTUN
+116:                   // ROON disabled; ROSEL disabled; RODIV Base clock value; ROSSLP disabled; 
+117:                   REFOCON = 0x0000;
+000BEC  EF274E     CLR REFOCON
+118:                   // PLLDIV 137; 
+119:                   PLLFBD = 0x0089;
+000BEE  200890     MOV #0x89, W0
+000BF0  883A30     MOV W0, PLLFBD
+120:                   // RND disabled; SATB disabled; SATA disabled; ACCSAT disabled; 
+121:               	CORCONbits.RND = 0;
+000BF2  A92044     BCLR CORCON, #1
+122:               	CORCONbits.SATB = 0;
+000BF4  A9C044     BCLR CORCON, #6
+123:               	CORCONbits.SATA = 0;
+000BF6  A9E044     BCLR CORCON, #7
+124:               	CORCONbits.ACCSAT = 0;
+000BF8  A98044     BCLR CORCON, #4
+125:               }
+000BFA  060000     RETURN
+126:               
+127:               uint16_t SYSTEM_GetResetCause(void)
+128:               {
+129:                   return RCON;
+000C0C  803A00     MOV RCON, W0
+130:               }
+000C0E  060000     RETURN
+131:               
+132:               void __attribute__ ((weak)) SYSTEM_ResetCauseHandler(void)
+133:               {
+000C3E  781F88     MOV W8, [W15++]
+134:                   uint16_t resetCause = SYSTEM_GetResetCause();
+000C40  07FFE5     RCALL SYSTEM_GetResetCause
+000C42  780400     MOV W0, W8
+135:                   if(SYSTEM_ResetCauseFromTrap(resetCause))
+000C44  780008     MOV W8, W0
+000C46  07FFE4     RCALL SYSTEM_ResetCauseFromTrap
+000C48  E00400     CP0.B W0
+000C4A  320002     BRA Z, 0xC50
+136:                   { 
+137:                     SYSTEM_ResetCauseClear(RESET_MASK_TRAPR); 
+000C4C  280000     MOV #0x8000, W0
+000C4E  07FFF3     RCALL SYSTEM_ResetCauseClear
+138:                     //Do something 
+139:                   }
+140:                   if(SYSTEM_ResetCauseFromIllegalOpcode(resetCause))
+000C50  780008     MOV W8, W0
+000C52  07FFE0     RCALL SYSTEM_ResetCauseFromIllegalOpcode
+000C54  E00400     CP0.B W0
+000C56  320002     BRA Z, 0xC5C
+141:                   { 
+142:                     SYSTEM_ResetCauseClear(RESET_MASK_IOPUWR); 
+000C58  240000     MOV #0x4000, W0
+000C5A  07FFED     RCALL SYSTEM_ResetCauseClear
+143:                     //Do something 
+144:                   }
+145:                   if(SYSTEM_ResetCauseFromConfigurationMismatch(resetCause))
+000C5C  780008     MOV W8, W0
+000C5E  07FFDF     RCALL SYSTEM_ResetCauseFromConfigurationMismatch
+000C60  E00400     CP0.B W0
+000C62  320002     BRA Z, 0xC68
+146:                   { 
+147:                     SYSTEM_ResetCauseClear(RESET_MASK_CM); 
+000C64  202000     MOV #0x200, W0
+000C66  07FFE7     RCALL SYSTEM_ResetCauseClear
+148:                     //Do something 
+149:                   }
+150:                   if(SYSTEM_ResetCauseFromExternal(resetCause))
+000C68  780008     MOV W8, W0
+000C6A  07FFDC     RCALL SYSTEM_ResetCauseFromExternal
+000C6C  E00400     CP0.B W0
+000C6E  320002     BRA Z, 0xC74
+151:                   { 
+152:                     SYSTEM_ResetCauseClear(RESET_MASK_EXTR); 
+000C70  200800     MOV #0x80, W0
+000C72  07FFE1     RCALL SYSTEM_ResetCauseClear
+153:                     //Do something 
+154:                   }
+155:                   if(SYSTEM_ResetCauseFromSoftware(resetCause))
+000C74  780008     MOV W8, W0
+000C76  07FFD9     RCALL SYSTEM_ResetCauseFromSoftware
+000C78  E00400     CP0.B W0
+000C7A  320002     BRA Z, 0xC80
+156:                   { 
+157:                     SYSTEM_ResetCauseClear(RESET_MASK_SWR); 
+000C7C  200400     MOV #0x40, W0
+000C7E  07FFDB     RCALL SYSTEM_ResetCauseClear
+158:                     //Do something 
+159:                   }
+160:                   if(SYSTEM_ResetCauseFromWatchdogTimer(resetCause))
+000C80  780008     MOV W8, W0
+000C82  07FFD6     RCALL SYSTEM_ResetCauseFromWatchdogTimer
+000C84  E00400     CP0.B W0
+000C86  320002     BRA Z, 0xC8C
+161:                   { 
+162:                     SYSTEM_ResetCauseClear(RESET_MASK_WDTO); 
+000C88  200100     MOV #0x10, W0
+000C8A  07FFD5     RCALL SYSTEM_ResetCauseClear
+163:                     //Do something 
+164:                   }
+165:               }
+000C8C  78044F     MOV [--W15], W8
+000C8E  060000     RETURN
+166:               
+167:               bool SYSTEM_ResetCauseFromTrap(uint16_t resetCause)
+000C10  DE004F     LSR W0, #15, W0
+168:               {
+169:                   bool resetStatus = false;
+170:                   if(resetCause & RESET_MASK_TRAPR)
+171:                   { 
+172:                     resetStatus = true; 
+173:                   }
+174:                   return resetStatus;
+175:               }
+000C12  060000     RETURN
+176:               
+177:               bool SYSTEM_ResetCauseFromIllegalOpcode(uint16_t resetCause)
+000C14  240001     MOV #0x4000, W1
+000C16  600001     AND W0, W1, W0
+000C18  EA0000     NEG W0, W0
+000C1A  DE004F     LSR W0, #15, W0
+178:               {
+179:                   bool resetStatus = false;
+180:                   if(resetCause & RESET_MASK_IOPUWR)
+181:                   { 
+182:                     resetStatus = true; 
+183:                   }
+184:                   return resetStatus;
+185:               }
+000C1C  060000     RETURN
+186:               
+187:               bool SYSTEM_ResetCauseFromConfigurationMismatch(uint16_t resetCause)
+000C1E  DE0049     LSR W0, #9, W0
+000C20  600061     AND W0, #0x1, W0
+188:               {
+189:                   bool resetStatus = false;
+190:                   if(resetCause & RESET_MASK_CM)
+191:                   { 
+192:                     resetStatus = true; 
+193:                   }
+194:                   return resetStatus;
+195:               }
+000C22  060000     RETURN
+196:               
+197:               bool SYSTEM_ResetCauseFromExternal(uint16_t resetCause)
+000C24  DE0047     LSR W0, #7, W0
+000C26  600061     AND W0, #0x1, W0
+198:               {
+199:                   bool resetStatus = false;
+200:                   if(resetCause & RESET_MASK_EXTR)
+201:                   { 
+202:                     resetStatus = true; 
+203:                   }
+204:                   return resetStatus;
+205:               }
+000C28  060000     RETURN
+206:               
+207:               bool SYSTEM_ResetCauseFromSoftware(uint16_t resetCause)
+000C2A  DE0046     LSR W0, #6, W0
+000C2C  600061     AND W0, #0x1, W0
+208:               {
+209:                   bool resetStatus = false;
+210:                   if(resetCause & RESET_MASK_SWR)
+211:                   { 
+212:                     resetStatus = true; 
+213:                   }
+214:                   return resetStatus;
+215:               }
+000C2E  060000     RETURN
+216:               
+217:               bool SYSTEM_ResetCauseFromWatchdogTimer(uint16_t resetCause)
+000C30  DE0044     LSR W0, #4, W0
+000C32  600061     AND W0, #0x1, W0
+218:               {
+219:                   bool resetStatus = false;
+220:                   if(resetCause & RESET_MASK_WDTO)
+221:                   { 
+222:                     resetStatus = true;
+223:                   }
+224:                   return resetStatus;
+225:               }
+000C34  060000     RETURN
+226:               
+227:               void SYSTEM_ResetCauseClear(RESET_MASKS resetFlagMask)
+228:               { 
+229:                    RCON = RCON & (~resetFlagMask); 
+000C36  EA8000     COM W0, W0
+000C38  B60740     AND RCON, WREG
+000C3A  883A00     MOV W0, RCON
+230:               } 
+000C3C  060000     RETURN
+231:               
+232:               void SYSTEM_ResetCauseClearAll()
+233:               { 
+234:                   RCON = 0x00; 
+000C90  EF2740     CLR RCON
+235:               }
+000C92  060000     RETURN
+236:               /**
+237:                End of File
+238:               */
+---  /Users/kneil/MPLABXProjects/PIC24Proj_Scratch.X/mcc_generated_files/interrupt_manager.c  -----------
+1:                 /**
+2:                   System Interrupts Generated Driver File 
+3:                 
+4:                   @Company:
+5:                     Microchip Technology Inc.
+6:                 
+7:                   @File Name:
+8:                     interrupt_manager.h
+9:                 
+10:                  @Summary:
+11:                    This is the generated driver implementation file for setting up the
+12:                    interrupts using MPLAB(c) Code Configurator
+13:                
+14:                  @Description:
+15:                    This source file provides implementations for MPLAB(c) Code Configurator interrupts.
+16:                    Generation Information : 
+17:                        Product Revision  :  MPLAB(c) Code Configurator - pic24-dspic-pic32mm : v1.35
+18:                        Device            :  PIC24EP512GP202
+19:                    The generated drivers are tested against the following:
+20:                        Compiler          :  XC16 1.31
+21:                        MPLAB             :  MPLAB X 3.60
+22:                */
+23:                /*
+24:                    (c) 2016 Microchip Technology Inc. and its subsidiaries. You may use this
+25:                    software and any derivatives exclusively with Microchip products.
+26:                
+27:                    THIS SOFTWARE IS SUPPLIED BY MICROCHIP "AS IS". NO WARRANTIES, WHETHER
+28:                    EXPRESS, IMPLIED OR STATUTORY, APPLY TO THIS SOFTWARE, INCLUDING ANY IMPLIED
+29:                    WARRANTIES OF NON-INFRINGEMENT, MERCHANTABILITY, AND FITNESS FOR A
+30:                    PARTICULAR PURPOSE, OR ITS INTERACTION WITH MICROCHIP PRODUCTS, COMBINATION
+31:                    WITH ANY OTHER PRODUCTS, OR USE IN ANY APPLICATION.
+32:                
+33:                    IN NO EVENT WILL MICROCHIP BE LIABLE FOR ANY INDIRECT, SPECIAL, PUNITIVE,
+34:                    INCIDENTAL OR CONSEQUENTIAL LOSS, DAMAGE, COST OR EXPENSE OF ANY KIND
+35:                    WHATSOEVER RELATED TO THE SOFTWARE, HOWEVER CAUSED, EVEN IF MICROCHIP HAS
+36:                    BEEN ADVISED OF THE POSSIBILITY OR THE DAMAGES ARE FORESEEABLE. TO THE
+37:                    FULLEST EXTENT ALLOWED BY LAW, MICROCHIP'S TOTAL LIABILITY ON ALL CLAIMS IN
+38:                    ANY WAY RELATED TO THIS SOFTWARE WILL NOT EXCEED THE AMOUNT OF FEES, IF ANY,
+39:                    THAT YOU HAVE PAID DIRECTLY TO MICROCHIP FOR THIS SOFTWARE.
+40:                
+41:                    MICROCHIP PROVIDES THIS SOFTWARE CONDITIONALLY UPON YOUR ACCEPTANCE OF THESE
+42:                    TERMS.
+43:                */
+44:                
+45:                /**
+46:                    Section: Includes
+47:                */
+48:                #include <xc.h>
+49:                
+50:                /**
+51:                    void INTERRUPT_Initialize (void)
+52:                */
+53:                void INTERRUPT_Initialize (void)
+54:                {
+55:                    //    TI: Timer 2
+56:                    //    Priority: 1
+57:                        IPC1bits.T2IP = 1;
+000EAA  28FFF0     MOV #0x8FFF, W0
+000EAC  B60842     AND IPC1, WREG
+000EAE  A0C000     BSET W0, #12
+000EB0  884210     MOV W0, IPC1
+58:                
+59:                }
+000EB2  060000     RETURN
+---  /Users/kneil/MPLABXProjects/PIC24Proj_Scratch.X/main.c  --------------------------------------------
+1:                 #include "header.h"
+2:                 //#include "oled.h"
+3:                 #include "schedule.h"
+4:                 
+5:                 //ADC over UART is a shitty solution, write the driver yourself
+6:                 //learn rest of C++, then port this pls
+7:                 //write driver for radio reciever, uses SPI so extra pins need to be allocated.
+8:                 
+9:                 void process_func(prc *p) {
+10:                    printf("In process %s, priority %d.\n", p->name, p->priority);
+000D20  9000B0     MOV [W0+6], W1
+000D22  781F81     MOV W1, [W15++]
+000D24  781F90     MOV [W0], [W15++]
+000D26  28B640     MOV #0x8B64, W0
+000D28  781F80     MOV W0, [W15++]
+000D2A  07FB45     RCALL __printf_cdnopuxX, __printf_cdnopsuxX
+000D2C  5787E6     SUB W15, #0x6, W15
+000D2E  37FFFF     BRA 0xD2E
+11:                    while(1);
+12:                }
+13:                
+14:                prc mkprocess(char *name, void (*fp)(prc*), int priority) {
+15:                    prc temp;
+16:                    temp.name = name;
+000D30  780801     MOV W1, [W0]
+17:                    temp.fp = fp;
+000D32  980022     MOV W2, [W0+4]
+18:                    temp.priority = priority;
+000D34  980033     MOV W3, [W0+6]
+19:                    return temp;
+20:                }
+000D36  060000     RETURN
+21:                
+22:                int pactive = 0;
+23:                prc *tp = NULL;
+24:                
+25:                void __attribute__ ( ( interrupt, no_auto_psv ) ) _T3Interrupt () {
+26:                    IFS0bits.T3IF = false;
+000348  A90801     BCLR 0x801, #0
+27:                    //GOTO PROCESS_CHANGE
+28:                }
+00034A  064000     RETFIE
+29:                
+30:                
+31:                //this should be a kernel function to execute only after getting interrupted from a T3 interrupt, 
+32:                //never called directly!!
+33:                
+34:                //if (pactive >= PSIZE) { 
+35:                //        pactive = 0; //circular buffer of processes
+36:                //    } else {
+37:                //        pactive++;
+38:                //    }
+39:                //    tp[pactive].fp(&tp[pactive]);
+40:                
+41:                int main(void) {
+000D38  FA0008     LNK #0x8
+000D3A  781F88     MOV W8, [W15++]
+42:                    SYSTEM_Initialize(); //4KB heap size
+000D3C  07FF5F     RCALL SYSTEM_Initialize
+43:                    
+44:                    //int *p = malloc(100 * sizeof(int)); //200 bytes  
+45:                	printf("%x, Ready.\n", RCON);
+000D3E  F80740     PUSH RCON
+000D40  28B810     MOV #0x8B81, W0
+000D42  781F80     MOV W0, [W15++]
+000D44  07FB38     RCALL __printf_cdnopuxX, __printf_cdnopsuxX
+46:                    RCON = 0;
+000D46  EF2740     CLR RCON
+47:                    
+48:                    tp = malloc(PSIZE * sizeof(prc)); //malloc the switch table
+000D48  200100     MOV #0x10, W0
+000D4A  07FB3C     RCALL _malloc
+000D4C  780400     MOV W0, W8
+000D4E  888298     MOV W8, tp
+49:                    tp[0] = mkprocess("process 1", process_func, 1);
+000D50  200013     MOV #0x1, W3
+000D52  20D202     MOV #0xD20, W2
+000D54  28B8D1     MOV #0x8B8D, W1
+000D56  57806E     SUB W15, #0xE, W0
+000D58  07FFEB     RCALL mkprocess
+000D5A  97B81F     MOV [W15-14], W0
+000D5C  97B8AF     MOV [W15-12], W1
+000D5E  97B93F     MOV [W15-10], W2
+000D60  97B9CF     MOV [W15-8], W3
+000D62  BE9C00     MOV.D W0, [W8++]
+000D64  BE9402     MOV.D W2, [W8--]
+50:                    tp[1] = mkprocess("process 2", process_func, 1);
+000D66  200013     MOV #0x1, W3
+000D68  20D202     MOV #0xD20, W2
+000D6A  28B971     MOV #0x8B97, W1
+000D6C  57806E     SUB W15, #0xE, W0
+000D6E  07FFE0     RCALL mkprocess
+000D70  97B81F     MOV [W15-14], W0
+000D72  97B8AF     MOV [W15-12], W1
+000D74  97B93F     MOV [W15-10], W2
+000D76  97B9CF     MOV [W15-8], W3
+000D78  980440     MOV W0, [W8+8]
+000D7A  980451     MOV W1, [W8+10]
+000D7C  980462     MOV W2, [W8+12]
+000D7E  980473     MOV W3, [W8+14]
+51:                    
+52:                    TMR2_Period32BitSet(0x7A20);
+000D80  27A200     MOV #0x7A20, W0
+000D82  200001     MOV #0x0, W1
+000D84  070014     RCALL TMR2_Period32BitSet
+53:                    TMR2_Start();
+000D86  07002C     RCALL TMR2_Start
+54:                    
+55:                    //IEC0bits.T3IE = 0; //disable interrupts for this
+56:                    
+57:                    for(;;) {
+58:                        
+59:                        int result;
+60:                        
+61:                        asm("mov w14, %0"
+000D88  78000E     MOV W14, W0
+62:                        : "=g" (result)
+63:                        :
+64:                        :);
+65:                        
+66:                        printf("> 0x%x\n", result);
+000D8A  781F80     MOV W0, [W15++]
+000D8C  28BA10     MOV #0x8BA1, W0
+000D8E  781F80     MOV W0, [W15++]
+000D90  07FB12     RCALL __printf_cdnopuxX, __printf_cdnopsuxX
+000D92  5787E8     SUB W15, #0x8, W15
+000D94  37FFFF     BRA 0xD94
+67:                        
+68:                        
+69:                        
+70:                        while(1);
+71:                    }
+72:                    return -1;
+73:                }
+---  /Users/kneil/MPLABXProjects/PIC24Proj_Scratch.X/i2c.c  ---------------------------------------------
+1:                 #include "i2c.h"
+2:                 
+3:                 void i2c_init(int speed) {
+4:                     ODCBbits.ODCB8 = 1; //set open-drain mode
+000000  040200     GOTO __resetPRI, __reset
+5:                     ODCBbits.ODCB9 = 1;
+000002  000000     NOP
+6:                     
+7:                     ANSELBbits.ANSB8 = 0; //clear analog functions
+000004  0002FE     NOP
+8:                     //no analog functionality on B9
+9:                     
+10:                    TRISBbits.TRISB8 = 0; //set as outputs
+000006  000310     NOP
+11:                    TRISBbits.TRISB9 = 0;
+000008  000328     NOP
+12:                    I2C1BRG = speed; //set speed to one of three values
+00000A  000306     NOP
+13:                    //WARNING: THIS ONLY WORKS AT 32Mhz, change if changing clock or add logic!
+14:                    IEC1bits.MI2C1IE = 0; 
+00000C  000318     NOP
+15:                    
+16:                    LATBbits.LATB8 = 1; //drive as 1
+00000E  000320     NOP
+17:                    LATBbits.LATB9 = 1;
+000010  000330     NOP
+18:                    
+19:                    I2C1CONbits.I2CEN = 1;
+000012  00034C     NOP
+20:                    
+21:                }
+000014  00034C     NOP
+22:                
+23:                void i2c_start(void) {
+24:                    I2C1CONbits.SEN = 1; //set start bit
+000016  00034C     NOP
+25:                    while (I2C1CONbits.SEN == 1); //wait until done transmitting
+000018  00034C     NOP
+00001A  00034C     NOP
+26:                }
+00001C  00034C     NOP
+27:                
+28:                void i2c_stop(void) {
+29:                    I2C1CONbits.PEN = 1; //set stop bit
+00001E  00034C     NOP
+30:                    while(I2C1CONbits.PEN == 1); //wait until done transmitting
+000020  00034C     NOP
+31:                }
+000024  000348     NOP
+32:                
+33:                bool i2c_send(uint8_t addr) {
+34:                    I2C1TRN = addr;
+000026  00034C     NOP
+35:                    while(I2C1STATbits.TBF == 1); //wait until done transmitting
+00002A  00034C     NOP
+36:                    for (int i = 0; i < I2C_TIMEOUT; i++); //possible response period
+000032  00034C     NOP
+37:                    return I2C1STATbits.ACKSTAT; // 1 for NACK, 0 for ACK
+000034  00034C     NOP
+000036  00034C     NOP
+38:                }
+000038  00034C     NOP
+39:                
+40:                //assumes read address has been sent
+41:                int i2c_recv(bool ackState) { // this falls apart for more than single cycle transfers
+42:                    I2C1CONbits.ACKDT = ackState; //set master to ack or nack slave transmission
+00003A  00034C     NOP
+00003C  00034C     NOP
+00003E  00034C     NOP
+000040  00034C     NOP
+43:                    I2C1CONbits.RCEN = 1; //enable receiving, gets cleared by hardware
+000046  00034C     NOP
+000048  00034C     NOP
+00004A  00034C     NOP
+00004C  00034C     NOP
+44:                    while(I2C1CONbits.RCEN == 1);
+000048  00034C     NOP
+00004A  00034C     NOP
+45:                    I2C1CONbits.ACKEN = 1;
+00004C  00034C     NOP
+00004E  00034C     NOP
+000050  00034C     NOP
+46:                    while(I2C1CONbits.ACKEN == 1);
+00004E  00034C     NOP
+000050  00034C     NOP
+000052  00034C     NOP
+000054  00034C     NOP
+000056  00034C     NOP
+47:                    return I2C1RCV;
+000052  00034C     NOP
+48:                }
+000054  00034C     NOP
+49:                
+50:                //void i2c_debug_scan(void) {
+51:                //    int i;
+52:                //    printf("ACK addresses:\n"); //nice formatting
+53:                //    for (i = 0; i < 256; i++) {
+54:                //        i2c_start(); //generate start and stop conditions to distinguish calls
+55:                //        if (i2c_send(i) == ACK) { //did the device respond?
+56:                //            printf("- %X\n", i); //yes, apparently
+57:                //        }
+58:                //        i2c_stop();
+59:                //    }
+60:                //}
+---  /Users/kneil/MPLABXProjects/PIC24Proj_Scratch.X/core.c  --------------------------------------------
+1:                 #include "header.h"
+2:                 
+3:                 //simple delay fuction not using interrupts, for debugging
+4:                 void delay_poll(uint16_t period) {
+5:                     PR2 = (period & 0x0000FFFF);
+000000  040200     GOTO __resetPRI, __reset
+6:                     PR3 = ((period & 0xFFFF0000)>>16); // bitshift to get period into 2 registers
+000002  000000     NOP
+7:                     
+8:                     T2CONbits.TON = 1; // start timer
+000004  0002FE     NOP
+9:                     
+10:                    while(IFS0bits.T3IF == 0) { //poll until counter done
+000006  000310     NOP
+000008  000328     NOP
+00000A  000306     NOP
+00000C  000318     NOP
+11:                        ;
+12:                    }
+13:                    IFS0bits.T3IF = 0; //clear flag
+00000E  000320     NOP
+14:                }
+000010  000330     NOP
+15:                
+16:                /* handy values for 32MHz clock:
+17:                 * min: 0x00 (15 us)
+18:                 * 1ms: 0x3F
+19:                 * 10ms: 0x272
+20:                 * 100ms: 0x186D
+21:                 * 500ms: 0x7A20
+22:                 * 1s: 0xF43F
+23:                 */
+24:                
+25:                void scanfs(char *dest, int lim) { //remove temp var eventually
+000012  00034C     NOP
+26:                    int i;
+27:                    register char temp = NULL;
+28:                    for (i = 0; i <= lim && temp != '\n'; i++) {
+00001A  00034C     NOP
+00001C  00034C     NOP
+00001E  00034C     NOP
+000020  00034C     NOP
+000022  00034C     NOP
+000026  00034C     NOP
+000028  00034C     NOP
+00002A  00034C     NOP
+00002C  00034C     NOP
+00002E  00034C     NOP
+29:                        temp = UART1_Read();
+000022  00034C     NOP
+30:                        dest[i] = temp;
+000024  000348     NOP
+31:                    }
+32:                    dest[i+1] = NULL;
+000030  00034C     NOP
+000032  00034C     NOP
+000034  00034C     NOP
+000036  00034C     NOP
+000038  00034C     NOP
+33:                }
+000036  00034C     NOP

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project>
+  <executable name="dist/default/production/Pic8Proj_IO.X.production.hex">
+    <memory name="program">
+      <units>bytes</units>
+      <length>98304</length>
+      <used>996</used>
+      <free>97308</free>
+    </memory>
+    <memory name="data">
+      <units>bytes</units>
+      <length>3328</length>
+      <used>54</used>
+      <free>3274</free>
+    </memory>
+  </executable>
+</project>

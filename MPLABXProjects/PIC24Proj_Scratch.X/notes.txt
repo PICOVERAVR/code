@@ -1,0 +1,98 @@
+
+//code for reading the keypad but it's not in a .c file for some reason
+int kpd_get(void) {
+    char buf[5];
+    register char temp = UART1_Read();
+    while (temp != '\n') { //wait to start of frame
+        temp = UART1_Read();
+    }
+    temp = NULL;
+    int i;
+    for (i = 0; temp != '\n'; i++) {
+        temp = UART1_Read();
+        buf[i] = temp;
+        
+    }
+    return atoi(buf+1);
+}
+
+int kpd_input(void) {
+    int temp = kpd_get();
+    int new = kpd_get();
+    
+    while(new == 0 || new == temp) {
+        new = kpd_get();
+    }
+    
+    return new;
+}
+
+        uint16_t xPosRaw = adc_convert(0);
+        long xPos = map(xPosRaw, 0, 1023, 320, 0);
+        ltoa(buf_x, xPos, 10);
+        tft_blank(17, 0, 15);
+        tft_str(17, 0, buf_x);
+        
+        uint16_t yPosRaw = adc_convert(1);
+        long yPos = map(yPosRaw, 0, 1023, 240, 0);
+        ltoa(buf_y, yPos, 10);
+        tft_blank(8, 0, 15);
+        tft_str(8, 0, buf_y);
+
+
+                                                                                                SD STUFF HERE
+
+    //SPI is mode 0 for both SD cards and the tft display! woo!
+    
+    //add PU on MISO
+    //Add a >45uF cap on power supply to absorb inrush current - there's a 10uF cap on board
+    
+//    SPI2CON1bits.PPRE = 0b00; //set clock speed to ~125kHz
+//    for (int i = 0; i < 10; i++) {
+//        SPI2_Exchange8bit(0xFF);
+//    }
+//    
+//    sd_command CMD0 = {.command = 0b01000000, .args[0] = 0, 
+//    .args[1] = 0, .args[2] = 0, .args[3] = 0, .crc = 0b10010101}; //this has to have a valid crc
+//    
+//    sd_command CMD1 = {.command = 0b01000001, .args[0] = 0,
+//    .args[1] = 0, .args[2] = 0, .args[3] = 0, .crc = 0b00000000}; //this shouldn't need a valid crc
+//    
+//    
+//    
+//    printf("SD card returned %d for CMD0\n", sd_writeCommand(CMD0)); //should get a 1 back
+//    printf("SD card returned %d for CMD1\n", sd_writeCommand(CMD1)); //may take ~500ms
+//    
+//    SPI2CON1bits.PPRE = 0b11; //return clock speed to ~8MHz
+
+typedef struct sd_command {
+    uint8_t command;
+    uint8_t args[4];
+    uint8_t crc;
+} sd_command;
+
+//could we use vargs for this?
+//Note: find out how the heck to calculate a CRC!
+uint8_t sd_writeCommand(sd_command c) {
+    SS_SetLow();
+    //set upper two bits of com to 0x40 later, or check for this
+    SPI2_Exchange8bit(c.command);
+    
+    SPI2_Exchange8bit(c.args[0]);
+    SPI2_Exchange8bit(c.args[1]);
+    SPI2_Exchange8bit(c.args[2]);
+    SPI2_Exchange8bit(c.args[3]);
+    
+    SPI2_Exchange8bit(c.crc); //CRC of CMD0
+    
+    uint8_t result = 0xFF;
+    do {
+        result = SPI2_Exchange8bit(0xFF); //have to keep the MOSI line high, cycle dummy writes 
+        //until we get a response
+    } while (result > 0x80);
+    
+    SS_SetHigh();
+    return result; //return the result code
+}
+
+
