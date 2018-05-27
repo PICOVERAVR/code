@@ -16,6 +16,11 @@ int main(void) {
     for(;;) {
         //menu items here idk
         
+        uint16_t xPosRaw = adc_convert(0);
+        long xPos = map(xPosRaw, 0, 1023, 320, 0);
+        ltoa(buf_x, xPos, 10);
+        tft_blank(17, 0, 15);
+        tft_str(17, 0, buf_x);
         
         
     }
