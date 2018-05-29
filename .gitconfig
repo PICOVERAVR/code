@@ -1,0 +1,7 @@
+[alias]
+	st = status
+	last = log -1 HEAD --oneline
+	hist = log -15 --pretty=format:\"> %h @ %ar, \\\"%s\\\"\" --graph --decorate
+[user]
+	email = kyle@johnneil.net
+	name = Kyle Neil

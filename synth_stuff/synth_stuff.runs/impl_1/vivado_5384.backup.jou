@@ -1,0 +1,12 @@
+#-----------------------------------------------------------
+# Vivado v2017.4.1 (64-bit)
+# SW Build 2117270 on Tue Jan 30 15:32:00 MST 2018
+# IP Build 2095745 on Tue Jan 30 17:13:15 MST 2018
+# Start of session at: Fri May 25 23:12:48 2018
+# Process ID: 5384
+# Current directory: C:/Users/kyle/Desktop/synth_stuff/synth_stuff.runs/impl_1
+# Command line: vivado.exe -log main.vdi -applog -product Vivado -messageDb vivado.pb -mode batch -source main.tcl -notrace
+# Log file: C:/Users/kyle/Desktop/synth_stuff/synth_stuff.runs/impl_1/main.vdi
+# Journal file: C:/Users/kyle/Desktop/synth_stuff/synth_stuff.runs/impl_1\vivado.jou
+#-----------------------------------------------------------
+source main.tcl -notrace

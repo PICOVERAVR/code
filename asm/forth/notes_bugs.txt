@@ -6,3 +6,11 @@ Bugs noticed:
 	things //still prints 2 1 even though stuff was updated
 	
 	(the online repl.it does this too, might be a part of the language...)
+
+exception mechanism works...? not tested.
+
+use clone() to spawn forth interpreters in seperate threads!
+( really cheap to create and destroy! )
+
+we should allocate memory dynamically for this to work well
+
