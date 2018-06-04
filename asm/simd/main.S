@@ -1,34 +1,31 @@
+.macro start
+	rdtsc
+	shl $32, %rdx
+	or %rax, %rdx
+	push %rdx
+.endm
+
+.macro stop
+	start
+	pop %rdx
+	sub (%rsp), %rdx
+.endm
+
+
 	.global _start
 
 	.text
 _start:
-	
-	push $3
-	push $2
-	push $1
-	
-	call fill
-	
-	# call <addr> = push %rip+8,  jmp <addr>
-	# ret  <num>  = TOS->%rip, pop <num> bytes off stack
-	# loop <addr> = dec %rcx, jnz <addr>
-	
-	# enter <num> = create a stack frame with <num> bytes of space
-	# leave	      = destroys stack frame
-	
-	# lock?
-	
-	#movaps (test), %xmm0
-	#movaps (test), %xmm1
-	#addps %xmm0, %xmm1
-	#movaps %xmm1, (test)
+	movaps (src), %xmm0
+	movaps (src), %xmm1
+	addps %xmm0, %xmm1
+	movaps %xmm1, (scratch)
 	
 	mov $60, %rax
 	xor %rdi, %rdi
 	syscall
 
 fill:
-	# know this stuff
 	ret
 	
 
@@ -36,7 +33,7 @@ fill:
 
 	.data
 .align 16
-test:	# 4 32-bit ints
+src:	# 4 32-bit ints
 	.long 2
 	.long 4
 	.long 8
