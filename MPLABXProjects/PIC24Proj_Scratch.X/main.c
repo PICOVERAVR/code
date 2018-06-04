@@ -1,26 +1,23 @@
 #include "header.h"
 #include "tft.h"
+#include "sd.h"
 
 int main(void) {
     SYSTEM_Initialize();
-    tft_init();
-    tft_fillScreen(TFT_COLOR_BLACK);
+    //tft_init();
+    //tft_fillScreen(TFT_COLOR_BLACK);
     
 	printf("%x, Ready.\n", RCON);
     RCON = 0;
+    printf("sd card initializing... ");
+    int res = sd_init();
+    printf((res) ? "fail\n" : "success\n");
     
-    asm("nop");
-    tft_str(0, 0, "TFT test screen");
-    char buf_x[15];
+    
     
     for(;;) {
-        //menu items here idk
         
-        uint16_t xPosRaw = adc_convert(0);
-        long xPos = map(xPosRaw, 0, 1023, 320, 0);
-        ltoa(buf_x, xPos, 10);
-        tft_blank(17, 0, 15);
-        tft_str(17, 0, buf_x);
+        
         
         
     }

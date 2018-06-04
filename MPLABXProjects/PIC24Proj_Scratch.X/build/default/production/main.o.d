@@ -9,4 +9,5 @@ mcc_generated_files/interrupt_manager.h  \
 mcc_generated_files/tmr2.h  \
  mcc_generated_files/spi2.h  \
 mcc_generated_files/uart1.h  \
-tft.h 
+tft.h  \
+sd.h 

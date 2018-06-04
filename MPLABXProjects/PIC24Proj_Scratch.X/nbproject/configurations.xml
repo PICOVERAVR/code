@@ -21,6 +21,7 @@
       <itemPath>oled.h</itemPath>
       <itemPath>schedule.h</itemPath>
       <itemPath>tft.h</itemPath>
+      <itemPath>sd.h</itemPath>
     </logicalFolder>
     <logicalFolder name="LinkerScript"
                    displayName="Linker Files"
