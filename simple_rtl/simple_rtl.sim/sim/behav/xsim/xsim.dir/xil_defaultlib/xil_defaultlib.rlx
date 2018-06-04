@@ -1,7 +1,0 @@
-0.6
-2017.3
-Oct  4 2017
-20:11:37
-C:/Users/kyle/Desktop/dev/main/simple_rtl/simple_rtl.sim/sim/behav/xsim/glbl.v,1507081072,verilog,,,,glbl,,xil_defaultlib,,,,,,
-C:/Users/kyle/Desktop/dev/main/simple_rtl/simple_rtl.srcs/sim/new/main_testbench.sv,1526250480,systemVerilog,,C:/Users/kyle/Desktop/dev/main/simple_rtl/simple_rtl.srcs/sources_1/new/main.sv,,main_testbench,,xil_defaultlib,C:/Xilinx/Vivado/2017.3/data/xilinx_vip/include,,,,,
-C:/Users/kyle/Desktop/dev/main/simple_rtl/simple_rtl.srcs/sources_1/new/main.sv,1526250577,systemVerilog,,,,alu;branch;pc;processor;regfile,,xil_defaultlib,C:/Xilinx/Vivado/2017.3/data/xilinx_vip/include,,,,,
