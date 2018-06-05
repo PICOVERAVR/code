@@ -8,17 +8,11 @@ typedef struct sd_resp { //40-bit response for some commands, like CMD58
     uint8_t resp[5];
 } sd_resp;
 
-sd_command CMD0 = {.command = 0b01000000, .args[0] = 0, 
-    .args[1] = 0, .args[2] = 0, .args[3] = 0, .crc = 0b10010101}; //this has to have a valid crc
-    
-sd_command CMD1 = {.command = 0b01000001, .args[0] = 0,
-    .args[1] = 0, .args[2] = 0, .args[3] = 0, .crc = 0b00000000}; //this shouldn't need a valid crc
-    
-sd_command CMD8 = {.command = 0b01001000, .args[0] = 0, 
-    .args[1] = 0, .args[2] = 1, .args[3] = 0b10101010, .crc = 0b10011011};
-
-sd_command CMD58 = {.command = 0b01111010, .args[0] = 0,
-    .args[1] = 0, .args[2] = 0, .args[3] = 0, .crc = 0b0111010};
+sd_command CMD0 = {.command = 0b01000000, .args[0] = 0, 0, 0, 0, .crc = 0b10010101}; //this has to have a valid crc
+//below commands shouldn't need a valid crc
+sd_command CMD1 = {.command = 0b01000001, .args[0] = 0, 0, .args[2] = 0, .args[3] = 0, .crc = 0b00000000};
+sd_command CMD8 = {.command = 0b01001000, .args[0] = 0, 0, 1, 0b10101010, .crc = 0b10011011};
+sd_command CMD58 = {.command = 0b01111010, .args[0] = 0, 0, 0, 0, .crc = 0b0111010};
 
 //could we use vargs for this?
 //Note: find out how the heck to calculate a CRC!
@@ -89,6 +83,9 @@ uint8_t sd_init() {
     if (r.resp[0] != 1) {
         printf("WARNING: CMD58 RETURNED UNKNOWN VALUE\n");
     }
+    printf("%x\n", r.resp[1]);
+    printf("%x\n", r.resp[2]);
+    printf("%x\n", r.resp[3]);
     
     SPI2CON1bits.PPRE = 0b11; //return clock speed to ~8MHz
     return 0;

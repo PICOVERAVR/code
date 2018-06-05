@@ -14,7 +14,6 @@ int main(void) {
     printf((res) ? "fail\n" : "success\n");
     
     
-    
     for(;;) {
         
         
