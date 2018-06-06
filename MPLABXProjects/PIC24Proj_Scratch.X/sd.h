@@ -1,6 +1,6 @@
 typedef struct sd_command { //basic SD command structure
     uint8_t command;
-    uint8_t args[4];
+    uint8_t args[5];
     uint8_t crc;
 } sd_command;
 
@@ -59,6 +59,7 @@ sd_resp sd_writeCommandLong(sd_command c) {
     s.resp[1] = SPI2_Exchange8bit(0xFF);
     s.resp[2] = SPI2_Exchange8bit(0xFF);
     s.resp[3] = SPI2_Exchange8bit(0xFF);
+    s.resp[4] = SPI2_Exchange8bit(0xFF);
     
     SS_SetHigh();
     return s;
@@ -83,9 +84,6 @@ uint8_t sd_init() {
     if (r.resp[0] != 1) {
         printf("WARNING: CMD58 RETURNED UNKNOWN VALUE\n");
     }
-    printf("%x\n", r.resp[1]);
-    printf("%x\n", r.resp[2]);
-    printf("%x\n", r.resp[3]);
     
     SPI2CON1bits.PPRE = 0b11; //return clock speed to ~8MHz
     return 0;
