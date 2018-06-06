@@ -1,6 +1,6 @@
 typedef struct sd_command { //basic SD command structure
     uint8_t command;
-    uint8_t args[4];
+    uint8_t args[5];
     uint8_t crc;
 } sd_command;
 
@@ -8,17 +8,11 @@ typedef struct sd_resp { //40-bit response for some commands, like CMD58
     uint8_t resp[5];
 } sd_resp;
 
-sd_command CMD0 = {.command = 0b01000000, .args[0] = 0, 
-    .args[1] = 0, .args[2] = 0, .args[3] = 0, .crc = 0b10010101}; //this has to have a valid crc
-    
-sd_command CMD1 = {.command = 0b01000001, .args[0] = 0,
-    .args[1] = 0, .args[2] = 0, .args[3] = 0, .crc = 0b00000000}; //this shouldn't need a valid crc
-    
-sd_command CMD8 = {.command = 0b01001000, .args[0] = 0, 
-    .args[1] = 0, .args[2] = 1, .args[3] = 0b10101010, .crc = 0b10011011};
-
-sd_command CMD58 = {.command = 0b01111010, .args[0] = 0,
-    .args[1] = 0, .args[2] = 0, .args[3] = 0, .crc = 0b0111010};
+sd_command CMD0 = {.command = 0b01000000, .args[0] = 0, 0, 0, 0, .crc = 0b10010101}; //this has to have a valid crc
+//below commands shouldn't need a valid crc
+sd_command CMD1 = {.command = 0b01000001, .args[0] = 0, 0, .args[2] = 0, .args[3] = 0, .crc = 0b00000000};
+sd_command CMD8 = {.command = 0b01001000, .args[0] = 0, 0, 1, 0b10101010, .crc = 0b10011011};
+sd_command CMD58 = {.command = 0b01111010, .args[0] = 0, 0, 0, 0, .crc = 0b0111010};
 
 //could we use vargs for this?
 //Note: find out how the heck to calculate a CRC!
@@ -65,6 +59,7 @@ sd_resp sd_writeCommandLong(sd_command c) {
     s.resp[1] = SPI2_Exchange8bit(0xFF);
     s.resp[2] = SPI2_Exchange8bit(0xFF);
     s.resp[3] = SPI2_Exchange8bit(0xFF);
+    s.resp[4] = SPI2_Exchange8bit(0xFF);
     
     SS_SetHigh();
     return s;
