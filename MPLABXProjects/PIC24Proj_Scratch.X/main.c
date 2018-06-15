@@ -4,11 +4,12 @@
 
 int main(void) {
     SYSTEM_Initialize();
-    tft_init();
-    tft_fillScreen(TFT_COLOR_BLACK);
     
 	printf("%x, Ready.\n", RCON);
     RCON = 0;
+    
+    printf("initializing SD card... ");
+    printf((!sd_init()) ? "success\n" : "fail\n");
     
     
     for(;;) {
