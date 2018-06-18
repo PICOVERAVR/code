@@ -1,3 +1,6 @@
+#define SD_TIMEOUT 100 //should be long enough?
+
+
 typedef struct sd_command { //basic SD command structure
     uint8_t command; //command with the form of 0b01xxxxxx
     uint8_t args[4]; //four arguments, all required
@@ -34,14 +37,15 @@ uint8_t sd_writeCommand(sd_command *c) {
     
     SPI2_Exchange8bit((*c).crc); //CRC of CMD0
     
+    int time = 0;
     uint8_t result = 0xFF;
     do {
         result = SPI2_Exchange8bit(0xFF); //have to keep the MOSI line high, cycle dummy writes 
         //until we get a response or the request times out
-    } while (result > 0x80);
+    } while (result > 0x80 && time++ < SD_TIMEOUT);
     
     SS_SetHigh();
-    return result; //return the result code
+    return (time >= SD_TIMEOUT) ? -1 : result; //return the result code, or -1 if the operation timed out
 }
 
 sd_resp sd_writeCommandLong(sd_command *c) {
@@ -56,14 +60,20 @@ sd_resp sd_writeCommandLong(sd_command *c) {
     
     SPI2_Exchange8bit((*c).crc);
     
+    int time = 0;
     uint8_t result = 0xFF;
-    while (result >= 0x80) {
-        result = SPI2_Exchange8bit(0xFF);
-    }
+    do {
+        result = SPI2_Exchange8bit(0xFF); //have to keep the MOSI line high, cycle dummy writes 
+        //until we get a response or the request times out
+    } while (result > 0x80 && time++ < SD_TIMEOUT);
     
-    s.resp[0] = result;
-    for (int i = 1; i < 5; i++) {
-        s.resp[i] = SPI2_Exchange8bit(0xFF);
+    if (time >= SD_TIMEOUT) {
+        s.resp[0] = -1;
+    } else {
+        s.resp[0] = result;
+        for (int i = 1; i < 5; i++) {
+            s.resp[i] = SPI2_Exchange8bit(0xFF);
+        }
     }
     
     SS_SetHigh();
@@ -105,22 +115,25 @@ uint8_t sd_init() {
         SPI2_Exchange8bit(0xFF);
     }
     
-    printf("\nCMD0 - %d\n", sd_writeCommand(&CMD0));
+    int result = sd_writeCommand(&CMD0);
+    if (result == -1) {
+        return -1;
+    }
     
     delay_poll(MS_100);
     sd_resp r = sd_writeCommandLong(&CMD8);
-    printf("CMD8 - %d %d %d %d %d\n", r.resp[0], r.resp[1], r.resp[2], r.resp[3], r.resp[4]);
+    if (r.resp[0] == -1) {
+        return -1;
+    }
     
-    printf("CMD55, ACMD41\n");
-    uint8_t result = 0xFF;
+    //forego error checking from this point on since previous commands succeeded...
+    result = 0xFF;
     do {
         sd_writeCommand(&CMD55);
         result = sd_writeCommand(&ACMD41);
     } while (result != 0);
     
-    r = sd_writeCommandLong(&CMD58);
-    printf("CMD58 - %d %d %d %d %d\n", r.resp[0], r.resp[1], r.resp[2], r.resp[3], r.resp[4]);
-    
+    r = sd_writeCommandLong(&CMD58);    
     SPI2CON1bits.PPRE = 0b11; //return clock speed to ~8MHz
     
     return 0;

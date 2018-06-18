@@ -11,7 +11,6 @@ int main(void) {
     printf("initializing SD card... ");
     printf((!sd_init()) ? "success\n" : "fail\n");
     
-    
     for(;;) {
         
         

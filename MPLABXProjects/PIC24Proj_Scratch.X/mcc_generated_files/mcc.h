@@ -1,49 +1,3 @@
-/**
-  @Generated MPLAB(c) Code Configurator Header File
-
-  @Company:
-    Microchip Technology Inc.
-
-  @File Name:
-    mcc.h
-
-  @Summary:
-    This is the mcc.h file generated using MPLAB(c) Code Configurator
-
-  @Description:
-    This header file provides implementations for driver APIs for all modules selected in the GUI.
-    Generation Information :
-        Product Revision  :  MPLAB(c) Code Configurator - pic24-dspic-pic32mm : v1.35
-        Device            :  PIC24EP512GP202
-    The generated drivers are tested against the following:
-        Compiler          :  XC16 1.31
-        MPLAB             :  MPLAB X 3.60
-*/
-
-/*
-    (c) 2016 Microchip Technology Inc. and its subsidiaries. You may use this
-    software and any derivatives exclusively with Microchip products.
-
-    THIS SOFTWARE IS SUPPLIED BY MICROCHIP "AS IS". NO WARRANTIES, WHETHER
-    EXPRESS, IMPLIED OR STATUTORY, APPLY TO THIS SOFTWARE, INCLUDING ANY IMPLIED
-    WARRANTIES OF NON-INFRINGEMENT, MERCHANTABILITY, AND FITNESS FOR A
-    PARTICULAR PURPOSE, OR ITS INTERACTION WITH MICROCHIP PRODUCTS, COMBINATION
-    WITH ANY OTHER PRODUCTS, OR USE IN ANY APPLICATION.
-
-    IN NO EVENT WILL MICROCHIP BE LIABLE FOR ANY INDIRECT, SPECIAL, PUNITIVE,
-    INCIDENTAL OR CONSEQUENTIAL LOSS, DAMAGE, COST OR EXPENSE OF ANY KIND
-    WHATSOEVER RELATED TO THE SOFTWARE, HOWEVER CAUSED, EVEN IF MICROCHIP HAS
-    BEEN ADVISED OF THE POSSIBILITY OR THE DAMAGES ARE FORESEEABLE. TO THE
-    FULLEST EXTENT ALLOWED BY LAW, MICROCHIP'S TOTAL LIABILITY ON ALL CLAIMS IN
-    ANY WAY RELATED TO THIS SOFTWARE WILL NOT EXCEED THE AMOUNT OF FEES, IF ANY,
-    THAT YOU HAVE PAID DIRECTLY TO MICROCHIP FOR THIS SOFTWARE.
-
-    MICROCHIP PROVIDES THIS SOFTWARE CONDITIONALLY UPON YOUR ACCEPTANCE OF THESE
-    TERMS.
-*/
-
-#ifndef MCC_H
-#define	MCC_H
 #include <xc.h>
 #include "pin_manager.h"
 #include <stdint.h>
@@ -54,6 +8,8 @@
 #include "tmr2.h"
 #include "spi2.h"
 #include "uart1.h"
+
+#pragma once
 
 #define _XTAL_FREQ  32013437UL
 
@@ -151,166 +107,43 @@ typedef enum tagRESET_MASKS
   RESET_MASK_TRAPR = 0x8000, 
 } RESET_MASKS;
 
-/**
- * @Param
-    none
- * @Returns
-    none
- * @Description
-    Initializes the device to the default states configured in the
- *                  MCC GUI
- * @Example
-    SYSTEM_Initialize(void);
- */
 void SYSTEM_Initialize(void);
 
-/**
- * @Param
-    none
- * @Returns
-    none
- * @Description
-    Initializes the oscillator to the default states configured in the
- *                  MCC GUI
- * @Example
-    OSCILLATOR_Initialize(void);
- */
 void OSCILLATOR_Initialize(void);
 
-/**
-* Checks reset cause, flashes UI with an error code as a result.
-* 
-* Note: this function should be called before any use of CLRWDT
-* since it has a side-effect of clearing the appropriate bits in the
-* register showing reset cause (see DS70602B page 8-10)
-*/
 uint16_t SYSTEM_GetResetCause(void);
 
-
-/**
- * Enables Watch Dog Timer (WDT) using the software bit.
- * @example
- * <code>
- * WDT_WatchdogtimerSoftwareEnable();
- * </code>
- */
-inline static void WDT_WatchdogtimerSoftwareEnable(void)
-{
+inline static void WDT_WatchdogtimerSoftwareEnable(void) {
     RCONbits.SWDTEN = 1;
 }
 
-/**
- * Disables Watch Dog Timer (WDT) using the software bit.
- * @example
- * <code>
- * WDT_WatchdogtimerSoftwareDisable();
- * </code>
- */
-inline static void WDT_WatchdogtimerSoftwareDisable(void)
-{
+inline static void WDT_WatchdogtimerSoftwareDisable(void) {
     RCONbits.SWDTEN = 0;
 }
 
-/**
- * Clears the Watch Dog Timer (WDT).
- * @example
- * <code>
- * WDT_WatchdogTimerClear();
- * </code>
- */
-inline static void WDT_WatchdogTimerClear(void)
-{
+inline static void WDT_WatchdogTimerClear(void) {
     ClrWdt();
 }
 
-/**
- * Gets the base address of the DEVID register for the currently selected device
- * @return base address of the DEVID register
- * @example
- * <code>
- * uint32_t devIdAddress;
- * devIdAddress = DEVICE_DeviceIdRegisterAddressGet();
- * </code>
- */
-inline static uint32_t DEVICE_DeviceIdRegisterAddressGet(void)
-{
+inline static uint32_t DEVICE_DeviceIdRegisterAddressGet(void) {
     return __DEVID_BASE;
 }
 
-/**
- * Initializes the CPU core control register.
- * @example
- * <code>
- * CORCON_Initialize();
- * </code>
- */
-inline static void CORCON_Initialize()
-{
+inline static void CORCON_Initialize() {
     CORCON = (CORCON & 0x00F2) | CORCON_MODE_PORVALUES;    // POR value
 }
 
-/**
- * Sets the CPU core control register operating mode to a value that is decided by the
- * SYSTEM_CORCON_MODES argument.
- * @param modeValue SYSTEM_CORCON_MODES initialization mode specifier
- * @example
- * <code>
- * CORCON_ModeOperatingSet(CORCON_MODE_ENABLEALLSATNORMAL_ROUNDUNBIASED);
- * </code>
- */
-inline static void CORCON_ModeOperatingSet(SYSTEM_CORCON_MODES modeValue)
-{
+inline static void CORCON_ModeOperatingSet(SYSTEM_CORCON_MODES modeValue) {
     CORCON = (CORCON & 0x00F2) | modeValue;
 }
 
-/**
- * Sets the value of CPU core control register.
- * @param value value that needs to be written to the CPU core control register
- * @example
- * <code>
- * CORCON_RegisterValueSet(0x00E2);
- * </code>
- */
-inline static void CORCON_RegisterValueSet(uint16_t value)
-{
+inline static void CORCON_RegisterValueSet(uint16_t value) {
     CORCON = value;
 }
 
-/**
- * Gets the value of CPU core control register.
- * @return value of the CPU core control register
- * @example
- * <code>
- * corconSave = CORCON_RegisterValueGet();
- * </code>
- */
-inline static uint16_t CORCON_RegisterValueGet(void)
-{    
+inline static uint16_t CORCON_RegisterValueGet(void) {    
     return CORCON;
 }
 
-/**
- * It handles the reset cause by clearing the cause register values.
- * Its a weak function user can override this function.
- * @return None
- * @example
- * <code>
- * SYSTEM_ResetCauseHandler();
- * </code>
- */
 void __attribute__ ((weak)) SYSTEM_ResetCauseHandler(void);
-
-/**
- * This function resets the reset cause register.
- * @return None
- * @example
- * <code>
- * SYSTEM_ResetCauseClearAll();
- * </code>
- */
 void SYSTEM_ResetCauseClearAll();
-
-#endif	/* MCC_H */
-/**
- End of File
-*/
