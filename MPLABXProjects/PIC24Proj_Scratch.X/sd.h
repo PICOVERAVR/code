@@ -1,5 +1,5 @@
 #define SD_TIMEOUT 100 //should be long enough?
-
+#define SD_ERROR 0xFF //impossible command
 
 typedef struct sd_command { //basic SD command structure
     uint8_t command; //command with the form of 0b01xxxxxx
@@ -27,7 +27,7 @@ typedef struct sd_block { //block size is almost universally 512 bytes
 } sd_block;
 
 uint8_t sd_writeCommand(sd_command *c) {
-    SS_SetLow();
+    SS_SD_SetLow();
     //set upper two bits of com to 0x40 later, or check for this
     SPI2_Exchange8bit((*c).command);
     
@@ -44,13 +44,13 @@ uint8_t sd_writeCommand(sd_command *c) {
         //until we get a response or the request times out
     } while (result > 0x80 && time++ < SD_TIMEOUT);
     
-    SS_SetHigh();
-    return (time >= SD_TIMEOUT) ? -1 : result; //return the result code, or -1 if the operation timed out
+    SS_SD_SetHigh();
+    return (time >= SD_TIMEOUT) ? SD_ERROR : result; //return the result code, or -1 if the operation timed out
 }
 
 sd_resp sd_writeCommandLong(sd_command *c) {
     sd_resp s;
-    SS_SetLow();
+    SS_SD_SetLow();
     //set upper two bits of com to 0x40 later, or check for this
     SPI2_Exchange8bit((*c).command);
     
@@ -68,7 +68,7 @@ sd_resp sd_writeCommandLong(sd_command *c) {
     } while (result > 0x80 && time++ < SD_TIMEOUT);
     
     if (time >= SD_TIMEOUT) {
-        s.resp[0] = -1;
+        s.resp[0] = SD_ERROR;
     } else {
         s.resp[0] = result;
         for (int i = 1; i < 5; i++) {
@@ -76,14 +76,14 @@ sd_resp sd_writeCommandLong(sd_command *c) {
         }
     }
     
-    SS_SetHigh();
+    SS_SD_SetHigh();
     return s;
 }
 
 //read a block from the SD card
 //this is hard-coded because there are only two commands to do this
-void sd_readBlock(uint64_t block_addr, sd_block *rd_block) {
-    SS_SetLow();
+void sd_readBlock(uint64_t block_addr, sd_block *block) {
+    SS_SD_SetLow();
     SPI2_Exchange8bit(CMD17.command);
     for (int i = 4; i > 0; i--) {
         SPI2_Exchange8bit((block_addr >> (i * 8)) & 0xFF);
@@ -101,28 +101,27 @@ void sd_readBlock(uint64_t block_addr, sd_block *rd_block) {
     }
     
     for (int i = 0; i < 512; i++) {
-        (*rd_block).data[i] = SPI2_Exchange8bit(0xFF);
+        (*block).data[i] = SPI2_Exchange8bit(0xFF);
     }
     
-    SS_SetHigh();
+    SS_SD_SetHigh();
 }
 
 //note: a recent SD card is assumed.  Old cards will not work.
-//add error checking here!!
 uint8_t sd_init() {
     SPI2CON1bits.PPRE = 0b00; //set clock speed to ~125kHz
     for (int i = 0; i < 10; i++) {
         SPI2_Exchange8bit(0xFF);
     }
     
-    int result = sd_writeCommand(&CMD0);
-    if (result == -1) {
+    uint8_t result = sd_writeCommand(&CMD0);
+    if ((uint16_t) result == SD_ERROR) {
         return -1;
     }
     
     delay_poll(MS_100);
     sd_resp r = sd_writeCommandLong(&CMD8);
-    if (r.resp[0] == -1) {
+    if ((uint16_t) r.resp[0] == SD_ERROR) {
         return -1;
     }
     
