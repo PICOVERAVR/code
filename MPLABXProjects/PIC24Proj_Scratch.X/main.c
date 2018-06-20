@@ -14,21 +14,31 @@ int main(void) {
     tft_init();
     printf("done.\n");
     
-    sd_block mbr, vbr;
-    sd_readBlock(0, &mbr);
+    sd_block_addr s = {0};
     
-    if (mbr.data[511] != 0xAA || mbr.data[510] != 0x55) {
-        printf("mbr not present!");
-    } else {
-        
-        uint64_t addr = 0;
-        for (int i = 4; i > 0; i--) {
-            
-        }
-        
-        
-        sd_readBlock(mbr.data[454] * 0x200, &vbr);
+    sd_block mbr, vbr;
+    sd_readBlock(s, &mbr);
+    
+    for (int i = 0; i < 512; i++) {
+        printf("%x ", mbr.data[i]);
     }
+    printf("\n\n");
+    
+    for (int i = 0; i < 4; i++) {
+        s.byte[i] = mbr.data[0x1C6 + i];
+    }
+    
+    //s.byte[1] = 0x20; //this is little-endian!
+    sd_readBlock(s, &vbr);
+    for (int i = 0; i < 512; i++) {
+        printf("%x ", vbr.data[i]);
+    }
+//    for (int i = 1; i <= 32; i++) {
+//        for (int j = 1; j <= 16; j++) {
+//            printf("%x, ", vbr.data[i * j]);
+//        }
+//        printf("\n");
+//    }
     
     for(;;) {
         

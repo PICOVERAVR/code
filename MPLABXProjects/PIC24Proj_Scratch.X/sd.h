@@ -11,6 +11,11 @@ typedef struct sd_resp { //40-bit response for some commands
     uint8_t resp[5];
 } sd_resp;
 
+typedef union sd_block_addr {
+    uint32_t uint;
+    uint8_t byte[4];
+} sd_block_addr;
+
 //this has to have a valid crc
 sd_command CMD0 = {.command = 0b01000000, .args[0] = 0, 0, 0, 0, .crc = 0b10010101};
 //below commands shouldn't need a valid crc
@@ -82,11 +87,12 @@ sd_resp sd_writeCommandLong(sd_command *c) {
 
 //read a block from the SD card
 //this is hard-coded because there are only two commands to do this
-void sd_readBlock(uint64_t block_addr, sd_block *block) {
+void sd_readBlock(sd_block_addr block_addr, sd_block *block) {
     SS_SD_SetLow();
+    
     SPI2_Exchange8bit(CMD17.command);
-    for (int i = 4; i > 0; i--) {
-        SPI2_Exchange8bit((block_addr >> (i * 8)) & 0xFF);
+    for (int i = 3; i >= 0; i--) {
+        SPI2_Exchange8bit(block_addr.byte[i]);
     }
     SPI2_Exchange8bit(CMD17.crc);
     

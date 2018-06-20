@@ -158,12 +158,12 @@ xc16-ld 1.34 (A)
 section                    address   length (PC units)   length (bytes) (dec)
 -------                    -------   -----------------   --------------------
 .text                        0x200              0x1ff0          0x2fe8  (12264)
-.const                      0x21f0               0x590           0x858  (2136)
-.text                       0x2780               0x5bc           0x89a  (2202)
-.dinit                      0x2d3c               0x128           0x1bc  (444)
-.text                       0x2e64               0x3a6           0x579  (1401)
+.const                      0x21f0               0x580           0x840  (2112)
+.text                       0x2770               0x5d2           0x8bb  (2235)
+.dinit                      0x2d42               0x128           0x1bc  (444)
+.text                       0x2e6a               0x3a6           0x579  (1401)
 
-                 Total "program" memory used (bytes):         0x480f  (18447) 3%
+                 Total "program" memory used (bytes):         0x4818  (18456) 3%
 
 
 "data" Memory  [Origin = 0x1000, Length = 0xc000]
@@ -282,97 +282,97 @@ External Symbols in Program Memory (by address):
                   0x00219c                  __fcompare
                   0x0021d2                  __dPropagateNaN
                   0x0021f0                  _font
-                  0x002780                  _writeData
-                  0x00278a                  _writeCommand
-                  0x002794                  _writeData16
-                  0x0027a4                  _tft_init
-                  0x00290a                  _tft_setAddrWindow
-                  0x002948                  _tft_setPixel
-                  0x00298e                  _tft_fillScreen
-                  0x0029be                  _tft_line
-                  0x002a56                  _tft_char
-                  0x002aa6                  _tft_str
-                  0x002ad4                  _tft_blank
-                  0x002b00                  _tft_bitmap
-                  0x002b50                  _sd_writeCommand
-                  0x002b98                  _sd_writeCommandLong
-                  0x002c06                  _sd_readBlock
-                  0x002c6e                  _sd_init
-                  0x002cc4                  _main
-                  0x002e64                  _SPI2_Initialize
-                  0x002e72                  _SPI2_Exchange
-                  0x002e9c                  _SPI2_ExchangeBuffer
-                  0x002f46                  _SPI2_Exchange8bit
-                  0x002f56                  _SPI2_Exchange8bitBuffer
-                  0x002f5a                  _SPI2_StatusGet
-                  0x002f6a                  _OSCILLATOR_Initialize
-                  0x002f8e                  _SYSTEM_Initialize
-                  0x002fa2                  _SYSTEM_GetResetCause
-                  0x002fa6                  _SYSTEM_ResetCauseFromTrap
-                  0x002faa                  _SYSTEM_ResetCauseFromIllegalOpcode
-                  0x002fb4                  _SYSTEM_ResetCauseFromConfigurationMismatch
-                  0x002fba                  _SYSTEM_ResetCauseFromExternal
-                  0x002fc0                  _SYSTEM_ResetCauseFromSoftware
-                  0x002fc6                  _SYSTEM_ResetCauseFromWatchdogTimer
-                  0x002fcc                  _SYSTEM_ResetCauseClear
-                  0x003026                  _SYSTEM_ResetCauseClearAll
-                  0x003038                  _delay_poll
-                  0x00304a                  _scanfs
-                  0x003074                  _adc_convert
-                  0x003094                  _map
-                  0x0030e6                  _PIN_MANAGER_Initialize
-                  0x003158                  _TMR2_Initialize
-                  0x003168                  _TMR2_Tasks_32BitOperation
-                  0x003170                  _TMR2_Period32BitSet
-                  0x003176                  _TMR2_Period32BitGet
-                  0x003188                  _TMR2_Counter32BitSet
-                  0x00318e                  _TMR2_Counter32BitGet
-                  0x0031a0                  _TMR2_Start
-                  0x0031a4                  _TMR2_Stop
-                  0x0031a8                  _UART1_Initialize
-                  0x0031b8                  _UART1_Read
-                  0x0031c6                  _UART1_Write
-                  0x0031d4                  _UART1_StatusGet
-                  0x0031f0                  _ADC1_Initialize
-                  0x003204                  _ADC1_Tasks
-                  0x003208                  _INTERRUPT_Initialize
+                  0x002770                  _writeData
+                  0x00277a                  _writeCommand
+                  0x002784                  _writeData16
+                  0x002794                  _tft_init
+                  0x0028fa                  _tft_setAddrWindow
+                  0x002938                  _tft_setPixel
+                  0x00297e                  _tft_fillScreen
+                  0x0029ae                  _tft_line
+                  0x002a46                  _tft_char
+                  0x002a96                  _tft_str
+                  0x002ac4                  _tft_blank
+                  0x002af0                  _tft_bitmap
+                  0x002b40                  _sd_writeCommand
+                  0x002b88                  _sd_writeCommandLong
+                  0x002bf6                  _sd_readBlock
+                  0x002c50                  _sd_init
+                  0x002ca6                  _main
+                  0x002e6a                  _SPI2_Initialize
+                  0x002e78                  _SPI2_Exchange
+                  0x002ea2                  _SPI2_ExchangeBuffer
+                  0x002f4c                  _SPI2_Exchange8bit
+                  0x002f5c                  _SPI2_Exchange8bitBuffer
+                  0x002f60                  _SPI2_StatusGet
+                  0x002f70                  _OSCILLATOR_Initialize
+                  0x002f94                  _SYSTEM_Initialize
+                  0x002fa8                  _SYSTEM_GetResetCause
+                  0x002fac                  _SYSTEM_ResetCauseFromTrap
+                  0x002fb0                  _SYSTEM_ResetCauseFromIllegalOpcode
+                  0x002fba                  _SYSTEM_ResetCauseFromConfigurationMismatch
+                  0x002fc0                  _SYSTEM_ResetCauseFromExternal
+                  0x002fc6                  _SYSTEM_ResetCauseFromSoftware
+                  0x002fcc                  _SYSTEM_ResetCauseFromWatchdogTimer
+                  0x002fd2                  _SYSTEM_ResetCauseClear
+                  0x00302c                  _SYSTEM_ResetCauseClearAll
+                  0x00303e                  _delay_poll
+                  0x003050                  _scanfs
+                  0x00307a                  _adc_convert
+                  0x00309a                  _map
+                  0x0030ec                  _PIN_MANAGER_Initialize
+                  0x00315e                  _TMR2_Initialize
+                  0x00316e                  _TMR2_Tasks_32BitOperation
+                  0x003176                  _TMR2_Period32BitSet
+                  0x00317c                  _TMR2_Period32BitGet
+                  0x00318e                  _TMR2_Counter32BitSet
+                  0x003194                  _TMR2_Counter32BitGet
+                  0x0031a6                  _TMR2_Start
+                  0x0031aa                  _TMR2_Stop
+                  0x0031ae                  _UART1_Initialize
+                  0x0031be                  _UART1_Read
+                  0x0031cc                  _UART1_Write
+                  0x0031da                  _UART1_StatusGet
+                  0x0031f6                  _ADC1_Initialize
+                  0x00320a                  _ADC1_Tasks
+                  0x00320e                  _INTERRUPT_Initialize
                   0x0557fa                  __FGS.sec
 
 External Symbols in Program Memory (by name):
 
-                  0x0031f0                  _ADC1_Initialize
-                  0x003204                  _ADC1_Tasks
-                  0x003208                  _INTERRUPT_Initialize
-                  0x002f6a                  _OSCILLATOR_Initialize
-                  0x0030e6                  _PIN_MANAGER_Initialize
-                  0x002e72                  _SPI2_Exchange
-                  0x002f46                  _SPI2_Exchange8bit
-                  0x002f56                  _SPI2_Exchange8bitBuffer
-                  0x002e9c                  _SPI2_ExchangeBuffer
-                  0x002e64                  _SPI2_Initialize
-                  0x002f5a                  _SPI2_StatusGet
-                  0x002fa2                  _SYSTEM_GetResetCause
-                  0x002f8e                  _SYSTEM_Initialize
-                  0x002fcc                  _SYSTEM_ResetCauseClear
-                  0x003026                  _SYSTEM_ResetCauseClearAll
-                  0x002fb4                  _SYSTEM_ResetCauseFromConfigurationMismatch
-                  0x002fba                  _SYSTEM_ResetCauseFromExternal
-                  0x002faa                  _SYSTEM_ResetCauseFromIllegalOpcode
-                  0x002fc0                  _SYSTEM_ResetCauseFromSoftware
-                  0x002fa6                  _SYSTEM_ResetCauseFromTrap
-                  0x002fc6                  _SYSTEM_ResetCauseFromWatchdogTimer
-                  0x00318e                  _TMR2_Counter32BitGet
-                  0x003188                  _TMR2_Counter32BitSet
-                  0x003158                  _TMR2_Initialize
-                  0x003176                  _TMR2_Period32BitGet
-                  0x003170                  _TMR2_Period32BitSet
-                  0x0031a0                  _TMR2_Start
-                  0x0031a4                  _TMR2_Stop
-                  0x003168                  _TMR2_Tasks_32BitOperation
-                  0x0031a8                  _UART1_Initialize
-                  0x0031b8                  _UART1_Read
-                  0x0031d4                  _UART1_StatusGet
-                  0x0031c6                  _UART1_Write
+                  0x0031f6                  _ADC1_Initialize
+                  0x00320a                  _ADC1_Tasks
+                  0x00320e                  _INTERRUPT_Initialize
+                  0x002f70                  _OSCILLATOR_Initialize
+                  0x0030ec                  _PIN_MANAGER_Initialize
+                  0x002e78                  _SPI2_Exchange
+                  0x002f4c                  _SPI2_Exchange8bit
+                  0x002f5c                  _SPI2_Exchange8bitBuffer
+                  0x002ea2                  _SPI2_ExchangeBuffer
+                  0x002e6a                  _SPI2_Initialize
+                  0x002f60                  _SPI2_StatusGet
+                  0x002fa8                  _SYSTEM_GetResetCause
+                  0x002f94                  _SYSTEM_Initialize
+                  0x002fd2                  _SYSTEM_ResetCauseClear
+                  0x00302c                  _SYSTEM_ResetCauseClearAll
+                  0x002fba                  _SYSTEM_ResetCauseFromConfigurationMismatch
+                  0x002fc0                  _SYSTEM_ResetCauseFromExternal
+                  0x002fb0                  _SYSTEM_ResetCauseFromIllegalOpcode
+                  0x002fc6                  _SYSTEM_ResetCauseFromSoftware
+                  0x002fac                  _SYSTEM_ResetCauseFromTrap
+                  0x002fcc                  _SYSTEM_ResetCauseFromWatchdogTimer
+                  0x003194                  _TMR2_Counter32BitGet
+                  0x00318e                  _TMR2_Counter32BitSet
+                  0x00315e                  _TMR2_Initialize
+                  0x00317c                  _TMR2_Period32BitGet
+                  0x003176                  _TMR2_Period32BitSet
+                  0x0031a6                  _TMR2_Start
+                  0x0031aa                  _TMR2_Stop
+                  0x00316e                  _TMR2_Tasks_32BitOperation
+                  0x0031ae                  _UART1_Initialize
+                  0x0031be                  _UART1_Read
+                  0x0031da                  _UART1_StatusGet
+                  0x0031cc                  _UART1_Write
                   0x00030c                  __AddressError
                   0x00031c                  __DMACError
                   0x000344                  __DefaultInterrupt
@@ -423,35 +423,35 @@ External Symbols in Program Memory (by name):
                   0x00023c                  __psv_init
                   0x000200                  __resetPRI
                   0x0006ea                  __vfprintf_cdnopuxX
-                  0x003074                  _adc_convert
-                  0x003038                  _delay_poll
+                  0x00307a                  _adc_convert
+                  0x00303e                  _delay_poll
                   0x0021f0                  _font
                   0x00069c                  _fputs
                   0x002074                  _frexpf
-                  0x002cc4                  _main
-                  0x003094                  _map
+                  0x002ca6                  _main
+                  0x00309a                  _map
                   0x00068e                  _printf
                   0x0006b8                  _puts
-                  0x00304a                  _scanfs
-                  0x002c6e                  _sd_init
-                  0x002c06                  _sd_readBlock
-                  0x002b50                  _sd_writeCommand
-                  0x002b98                  _sd_writeCommandLong
+                  0x003050                  _scanfs
+                  0x002c50                  _sd_init
+                  0x002bf6                  _sd_readBlock
+                  0x002b40                  _sd_writeCommand
+                  0x002b88                  _sd_writeCommandLong
                   0x0006cc                  _strlen
-                  0x002b00                  _tft_bitmap
-                  0x002ad4                  _tft_blank
-                  0x002a56                  _tft_char
-                  0x00298e                  _tft_fillScreen
-                  0x0027a4                  _tft_init
-                  0x0029be                  _tft_line
-                  0x00290a                  _tft_setAddrWindow
-                  0x002948                  _tft_setPixel
-                  0x002aa6                  _tft_str
+                  0x002af0                  _tft_bitmap
+                  0x002ac4                  _tft_blank
+                  0x002a46                  _tft_char
+                  0x00297e                  _tft_fillScreen
+                  0x002794                  _tft_init
+                  0x0029ae                  _tft_line
+                  0x0028fa                  _tft_setAddrWindow
+                  0x002938                  _tft_setPixel
+                  0x002a96                  _tft_str
                   0x000d92                  _vfprintf
                   0x000348                  _write
-                  0x00278a                  _writeCommand
-                  0x002780                  _writeData
-                  0x002794                  _writeData16
+                  0x00277a                  _writeCommand
+                  0x002770                  _writeData
+                  0x002784                  _writeData16
 
 Memory Configuration
 
@@ -666,7 +666,7 @@ __FOSCSEL
 
 __FGS             0x0557fa          0x2
  *(__FGS.sec*)
- __FGS.sec        0x0557fa          0x2 /CW/_FGS†Øè‘Øè__FGS.sec
+ __FGS.sec        0x0557fa          0x2 /CW/_FGS†ë⁄‘ë⁄__FGS.sec
                   0x0557fa                  __FGS.sec
 
 __FUID0
@@ -684,7 +684,7 @@ __FUID3
 .comment
  *(.comment)
 
-.debug_info       0x000000       0xac66
+.debug_info       0x000000       0xacc7
  *(.debug_info)
  .debug_info      0x000000       0x179f build/default/production/mcc_generated_files/mcc.o
  .debug_info      0x00179f        0x166 build/default/production/mcc_generated_files/interrupt_manager.o
@@ -694,13 +694,13 @@ __FUID3
  .debug_info      0x002fa1        0x74a build/default/production/mcc_generated_files/uart1.o
  .debug_info      0x0036eb        0x91f build/default/production/mcc_generated_files/spi2.o
  .debug_info      0x00400a        0xfc0 build/default/production/mcc_generated_files/adc1.o
- .debug_info      0x004fca       0x1743 build/default/production/main.o
- .debug_info      0x00670d       0x1371 build/default/production/core.o
- .debug_info      0x007a7e       0x1ae1 build/default/production/i2c.o
- .debug_info      0x00955f       0x1707 build/default/production/tft.o
+ .debug_info      0x004fca       0x17a4 build/default/production/main.o
+ .debug_info      0x00676e       0x1371 build/default/production/core.o
+ .debug_info      0x007adf       0x1ae1 build/default/production/i2c.o
+ .debug_info      0x0095c0       0x1707 build/default/production/tft.o
  *(.gnu.linkonce.wi.*)
 
-.debug_abbrev     0x000000        0xf2e
+.debug_abbrev     0x000000        0xf4a
  *(.debug_abbrev)
  .debug_abbrev    0x000000        0x1f5 build/default/production/mcc_generated_files/mcc.o
  .debug_abbrev    0x0001f5         0x34 build/default/production/mcc_generated_files/interrupt_manager.o
@@ -710,27 +710,27 @@ __FUID3
  .debug_abbrev    0x000550        0x145 build/default/production/mcc_generated_files/uart1.o
  .debug_abbrev    0x000695        0x183 build/default/production/mcc_generated_files/spi2.o
  .debug_abbrev    0x000818         0xc5 build/default/production/mcc_generated_files/adc1.o
- .debug_abbrev    0x0008dd        0x1d0 build/default/production/main.o
- .debug_abbrev    0x000aad        0x1a6 build/default/production/core.o
- .debug_abbrev    0x000c53        0x12b build/default/production/i2c.o
- .debug_abbrev    0x000d7e        0x1b0 build/default/production/tft.o
+ .debug_abbrev    0x0008dd        0x1ec build/default/production/main.o
+ .debug_abbrev    0x000ac9        0x1a6 build/default/production/core.o
+ .debug_abbrev    0x000c6f        0x12b build/default/production/i2c.o
+ .debug_abbrev    0x000d9a        0x1b0 build/default/production/tft.o
 
-.debug_line       0x000000        0xc84
+.debug_line       0x000000        0xc95
  *(.debug_line)
  .debug_line      0x000000        0x131 build/default/production/mcc_generated_files/mcc.o
  .debug_line      0x000131         0x52 build/default/production/mcc_generated_files/interrupt_manager.o
  .debug_line      0x000183        0x11b build/default/production/mcc_generated_files/traps.o
  .debug_line      0x00029e         0xfc build/default/production/mcc_generated_files/pin_manager.o
  .debug_line      0x00039a         0xf7 build/default/production/mcc_generated_files/tmr2.o
- .debug_line      0x000491        0x10e build/default/production/mcc_generated_files/uart1.o
- .debug_line      0x00059f        0x144 build/default/production/mcc_generated_files/spi2.o
- .debug_line      0x0006e3         0xe8 build/default/production/mcc_generated_files/adc1.o
- .debug_line      0x0007cb        0x136 build/default/production/main.o
- .debug_line      0x000901        0x10f build/default/production/core.o
- .debug_line      0x000a10         0xe6 build/default/production/i2c.o
- .debug_line      0x000af6        0x18e build/default/production/tft.o
+ .debug_line      0x000491        0x111 build/default/production/mcc_generated_files/uart1.o
+ .debug_line      0x0005a2        0x144 build/default/production/mcc_generated_files/spi2.o
+ .debug_line      0x0006e6         0xe8 build/default/production/mcc_generated_files/adc1.o
+ .debug_line      0x0007ce        0x144 build/default/production/main.o
+ .debug_line      0x000912        0x10f build/default/production/core.o
+ .debug_line      0x000a21         0xe6 build/default/production/i2c.o
+ .debug_line      0x000b07        0x18e build/default/production/tft.o
 
-.debug_frame      0x000000        0x780
+.debug_frame      0x000000        0x794
  *(.debug_frame)
  .debug_frame     0x000000         0xee build/default/production/mcc_generated_files/mcc.o
  .debug_frame     0x0000ee         0x24 build/default/production/mcc_generated_files/interrupt_manager.o
@@ -740,12 +740,12 @@ __FUID3
  .debug_frame     0x00028a         0x64 build/default/production/mcc_generated_files/uart1.o
  .debug_frame     0x0002ee         0x94 build/default/production/mcc_generated_files/spi2.o
  .debug_frame     0x000382         0x34 build/default/production/mcc_generated_files/adc1.o
- .debug_frame     0x0003b6        0x102 build/default/production/main.o
- .debug_frame     0x0004b8         0xa2 build/default/production/core.o
- .debug_frame     0x00055a         0x64 build/default/production/i2c.o
- .debug_frame     0x0005be        0x1c2 build/default/production/tft.o
+ .debug_frame     0x0003b6        0x116 build/default/production/main.o
+ .debug_frame     0x0004cc         0xa2 build/default/production/core.o
+ .debug_frame     0x00056e         0x64 build/default/production/i2c.o
+ .debug_frame     0x0005d2        0x1c2 build/default/production/tft.o
 
-.debug_str        0x000000        0x4f6
+.debug_str        0x000000        0x504
  *(.debug_str)
  .debug_str       0x000000         0xb2 build/default/production/mcc_generated_files/mcc.o
  .debug_str       0x0000b2         0x24 build/default/production/mcc_generated_files/traps.o
@@ -754,10 +754,10 @@ __FUID3
  .debug_str       0x00011f         0x15 build/default/production/mcc_generated_files/uart1.o
  .debug_str       0x000134         0x5a build/default/production/mcc_generated_files/spi2.o
  .debug_str       0x00018e         0x87 build/default/production/mcc_generated_files/adc1.o
- .debug_str       0x000215         0xc1 build/default/production/main.o
- .debug_str       0x0002d6         0x9a build/default/production/core.o
- .debug_str       0x000370         0xd9 build/default/production/i2c.o
- .debug_str       0x000449         0xad build/default/production/tft.o
+ .debug_str       0x000215         0xcf build/default/production/main.o
+ .debug_str       0x0002e4         0x9a build/default/production/core.o
+ .debug_str       0x00037e         0xd9 build/default/production/i2c.o
+ .debug_str       0x000457         0xad build/default/production/tft.o
 
 .debug_loc
  *(.debug_loc)
@@ -1676,12 +1676,12 @@ LOAD /Applications/microchip/xc16/v1.34/bin/bin/../../lib/libm-elf.a
 LOAD /Applications/microchip/xc16/v1.34/bin/bin/../../lib/libc-elf.a
 END GROUP
 OUTPUT(dist/default/production/PIC24Proj_Scratch.X.production.elf elf32-pic30)
-LOAD /CW/_FGS†Øè‘Øè__FGS.sec
+LOAD /CW/_FGS†ë⁄‘ë⁄__FGS.sec
 LOAD default_isr
 LOAD data_init
 
 .debug_pubtypes
-                  0x000128        0xcf9
+                  0x000128        0xd1d
  .debug_pubtypes
                   0x000128        0x1c6 build/default/production/mcc_generated_files/mcc.o
  .debug_pubtypes
@@ -1699,116 +1699,116 @@ LOAD data_init
  .debug_pubtypes
                   0x0005d6        0x129 build/default/production/mcc_generated_files/adc1.o
  .debug_pubtypes
-                  0x0006ff        0x1f1 build/default/production/main.o
+                  0x0006ff        0x215 build/default/production/main.o
  .debug_pubtypes
-                  0x0008f0        0x176 build/default/production/core.o
+                  0x000914        0x176 build/default/production/core.o
  .debug_pubtypes
-                  0x000a66        0x231 build/default/production/i2c.o
+                  0x000a8a        0x231 build/default/production/i2c.o
  .debug_pubtypes
-                  0x000c97        0x18a build/default/production/tft.o
+                  0x000cbb        0x18a build/default/production/tft.o
 
 __c30_signature
-                  0x000e21        0x12c
+                  0x000e45        0x12c
  __c30_signature
-                  0x000e21          0x6 build/default/production/mcc_generated_files/mcc.o
+                  0x000e45          0x6 build/default/production/mcc_generated_files/mcc.o
  __c30_signature
-                  0x000e27          0x6 build/default/production/mcc_generated_files/interrupt_manager.o
+                  0x000e4b          0x6 build/default/production/mcc_generated_files/interrupt_manager.o
  __c30_signature
-                  0x000e2d          0x6 build/default/production/mcc_generated_files/traps.o
+                  0x000e51          0x6 build/default/production/mcc_generated_files/traps.o
  __c30_signature
-                  0x000e33          0x6 build/default/production/mcc_generated_files/pin_manager.o
+                  0x000e57          0x6 build/default/production/mcc_generated_files/pin_manager.o
  __c30_signature
-                  0x000e39          0x6 build/default/production/mcc_generated_files/tmr2.o
+                  0x000e5d          0x6 build/default/production/mcc_generated_files/tmr2.o
  __c30_signature
-                  0x000e3f          0x6 build/default/production/mcc_generated_files/uart1.o
+                  0x000e63          0x6 build/default/production/mcc_generated_files/uart1.o
  __c30_signature
-                  0x000e45          0x6 build/default/production/mcc_generated_files/spi2.o
+                  0x000e69          0x6 build/default/production/mcc_generated_files/spi2.o
  __c30_signature
-                  0x000e4b          0x6 build/default/production/mcc_generated_files/adc1.o
+                  0x000e6f          0x6 build/default/production/mcc_generated_files/adc1.o
  __c30_signature
-                  0x000e51          0x6 build/default/production/main.o
+                  0x000e75          0x6 build/default/production/main.o
  __c30_signature
-                  0x000e57          0x6 build/default/production/core.o
+                  0x000e7b          0x6 build/default/production/core.o
  __c30_signature
-                  0x000e5d          0x6 build/default/production/i2c.o
+                  0x000e81          0x6 build/default/production/i2c.o
  __c30_signature
-                  0x000e63          0x6 build/default/production/tft.o
+                  0x000e87          0x6 build/default/production/tft.o
  __c30_signature
-                  0x000e69          0x6 /Applications/microchip/xc16/v1.34/bin/bin/../../lib/libpic30-elf.a(crt0_extendedep.o)
+                  0x000e8d          0x6 /Applications/microchip/xc16/v1.34/bin/bin/../../lib/libpic30-elf.a(crt0_extendedep.o)
  __c30_signature
-                  0x000e6f          0x6 /Applications/microchip/xc16/v1.34/bin/bin/../../lib/libpic30-elf.a(data_init_extended.o)
+                  0x000e93          0x6 /Applications/microchip/xc16/v1.34/bin/bin/../../lib/libpic30-elf.a(data_init_extended.o)
  __c30_signature
-                  0x000e75          0x6 /Applications/microchip/xc16/v1.34/bin/bin/../../lib/libm-elf.a(addsf3.epeo)
+                  0x000e99          0x6 /Applications/microchip/xc16/v1.34/bin/bin/../../lib/libm-elf.a(addsf3.epeo)
  __c30_signature
-                  0x000e7b          0x6 /Applications/microchip/xc16/v1.34/bin/bin/../../lib/libm-elf.a(divsf3.epeo)
+                  0x000e9f          0x6 /Applications/microchip/xc16/v1.34/bin/bin/../../lib/libm-elf.a(divsf3.epeo)
  __c30_signature
-                  0x000e81          0x6 /Applications/microchip/xc16/v1.34/bin/bin/../../lib/libm-elf.a(fixsfsi.epeo)
+                  0x000ea5          0x6 /Applications/microchip/xc16/v1.34/bin/bin/../../lib/libm-elf.a(fixsfsi.epeo)
  __c30_signature
-                  0x000e87          0x6 /Applications/microchip/xc16/v1.34/bin/bin/../../lib/libm-elf.a(floatsisf.epeo)
+                  0x000eab          0x6 /Applications/microchip/xc16/v1.34/bin/bin/../../lib/libm-elf.a(floatsisf.epeo)
  __c30_signature
-                  0x000e8d          0x6 /Applications/microchip/xc16/v1.34/bin/bin/../../lib/libm-elf.a(fpack.epeo)
+                  0x000eb1          0x6 /Applications/microchip/xc16/v1.34/bin/bin/../../lib/libm-elf.a(fpack.epeo)
  __c30_signature
-                  0x000e93          0x6 /Applications/microchip/xc16/v1.34/bin/bin/../../lib/libm-elf.a(funpack.epeo)
+                  0x000eb7          0x6 /Applications/microchip/xc16/v1.34/bin/bin/../../lib/libm-elf.a(funpack.epeo)
  __c30_signature
-                  0x000e99          0x6 /Applications/microchip/xc16/v1.34/bin/bin/../../lib/libm-elf.a(funpack2.epeo)
+                  0x000ebd          0x6 /Applications/microchip/xc16/v1.34/bin/bin/../../lib/libm-elf.a(funpack2.epeo)
  __c30_signature
-                  0x000e9f          0x6 /Applications/microchip/xc16/v1.34/bin/bin/../../lib/libm-elf.a(futil.epeo)
+                  0x000ec3          0x6 /Applications/microchip/xc16/v1.34/bin/bin/../../lib/libm-elf.a(futil.epeo)
  __c30_signature
-                  0x000ea5          0x6 /Applications/microchip/xc16/v1.34/bin/bin/../../lib/libm-elf.a(mulsf3.epeo)
+                  0x000ec9          0x6 /Applications/microchip/xc16/v1.34/bin/bin/../../lib/libm-elf.a(mulsf3.epeo)
  __c30_signature
-                  0x000eab          0x6 /Applications/microchip/xc16/v1.34/bin/bin/../../lib/libm-elf.a(floatdisf.epeo)
+                  0x000ecf          0x6 /Applications/microchip/xc16/v1.34/bin/bin/../../lib/libm-elf.a(floatdisf.epeo)
  __c30_signature
-                  0x000eb1          0x6 /Applications/microchip/xc16/v1.34/bin/bin/../../lib/libm-elf.a(floatundisf.epeo)
+                  0x000ed5          0x6 /Applications/microchip/xc16/v1.34/bin/bin/../../lib/libm-elf.a(floatundisf.epeo)
  __c30_signature
-                  0x000eb7          0x6 /Applications/microchip/xc16/v1.34/bin/bin/../../lib/libc-elf.a(printf_cdnopuxX.EPeo)
+                  0x000edb          0x6 /Applications/microchip/xc16/v1.34/bin/bin/../../lib/libc-elf.a(printf_cdnopuxX.EPeo)
  __c30_signature
-                  0x000ebd          0x6 /Applications/microchip/xc16/v1.34/bin/bin/../../lib/libc-elf.a(printf.epeo)
+                  0x000ee1          0x6 /Applications/microchip/xc16/v1.34/bin/bin/../../lib/libc-elf.a(printf.epeo)
  __c30_signature
-                  0x000ec3          0x6 /Applications/microchip/xc16/v1.34/bin/bin/../../lib/libc-elf.a(puts.epeo)
+                  0x000ee7          0x6 /Applications/microchip/xc16/v1.34/bin/bin/../../lib/libc-elf.a(puts.epeo)
  __c30_signature
-                  0x000ec9          0x6 /Applications/microchip/xc16/v1.34/bin/bin/../../lib/libc-elf.a(strlen.epeo)
+                  0x000eed          0x6 /Applications/microchip/xc16/v1.34/bin/bin/../../lib/libc-elf.a(strlen.epeo)
  __c30_signature
-                  0x000ecf          0x6 /Applications/microchip/xc16/v1.34/bin/bin/../../lib/libc-elf.a(_iob.epeo)
+                  0x000ef3          0x6 /Applications/microchip/xc16/v1.34/bin/bin/../../lib/libc-elf.a(_iob.epeo)
  __c30_signature
-                  0x000ed5          0x6 /Applications/microchip/xc16/v1.34/bin/bin/../../lib/libc-elf.a(doprnt_cdnopuxX.EPeo)
+                  0x000ef9          0x6 /Applications/microchip/xc16/v1.34/bin/bin/../../lib/libc-elf.a(doprnt_cdnopuxX.EPeo)
  __c30_signature
-                  0x000edb          0x6 /Applications/microchip/xc16/v1.34/bin/bin/../../lib/libc-elf.a(doprnt.epeo)
+                  0x000eff          0x6 /Applications/microchip/xc16/v1.34/bin/bin/../../lib/libc-elf.a(doprnt.epeo)
  __c30_signature
-                  0x000ee1          0x6 /Applications/microchip/xc16/v1.34/bin/bin/../../lib/libc-elf.a(fputc.epeo)
+                  0x000f05          0x6 /Applications/microchip/xc16/v1.34/bin/bin/../../lib/libc-elf.a(fputc.epeo)
  __c30_signature
-                  0x000ee7          0x6 /Applications/microchip/xc16/v1.34/bin/bin/../../lib/libc-elf.a(powers.epeo)
+                  0x000f0b          0x6 /Applications/microchip/xc16/v1.34/bin/bin/../../lib/libc-elf.a(powers.epeo)
  __c30_signature
-                  0x000eed          0x6 /Applications/microchip/xc16/v1.34/bin/bin/../../lib/libc-elf.a(flsbuf.epeo)
+                  0x000f11          0x6 /Applications/microchip/xc16/v1.34/bin/bin/../../lib/libc-elf.a(flsbuf.epeo)
  __c30_signature
-                  0x000ef3          0x6 /Applications/microchip/xc16/v1.34/bin/bin/../../lib/libm-elf.a(feqltle.epeo)
+                  0x000f17          0x6 /Applications/microchip/xc16/v1.34/bin/bin/../../lib/libm-elf.a(feqltle.epeo)
  __c30_signature
-                  0x000ef9          0x6 /Applications/microchip/xc16/v1.34/bin/bin/../../lib/libm-elf.a(fgtge.epeo)
+                  0x000f1d          0x6 /Applications/microchip/xc16/v1.34/bin/bin/../../lib/libm-elf.a(fgtge.epeo)
  __c30_signature
-                  0x000eff          0x6 /Applications/microchip/xc16/v1.34/bin/bin/../../lib/libm-elf.a(fixunssfsi.epeo)
+                  0x000f23          0x6 /Applications/microchip/xc16/v1.34/bin/bin/../../lib/libm-elf.a(fixunssfsi.epeo)
  __c30_signature
-                  0x000f05          0x6 /Applications/microchip/xc16/v1.34/bin/bin/../../lib/libm-elf.a(floatunsisf.epeo)
+                  0x000f29          0x6 /Applications/microchip/xc16/v1.34/bin/bin/../../lib/libm-elf.a(floatunsisf.epeo)
  __c30_signature
-                  0x000f0b          0x6 /Applications/microchip/xc16/v1.34/bin/bin/../../lib/libm-elf.a(fne.epeo)
+                  0x000f2f          0x6 /Applications/microchip/xc16/v1.34/bin/bin/../../lib/libm-elf.a(fne.epeo)
  __c30_signature
-                  0x000f11          0x6 /Applications/microchip/xc16/v1.34/bin/bin/../../lib/libm-elf.a(frexpf.epeo)
+                  0x000f35          0x6 /Applications/microchip/xc16/v1.34/bin/bin/../../lib/libm-elf.a(frexpf.epeo)
  __c30_signature
-                  0x000f17          0x6 /Applications/microchip/xc16/v1.34/bin/bin/../../lib/libm-elf.a(truncdfsf.epeo)
+                  0x000f3b          0x6 /Applications/microchip/xc16/v1.34/bin/bin/../../lib/libm-elf.a(truncdfsf.epeo)
  __c30_signature
-                  0x000f1d          0x6 /Applications/microchip/xc16/v1.34/bin/bin/../../lib/libm-elf.a(udivsi3.epeo)
+                  0x000f41          0x6 /Applications/microchip/xc16/v1.34/bin/bin/../../lib/libm-elf.a(udivsi3.epeo)
  __c30_signature
-                  0x000f23          0x6 /Applications/microchip/xc16/v1.34/bin/bin/../../lib/libm-elf.a(umodsi3.epeo)
+                  0x000f47          0x6 /Applications/microchip/xc16/v1.34/bin/bin/../../lib/libm-elf.a(umodsi3.epeo)
  __c30_signature
-                  0x000f29          0x6 /Applications/microchip/xc16/v1.34/bin/bin/../../lib/libm-elf.a(mulsi3.epeo)
+                  0x000f4d          0x6 /Applications/microchip/xc16/v1.34/bin/bin/../../lib/libm-elf.a(mulsi3.epeo)
  __c30_signature
-                  0x000f2f          0x6 /Applications/microchip/xc16/v1.34/bin/bin/../../lib/libm-elf.a(_frexpf.epeo)
+                  0x000f53          0x6 /Applications/microchip/xc16/v1.34/bin/bin/../../lib/libm-elf.a(_frexpf.epeo)
  __c30_signature
-                  0x000f35          0x6 /Applications/microchip/xc16/v1.34/bin/bin/../../lib/libm-elf.a(dunpack.epeo)
+                  0x000f59          0x6 /Applications/microchip/xc16/v1.34/bin/bin/../../lib/libm-elf.a(dunpack.epeo)
  __c30_signature
-                  0x000f3b          0x6 /Applications/microchip/xc16/v1.34/bin/bin/../../lib/libm-elf.a(dunpack2.epeo)
+                  0x000f5f          0x6 /Applications/microchip/xc16/v1.34/bin/bin/../../lib/libm-elf.a(dunpack2.epeo)
  __c30_signature
-                  0x000f41          0x6 /Applications/microchip/xc16/v1.34/bin/bin/../../lib/libm-elf.a(fcompare.epeo)
+                  0x000f65          0x6 /Applications/microchip/xc16/v1.34/bin/bin/../../lib/libm-elf.a(fcompare.epeo)
  __c30_signature
-                  0x000f47          0x6 /Applications/microchip/xc16/v1.34/bin/bin/../../lib/libm-elf.a(dpropagateNaN.epeo)
+                  0x000f6b          0x6 /Applications/microchip/xc16/v1.34/bin/bin/../../lib/libm-elf.a(dpropagateNaN.epeo)
 
 .ndata              0x1000          0x4
  .ndata             0x1000          0x2 build/default/production/mcc_generated_files/traps.o
@@ -1893,82 +1893,82 @@ __c30_signature
  .ivt._SoftTrapError
                   0x000010          0x2 build/default/production/mcc_generated_files/traps.o
 
-.const              0xa1f0        0x590 load address 0x0021f0  
+.const              0xa1f0        0x580 load address 0x0021f0  
  .const             0xa1f0        0x4fc build/default/production/tft.o
                     0xa1f0                  _font
- .const             0xa6ec         0x72 build/default/production/main.o
- .const             0xa75e         0x22 build/default/production/mcc_generated_files/traps.o
+ .const             0xa6ec         0x62 build/default/production/main.o
+ .const             0xa74e         0x22 build/default/production/mcc_generated_files/traps.o
 
-.text             0x002780        0x5bc
- .text            0x002780        0x3d0 build/default/production/tft.o
-                  0x002780                  _writeData
-                  0x00278a                  _writeCommand
-                  0x002794                  _writeData16
-                  0x0027a4                  _tft_init
-                  0x00290a                  _tft_setAddrWindow
-                  0x002948                  _tft_setPixel
-                  0x00298e                  _tft_fillScreen
-                  0x0029be                  _tft_line
-                  0x002a56                  _tft_char
-                  0x002aa6                  _tft_str
-                  0x002ad4                  _tft_blank
-                  0x002b00                  _tft_bitmap
- .text            0x002b50        0x1ec build/default/production/main.o
-                  0x002b50                  _sd_writeCommand
-                  0x002b98                  _sd_writeCommandLong
-                  0x002c06                  _sd_readBlock
-                  0x002c6e                  _sd_init
-                  0x002cc4                  _main
+.text             0x002770        0x5d2
+ .text            0x002770        0x3d0 build/default/production/tft.o
+                  0x002770                  _writeData
+                  0x00277a                  _writeCommand
+                  0x002784                  _writeData16
+                  0x002794                  _tft_init
+                  0x0028fa                  _tft_setAddrWindow
+                  0x002938                  _tft_setPixel
+                  0x00297e                  _tft_fillScreen
+                  0x0029ae                  _tft_line
+                  0x002a46                  _tft_char
+                  0x002a96                  _tft_str
+                  0x002ac4                  _tft_blank
+                  0x002af0                  _tft_bitmap
+ .text            0x002b40        0x202 build/default/production/main.o
+                  0x002b40                  _sd_writeCommand
+                  0x002b88                  _sd_writeCommandLong
+                  0x002bf6                  _sd_readBlock
+                  0x002c50                  _sd_init
+                  0x002ca6                  _main
 
-.dinit            0x002d3c        0x128
- .dinit           0x002d3c        0x128 data_init
+.dinit            0x002d42        0x128
+ .dinit           0x002d42        0x128 data_init
 
-.text             0x002e64        0x3a6
- .text            0x002e64         0xfa build/default/production/mcc_generated_files/spi2.o
-                  0x002e64                  _SPI2_Initialize
-                  0x002e72                  _SPI2_Exchange
-                  0x002e9c                  _SPI2_ExchangeBuffer
-                  0x002f46                  _SPI2_Exchange8bit
-                  0x002f56                  _SPI2_Exchange8bitBuffer
-                  0x002f5a                  _SPI2_StatusGet
- .text            0x002f5e         0xcc build/default/production/mcc_generated_files/mcc.o
-                  0x002f6a                  _OSCILLATOR_Initialize
-                  0x002f8e                  _SYSTEM_Initialize
-                  0x002fa2                  _SYSTEM_GetResetCause
-                  0x002fa6                  _SYSTEM_ResetCauseFromTrap
-                  0x002faa                  _SYSTEM_ResetCauseFromIllegalOpcode
-                  0x002fb4                  _SYSTEM_ResetCauseFromConfigurationMismatch
-                  0x002fba                  _SYSTEM_ResetCauseFromExternal
-                  0x002fc0                  _SYSTEM_ResetCauseFromSoftware
-                  0x002fc6                  _SYSTEM_ResetCauseFromWatchdogTimer
-                  0x002fcc                  _SYSTEM_ResetCauseClear
-                  0x002fd4                  _SYSTEM_ResetCauseHandler
-                  0x003026                  _SYSTEM_ResetCauseClearAll
- .text            0x00302a         0xbc build/default/production/core.o
-                  0x003038                  _delay_poll
-                  0x00304a                  _scanfs
-                  0x003074                  _adc_convert
-                  0x003094                  _map
- .text            0x0030e6         0x72 build/default/production/mcc_generated_files/pin_manager.o
-                  0x0030e6                  _PIN_MANAGER_Initialize
- .text            0x003158         0x50 build/default/production/mcc_generated_files/tmr2.o
-                  0x003158                  _TMR2_Initialize
-                  0x003168                  _TMR2_Tasks_32BitOperation
-                  0x003170                  _TMR2_Period32BitSet
-                  0x003176                  _TMR2_Period32BitGet
-                  0x003188                  _TMR2_Counter32BitSet
-                  0x00318e                  _TMR2_Counter32BitGet
-                  0x0031a0                  _TMR2_Start
-                  0x0031a4                  _TMR2_Stop
- .text            0x0031a8         0x30 build/default/production/mcc_generated_files/uart1.o
-                  0x0031a8                  _UART1_Initialize
-                  0x0031b8                  _UART1_Read
-                  0x0031c6                  _UART1_Write
-                  0x0031d4                  _UART1_StatusGet
- .text            0x0031d8         0x18 build/default/production/mcc_generated_files/traps.o
-                  0x0031e2                  _TRAPS_halt_on_error
- .text            0x0031f0         0x18 build/default/production/mcc_generated_files/adc1.o
-                  0x0031f0                  _ADC1_Initialize
-                  0x003204                  _ADC1_Tasks
- .text            0x003208          0x2 build/default/production/mcc_generated_files/interrupt_manager.o
-                  0x003208                  _INTERRUPT_Initialize
+.text             0x002e6a        0x3a6
+ .text            0x002e6a         0xfa build/default/production/mcc_generated_files/spi2.o
+                  0x002e6a                  _SPI2_Initialize
+                  0x002e78                  _SPI2_Exchange
+                  0x002ea2                  _SPI2_ExchangeBuffer
+                  0x002f4c                  _SPI2_Exchange8bit
+                  0x002f5c                  _SPI2_Exchange8bitBuffer
+                  0x002f60                  _SPI2_StatusGet
+ .text            0x002f64         0xcc build/default/production/mcc_generated_files/mcc.o
+                  0x002f70                  _OSCILLATOR_Initialize
+                  0x002f94                  _SYSTEM_Initialize
+                  0x002fa8                  _SYSTEM_GetResetCause
+                  0x002fac                  _SYSTEM_ResetCauseFromTrap
+                  0x002fb0                  _SYSTEM_ResetCauseFromIllegalOpcode
+                  0x002fba                  _SYSTEM_ResetCauseFromConfigurationMismatch
+                  0x002fc0                  _SYSTEM_ResetCauseFromExternal
+                  0x002fc6                  _SYSTEM_ResetCauseFromSoftware
+                  0x002fcc                  _SYSTEM_ResetCauseFromWatchdogTimer
+                  0x002fd2                  _SYSTEM_ResetCauseClear
+                  0x002fda                  _SYSTEM_ResetCauseHandler
+                  0x00302c                  _SYSTEM_ResetCauseClearAll
+ .text            0x003030         0xbc build/default/production/core.o
+                  0x00303e                  _delay_poll
+                  0x003050                  _scanfs
+                  0x00307a                  _adc_convert
+                  0x00309a                  _map
+ .text            0x0030ec         0x72 build/default/production/mcc_generated_files/pin_manager.o
+                  0x0030ec                  _PIN_MANAGER_Initialize
+ .text            0x00315e         0x50 build/default/production/mcc_generated_files/tmr2.o
+                  0x00315e                  _TMR2_Initialize
+                  0x00316e                  _TMR2_Tasks_32BitOperation
+                  0x003176                  _TMR2_Period32BitSet
+                  0x00317c                  _TMR2_Period32BitGet
+                  0x00318e                  _TMR2_Counter32BitSet
+                  0x003194                  _TMR2_Counter32BitGet
+                  0x0031a6                  _TMR2_Start
+                  0x0031aa                  _TMR2_Stop
+ .text            0x0031ae         0x30 build/default/production/mcc_generated_files/uart1.o
+                  0x0031ae                  _UART1_Initialize
+                  0x0031be                  _UART1_Read
+                  0x0031cc                  _UART1_Write
+                  0x0031da                  _UART1_StatusGet
+ .text            0x0031de         0x18 build/default/production/mcc_generated_files/traps.o
+                  0x0031e8                  _TRAPS_halt_on_error
+ .text            0x0031f6         0x18 build/default/production/mcc_generated_files/adc1.o
+                  0x0031f6                  _ADC1_Initialize
+                  0x00320a                  _ADC1_Tasks
+ .text            0x00320e          0x2 build/default/production/mcc_generated_files/interrupt_manager.o
+                  0x00320e                  _INTERRUPT_Initialize
