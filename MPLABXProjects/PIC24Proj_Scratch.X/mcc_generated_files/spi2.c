@@ -1,71 +1,11 @@
-
-/**
-  SPI2 Generated Driver API Source File
-
-  Company:
-    Microchip Technology Inc.
-
-  File Name:
-    spi2.c
-
-  @Summary
-    This is the generated source file for the SPI2 driver using MPLAB(c) Code Configurator
-
-  @Description
-    This source file provides APIs for driver for SPI2.
-    Generation Information :
-        Product Revision  :  MPLAB(c) Code Configurator - pic24-dspic-pic32mm : v1.35
-        Device            :  PIC24EP512GP202
-    The generated drivers are tested against the following:
-        Compiler          :  XC16 1.31
-        MPLAB 	          :  MPLAB X 3.60
-*/
-
-/*
-    (c) 2016 Microchip Technology Inc. and its subsidiaries. You may use this
-    software and any derivatives exclusively with Microchip products.
-
-    THIS SOFTWARE IS SUPPLIED BY MICROCHIP "AS IS". NO WARRANTIES, WHETHER
-    EXPRESS, IMPLIED OR STATUTORY, APPLY TO THIS SOFTWARE, INCLUDING ANY IMPLIED
-    WARRANTIES OF NON-INFRINGEMENT, MERCHANTABILITY, AND FITNESS FOR A
-    PARTICULAR PURPOSE, OR ITS INTERACTION WITH MICROCHIP PRODUCTS, COMBINATION
-    WITH ANY OTHER PRODUCTS, OR USE IN ANY APPLICATION.
-
-    IN NO EVENT WILL MICROCHIP BE LIABLE FOR ANY INDIRECT, SPECIAL, PUNITIVE,
-    INCIDENTAL OR CONSEQUENTIAL LOSS, DAMAGE, COST OR EXPENSE OF ANY KIND
-    WHATSOEVER RELATED TO THE SOFTWARE, HOWEVER CAUSED, EVEN IF MICROCHIP HAS
-    BEEN ADVISED OF THE POSSIBILITY OR THE DAMAGES ARE FORESEEABLE. TO THE
-    FULLEST EXTENT ALLOWED BY LAW, MICROCHIP'S TOTAL LIABILITY ON ALL CLAIMS IN
-    ANY WAY RELATED TO THIS SOFTWARE WILL NOT EXCEED THE AMOUNT OF FEES, IF ANY,
-    THAT YOU HAVE PAID DIRECTLY TO MICROCHIP FOR THIS SOFTWARE.
-
-    MICROCHIP PROVIDES THIS SOFTWARE CONDITIONALLY UPON YOUR ACCEPTANCE OF THESE
-    TERMS.
-*/
-
-/**
-  Section: Included Files
-*/
-
 #include <xc.h>
 #include "spi2.h"
-
-
-/**
- Section: File specific functions
-*/
 
 inline __attribute__((__always_inline__)) SPI2_TRANSFER_MODE SPI2_TransferModeGet(void);
 void SPI2_Exchange( uint8_t *pTransmitData, uint8_t *pReceiveData );
 uint16_t SPI2_ExchangeBuffer(uint8_t *pTransmitData, uint16_t byteCount, uint8_t *pReceiveData);
 
-/**
- Section: Driver Interface Function Definitions
-*/
-
-
-void SPI2_Initialize (void)
-{
+void SPI2_Initialize (void) {
     // MSTEN Master; DISSDO disabled; PPRE 1:1; SPRE 2:1; MODE16 disabled; SMP Middle; DISSCK disabled; CKP Idle:Low, Active:High; CKE Active to Idle; SSEN disabled; 
     SPI2CON1 = 0x013B;
     // SPIFSD disabled; SPIBEN enabled; FRMPOL disabled; FRMDLY disabled; FRMEN disabled; 
@@ -74,11 +14,9 @@ void SPI2_Initialize (void)
     SPI2STAT = 0x800C;
 }
 
-void SPI2_Exchange( uint8_t *pTransmitData, uint8_t *pReceiveData )
-{
+void SPI2_Exchange( uint8_t *pTransmitData, uint8_t *pReceiveData ) {
 
-    while( SPI2STATbits.SPITBF == true )
-    {
+    while( SPI2STATbits.SPITBF == true ) {
 
     }
 
@@ -96,8 +34,7 @@ void SPI2_Exchange( uint8_t *pTransmitData, uint8_t *pReceiveData )
 
 }
 
-uint16_t SPI2_ExchangeBuffer(uint8_t *pTransmitData, uint16_t byteCount, uint8_t *pReceiveData)
-{
+uint16_t SPI2_ExchangeBuffer(uint8_t *pTransmitData, uint16_t byteCount, uint8_t *pReceiveData) {
 
     uint16_t dataSentCount = 0;
     uint16_t count = 0;
@@ -248,6 +185,3 @@ SPI2_STATUS SPI2_StatusGet()
 {
     return(SPI2STAT);
 }
-/**
- End of File
-*/

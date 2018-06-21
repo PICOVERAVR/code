@@ -1221,6 +1221,152 @@
 
 */
 #define MOSI_SetDigitalOutput() _TRISB7 = 0
+/**
+  @Summary
+    Sets the GPIO pin, RB8, high using LATB8.
+
+  @Description
+    Sets the GPIO pin, RB8, high using LATB8.
+
+  @Preconditions
+    The RB8 must be set to an output.
+
+  @Returns
+    None.
+
+  @Param
+    None.
+
+  @Example
+    <code>
+    // Set RB8 high (1)
+    SS_SD_SetHigh();
+    </code>
+
+*/
+#define SS_SD_SetHigh()          _LATB8 = 1
+/**
+  @Summary
+    Sets the GPIO pin, RB8, low using LATB8.
+
+  @Description
+    Sets the GPIO pin, RB8, low using LATB8.
+
+  @Preconditions
+    The RB8 must be set to an output.
+
+  @Returns
+    None.
+
+  @Param
+    None.
+
+  @Example
+    <code>
+    // Set RB8 low (0)
+    SS_SD_SetLow();
+    </code>
+
+*/
+#define SS_SD_SetLow()           _LATB8 = 0
+/**
+  @Summary
+    Toggles the GPIO pin, RB8, using LATB8.
+
+  @Description
+    Toggles the GPIO pin, RB8, using LATB8.
+
+  @Preconditions
+    The RB8 must be set to an output.
+
+  @Returns
+    None.
+
+  @Param
+    None.
+
+  @Example
+    <code>
+    // Toggle RB8
+    SS_SD_Toggle();
+    </code>
+
+*/
+#define SS_SD_Toggle()           _LATB8 ^= 1
+/**
+  @Summary
+    Reads the value of the GPIO pin, RB8.
+
+  @Description
+    Reads the value of the GPIO pin, RB8.
+
+  @Preconditions
+    None.
+
+  @Returns
+    None.
+
+  @Param
+    None.
+
+  @Example
+    <code>
+    uint16_t portValue;
+
+    // Read RB8
+    postValue = SS_SD_GetValue();
+    </code>
+
+*/
+#define SS_SD_GetValue()         _RB8
+/**
+  @Summary
+    Configures the GPIO pin, RB8, as an input.
+
+  @Description
+    Configures the GPIO pin, RB8, as an input.
+
+  @Preconditions
+    None.
+
+  @Returns
+    None.
+
+  @Param
+    None.
+
+  @Example
+    <code>
+    // Sets the RB8 as an input
+    SS_SD_SetDigitalInput();
+    </code>
+
+*/
+#define SS_SD_SetDigitalInput()  _TRISB8 = 1
+/**
+  @Summary
+    Configures the GPIO pin, RB8, as an output.
+
+  @Description
+    Configures the GPIO pin, RB8, as an output.
+
+  @Preconditions
+    None.
+
+  @Returns
+    None.
+
+  @Param
+    None.
+
+  @Example
+    <code>
+    // Sets the RB8 as an output
+    SS_SD_SetDigitalOutput();
+    </code>
+
+*/
+#define SS_SD_SetDigitalOutput() _TRISB8 = 0
 
 /**
     Section: Function Prototypes
