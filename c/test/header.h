@@ -8,7 +8,5 @@
 #include <stdint.h>
 #include <ctype.h>
 
-#include <omp.h> //for parallel workloads
 #include <pthread.h>
 
-#include <ncurses.h> //for graphics programming
