@@ -1,0 +1,32 @@
+# Use an official ubuntu image as a parent
+FROM ubuntu:latest
+MAINTAINER Kyle Neil <kyle@johnneil.net>
+
+# Set the start directory to /root
+WORKDIR /root
+
+# Set default shell to be sure
+SHELL ["/bin/bash", "-c"]
+
+# Update package cache and install all the packages I want
+RUN apt-get update --yes
+RUN apt-get install --yes gcc g++ golang-go python3 # compilers/interpreters for languages I want
+RUN apt-get install --yes man strace valgrind vim gdb make git # system/debugging tools
+RUN apt-get install --yes flex bison # gnu parse tools
+
+RUN apt-get update --yes
+
+RUN apt-get install --yes qemu
+RUN apt-get update --yes
+RUN apt-get upgrade --yes
+
+# Make port 80 available for anything and port 22 available for SSH
+EXPOSE 80
+EXPOSE 22 
+
+# the rest of the config options are in .bashrc and .gitrc
+
+# build with: docker build -t base .
+# run with: docker run -it --rm -v C:\Users\kyle\Desktop\dev\:/root/ -v C:\Users\kyle\:/mnt --privileged --name base base bash
+# to clean "<none>:<none>" files: docker system prune
+# NOTE: docker system prune makes updating the dockerfile take forever to re-install everything
