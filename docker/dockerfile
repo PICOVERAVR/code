@@ -9,16 +9,17 @@ WORKDIR /root
 SHELL ["/bin/bash", "-c"]
 
 # Update package cache and install all the packages I want
+RUN apt-get -y upgrade --yes
 RUN apt-get update --yes
-RUN apt-get upgrade --yes
-RUN apt-get dist-upgrade --yes
 
 RUN apt-get install --yes gcc g++ golang-go python3 # compilers/interpreters for languages I want
 RUN apt-get install --yes man strace valgrind vim gdb make git binutils # system/debugging tools
 RUN apt-get install --yes flex bison # gnu parse tools
+RUN apt-get install --yes autotools-dev autoconf # gnu packaging tools
 
 RUN apt-get update --yes
 RUN apt-get upgrade --yes
+RUN apt-get dist-upgrade --yes
 
 # Make port 80 available for anything and port 22 available for SSH
 EXPOSE 80
