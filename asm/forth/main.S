@@ -998,9 +998,9 @@ defcode "SYSCALL0",8,,SYSCALL0
 	push %rax
 	NEXT
 
-//this allocates 64K of memory for the user
+//this allocates 1M of memory for the user
 .text
-	.set INITIAL_DATA_SEGMENT_SIZE, 65536
+	.set INITIAL_DATA_SEGMENT_SIZE, 0xFFFFF
 set_up_data_segment:
 	xor %rdi, %rdi
 	mov $12, %rax

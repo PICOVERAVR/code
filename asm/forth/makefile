@@ -1,12 +1,15 @@
 CC = gcc
 SRC = $(filter-out test.S, $(wildcard *.S)) # grab all asm files except the test one
+FLAGS = -nostdlib -no-pie
+
+DFLAGS = $(FLAGS) -g
 
 debug:
-	@$(CC) -nostdlib $(SRC)-g
+	@$(CC) $(DFLAGS) $(SRC)
 	@echo "dev build completed."
 
 release:
-	@$(CC) -nostdlib $(SRC)-o release.out
+	@$(CC) $(FLAGS) $(SRC)-o release.out
 	@tar -zcf KForth.tar.gz release.out #this is not accurate anymore.
 	@echo "zipped build completed."
 

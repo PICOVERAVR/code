@@ -715,3 +715,122 @@
 
  ( C strings are a thing! )
 
+: Z" IMMEDIATE
+	STATE @ IF
+		' LITSTRING ,
+		HERE @
+		0 ,
+		BEGIN
+			KEY
+			DUP '"' <>
+		WHILE
+			HERE @ C!
+			1 HERE +!
+		REPEAT
+		0 HERE @ C!
+		1 HERE +!
+		DROP
+		DUP
+		HERE @ SWAP -
+		8-
+		SWAP !
+		ALIGN
+		' DROP ,
+	ELSE
+		HERE @
+		BEGIN
+			KEY
+			DUP '"' <>
+		WHILE
+			OVER C!
+			1+
+		REPEAT
+		DROP
+		0 SWAP C!
+		HERE @
+	THEN
+;
+
+: STRLEN
+	DUP
+	BEGIN
+		DUP C@ 0<>
+	WHILE
+		1+
+	REPEAT
+	
+	SWAP -
+;
+
+: CSTRING
+	SWAP OVER
+	HERE @ SWAP
+	CMOVE
+	
+	HERE @ +
+	0 SWAP C!
+	
+	HERE @
+;
+
+: ARGC
+	S0 @ @
+;
+
+: ARGV
+	1+ CELLS S0 @ +
+	@
+	DUP STRLEN
+;
+
+: ENVIRON
+	ARGC
+	2 +
+	CELLS
+	S0 @ +
+;
+
+( exits forth )
+( 60 is sys_exit syscall # )
+: BYE
+	0
+	60
+	SYSCALL1
+;
+
+: GET_BRK ( -- brkpoint )
+	0 12 SYSCALL1
+;
+
+: UNUSED ( -- n )
+	GET_BRK
+	HERE @
+	-
+	8 /
+;
+
+: BRK ( brkpoint -- )
+	12 SYSCALL1
+;
+
+( note: this should be called with at least 512 cells, and COMMA, ALLOT, and CREATE should call this )
+( but they do not right now. )
+
+: MORECORE ( cells -- )
+	CELLS GET_BRK + BRK
+;
+
+: R/O ( -- fam ) ;
+
+
+
+
+
+
+: HELLO
+	." done." CR
+	." kforth, " UNUSED . ." cells available." CR
+;
+
+HELLO
+HIDE HELLO
