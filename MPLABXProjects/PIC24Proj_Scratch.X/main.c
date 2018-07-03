@@ -19,11 +19,6 @@ int main(void) {
     sd_block mbr, vbr;
     sd_readBlock(s, &mbr);
     
-    for (int i = 0; i < 512; i++) {
-        printf("%x ", mbr.data[i]);
-    }
-    printf("\n\n");
-    
     for (int i = 0; i < 4; i++) {
         s.byte[i] = mbr.data[0x1C6 + i];
     }
@@ -31,7 +26,7 @@ int main(void) {
     //s.byte[1] = 0x20; //this is little-endian!
     sd_readBlock(s, &vbr);
     for (int i = 0; i < 512; i++) {
-        printf("%x ", vbr.data[i]);
+        printf("%d %x\t", i, vbr.data[i]);
     }
 //    for (int i = 1; i <= 32; i++) {
 //        for (int j = 1; j <= 16; j++) {

@@ -12,6 +12,7 @@ SHELL ["/bin/bash", "-c"]
 RUN apt-get update --yes
 RUN apt-get install --yes gcc g++ golang-go python3 # compilers/interpreters for languages I want
 RUN apt-get install --yes man strace valgrind vim gdb make git binutils # system/debugging tools
+RUN apt-get install --yes autotools-dev autoconf
 RUN apt-get install --yes flex bison # gnu parse tools
 
 RUN apt-get update --yes
