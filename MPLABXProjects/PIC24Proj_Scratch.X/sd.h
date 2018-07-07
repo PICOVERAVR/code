@@ -34,13 +34,13 @@ typedef struct sd_block { //block size is almost universally 512 bytes
 uint8_t sd_writeCommand(sd_command *c) {
     SS_SD_SetLow();
     //set upper two bits of com to 0x40 later, or check for this
-    SPI2_Exchange8bit((*c).command);
+    SPI2_Exchange8bit(c->command);
     
     for (int i = 0; i < 4; i++) {
-        SPI2_Exchange8bit((*c).args[i]);
+        SPI2_Exchange8bit(c->args[i]);
     }
     
-    SPI2_Exchange8bit((*c).crc); //CRC of CMD0
+    SPI2_Exchange8bit(c->crc); //CRC of CMD0
     
     int time = 0;
     uint8_t result = 0xFF;
@@ -57,13 +57,13 @@ sd_resp sd_writeCommandLong(sd_command *c) {
     sd_resp s;
     SS_SD_SetLow();
     //set upper two bits of com to 0x40 later, or check for this
-    SPI2_Exchange8bit((*c).command);
+    SPI2_Exchange8bit(c->command);
     
     for (int i = 0; i < 4; i++) {
-        SPI2_Exchange8bit((*c).args[i]);
+        SPI2_Exchange8bit(c->args[i]);
     }
     
-    SPI2_Exchange8bit((*c).crc);
+    SPI2_Exchange8bit(c->crc);
     
     int time = 0;
     uint8_t result = 0xFF;
@@ -107,7 +107,7 @@ void sd_readBlock(sd_block_addr block_addr, sd_block *block) {
     }
     
     for (int i = 0; i < 512; i++) {
-        (*block).data[i] = SPI2_Exchange8bit(0xFF);
+        block->data[i] = SPI2_Exchange8bit(0xFF);
     }
     
     SS_SD_SetHigh();
@@ -142,4 +142,55 @@ uint8_t sd_init() {
     SPI2CON1bits.PPRE = 0b11; //return clock speed to ~8MHz
     
     return 0;
+}
+
+static int getHexDigits(int num) {
+    int digits = 0;
+    
+    if (num == 0) {
+        return 1;
+    } else {
+        while(num != 0) {
+            num /= 16;
+            digits++;
+        }
+        return digits;
+    }
+}
+
+void sd_printBlock(sd_block *block) {
+    printf("          ");
+    for (int i = 0; i < 32; i++) {
+        if (getHexDigits(i) == 2) {
+            printf("%x ", i);
+        } else {
+            printf("%x  ", i);
+        }
+    }
+    printf("\n\n");
+    
+    for (int i = 0; i < 512; i += 32) {
+        printf("0x%x", i);
+        
+        for (int spaces = 0; spaces < 8 - getHexDigits(i); spaces++) {
+            printf(" ");
+        }
+        
+        for (int j = 0; j < 32; j++) {
+            uint8_t item = block->data[i + j];
+            if (getHexDigits(item) == 2) {
+                printf("%x ", item);
+            } else {
+                printf("%x  ", item);
+            }
+            
+        }
+        printf("\t");
+        for (int j = 0; j < 32; j++) {
+            uint8_t item = block->data[i + j];
+            printf("%c", (isprint(item)) ? item : '.');
+            
+        }
+        printf("\n");
+    }
 }

@@ -45,9 +45,9 @@ int main(void) {
     
     sd_readBlock(root_addr, &root);
     
-    for (int i = 0; i < 512; i++) {
-        printf("%d\t", root.data[i]);
-    }
+    sd_printBlock(&fat);
+    printf("\n\n");
+    sd_printBlock(&root);
 
     for(;;) {
         
