@@ -813,19 +813,112 @@
 	12 SYSCALL1
 ;
 
-( note: this should be called with at least 512 cells, and COMMA, ALLOT, and CREATE should call this )
-( but they do not right now. )
+
+
+( this should be called with at least 512 cells, and COMMA, ALLOT, and CREATE should call this )
+( but they do not right now )
+
+
 
 : MORECORE ( cells -- )
 	CELLS GET_BRK + BRK
 ;
 
-: R/O ( -- fam ) ;
 
 
+: RO 0 ; ( fix the relevant defconst here )
+: RW 1 ;
+
+( c-addr u fam -- fd result )
+: OPEN-FILE
+        -ROT
+        CSTRING
+        2 SYSCALL2
+        DUP
+        DUP 0< IF
+                NEGATE
+        ELSE
+                DROP 0
+        THEN
+;
+
+( c-addr u fam -- fd result )
+: CREATE-FILE
+        64 OR
+        512 OR
+        -ROT
+        CSTRING
+        420 -ROT
+        2 SYSCALL3
+        DUP
+        DUP 0< IF
+                NEGATE
+        ELSE
+                DROP 0
+        THEN
+;
+
+( fd -- result )
+: CLOSE-FILE
+        3 SYSCALL1
+        NEGATE
+;
+
+: READ-FILE
+        >R SWAP R>
+        0 SYSCALL3
+
+        DUP
+        DUP 0< IF
+                NEGATE
+        ELSE
+                DROP 0
+        THEN
+;
+
+: PERROR
+        TELL
+        ':' EMIT SPACE
+        ." ERRNO = "
+        . CR
+;
 
 
+( now we get to write forth words in assembly! woo! )
 
+HEX
+: NEXT IMMEDIATE 48 C, AD C, FF C, 24 C, 25 C, 00 C, 00 C, 00 C, 00 ;
+
+: ;CODE IMMEDIATE
+        [COMPILE] NEXT
+        ALIGN
+        LATEST @ DUP
+        HIDDEN
+        DUP >DFA SWAP >CFA !
+        [COMPILE] [
+;
+
+: RAX IMMEDIATE 0 ;
+: RCX IMMEDIATE 1 ;
+: RDX IMMEDIATE 2 ;
+: RBX IMMEDIATE 3 ;
+: RSP IMMEDIATE 4 ;
+: RBP IMMEDIATE 5 ;
+: RSI IMMEDIATE 6 ;
+: RDI IMMEDIATE 7 ;
+
+: PUSH IMMEDIATE 50 + C, ;
+: POP IMMEDIATE 58 + C, ;
+
+: RDTSC IMMEDIATE 0F C, 31 C, ;
+
+: RDTSC
+        RDTSC
+        RAX PUSH
+        RDX PUSH
+;CODE
+
+DECIMAL
 
 : HELLO
 	." done." CR
@@ -834,3 +927,4 @@
 
 HELLO
 HIDE HELLO
+

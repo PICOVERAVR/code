@@ -473,6 +473,15 @@ defconst "F_IMMED",7,,__F_IMMED,F_IMMED //should the word be executed immediatel
 defconst "F_HIDDEN",8,,__F_HIDDEN,F_HIDDEN //is the word visible to the user?
 defconst "F_LENMASK",9,,__F_LENMASK,F_LENMASK //will become useful once we get to compiling words
 
+defconst "O_RDONLY",8,,__O_RDONLY,0
+defconst "O_WRONLY",8,,__O_WRONLY,1
+defconst "O_RDWR",8,,__O_RDWR,2
+defconst "O_CREAT",7,,__O_CREAT,0100
+defconst "O_EXCL",6,,__O_EXCL,0200
+defconst "O_TRUNC",7,,__O_TRUNC,01000
+defconst "O_APPEND",8,,__O_APPEND,02000
+defconst "O_NONBLOCK",10,,__O_NONBLOCK,04000
+
 //some words to manuipulate the return stack
 //note: these values must be popped before the word returns or the interpreter will
 //return to that address and probably crash
@@ -926,9 +935,9 @@ defcode "INTERPRET",9,,INTERPRET
 	mov (currkey), %rsi //throw some context into error message
 	mov %rsi, %rdx
 	sub $buffer, %rdx
-	cmp $40, %rdx
+	cmp $20, %rdx //the length of context is $20, $40 is too long and really confusing...
 	jle 7f
-	mov $40, %rdx
+	mov $20, %rdx
 7:	sub %rdx, %rsi
 	mov $1, %rax
 	syscall
@@ -941,7 +950,7 @@ defcode "INTERPRET",9,,INTERPRET
 	NEXT
 
 	.section .rodata
-errmsg: .ascii "unknown input: "
+errmsg: .ascii "unknown input:"
 errmsgend:
 errmsgnl: .ascii "\n" 
 	

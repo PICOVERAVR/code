@@ -26,8 +26,6 @@ RUN apt-get dist-upgrade --yes
 EXPOSE 80
 EXPOSE 22 
 
-# the rest of the config options are in .bashrc and .gitrc
-
 # build with: docker build -t base .
 # run with:
 # 	(Windows) docker run -it --rm -v C:\Users\kyle\Desktop\dev\:/root/ -v C:\Users\kyle\:/mnt --privileged --name base base bash
