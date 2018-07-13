@@ -43,9 +43,8 @@ _start:
 	
 	call set_up_data_segment 
 	
-	push $0 //set a stack canary for debugging
-	
 	mov $cold_start, %rsi
+	
 	NEXT //and we're off!
 	
 	.section .rodata
@@ -459,6 +458,8 @@ defvar "LATEST",6,,LATEST,name_SYSCALL0 //must be last for some reason...?
 defvar "S0",2,,SZ
 defvar "BASE",4,,BASE,10 //radix
 
+
+defvar "TEST",4,,TEST
 //constant macro, similar to defvar but only pushes to stack
 .macro defconst name, namelen, flags=0, label, value
 	defcode \name,\namelen,\flags,\label
@@ -618,8 +619,8 @@ _WORD:
 	jmp 1b
 
 	.data
-word_buffer: //forth words can only be 64 bytes long!
-	.space 64
+word_buffer: //forth words can only be 512 bytes long!
+	.space 512
 
 //parse a numeric string and push the result
 //this would benefit from a libc linking...

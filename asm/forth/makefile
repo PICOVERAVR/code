@@ -1,6 +1,6 @@
 CC = gcc
 SRC = $(filter-out test.S, $(wildcard *.S)) # grab all asm files except the test one
-FLAGS = -nostdlib -no-pie
+FLAGS = -nostdlib -no-pie # make this a standalone executable, no stdlib dependancies
 DFLAGS = $(FLAGS) -g
 
 UNAME := $(shell uname)

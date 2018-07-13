@@ -15,3 +15,10 @@ use clone() to spawn forth interpreters in seperate threads!
 we should allocate memory dynamically for this to work well
 
 profiling does not work for this, as we need the stdlib exit(2) to work to generate a gmon.out
+
+this interpreter needs to be a lot safer.  more sanity checks are in order.
+
+unknown command know:
+
+: TEST WORD FIND 0= ;
+\ TEST dlksfkjdfl
