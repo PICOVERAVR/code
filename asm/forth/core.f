@@ -887,7 +887,7 @@
 ( now we get to write forth words in assembly! woo! )
 
 HEX
-: NEXT IMMEDIATE 48 C, AD C, FF C, 24 C, 25 C, 00 C, 00 C, 00 C, 00 ;
+: NEXT IMMEDIATE 48 C, AD C, FF C, 24 C, 25 C, 00 C, 00 C, 00 C, 00 C, ;
 
 : ;CODE IMMEDIATE
         [COMPILE] NEXT
@@ -918,7 +918,48 @@ HEX
         RDX PUSH
 ;CODE
 
+HEX
+( addr -- next? )
+: =NEXT
+	DUP C@ 48 <> IF DROP FALSE EXIT THEN
+	1+ DUP C@ AD <> IF DROP FALSE EXIT THEN
+	1+ DUP C@ FF <> IF DROP FALSE EXIT THEN
+	1+ DUP C@ 24 <> IF DROP FALSE EXIT THEN
+	1+ DUP C@ 25 <> IF DROP FALSE EXIT THEN
+	1+ DUP C@ 00 <> IF DROP FALSE EXIT THEN
+	1+ DUP C@ 00 <> IF DROP FALSE EXIT THEN
+	1+ DUP C@ 00 <> IF DROP FALSE EXIT THEN
+	1+ DUP C@ 00 <> IF DROP FALSE EXIT THEN
+	TRUE
+;
+
 DECIMAL
+
+( cfa -- )
+: (INLINE)
+	@
+	BEGIN
+		DUP =NEXT NOT
+	WHILE
+		DUP C@ C,
+		1+
+	REPEAT
+	DROP
+;
+
+: INLINE IMMEDIATE
+	WORD FIND
+	>CFA
+	
+	DUP @ DOCOL = IF
+		." cannot inline a forth word" CR ABORT
+	THEN
+	
+	(INLINE)
+;
+
+HIDE =NEXT
+
 
 : HELLO
 	." done." CR
