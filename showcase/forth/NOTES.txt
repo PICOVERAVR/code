@@ -1,0 +1,16 @@
+use clone() to spawn forth interpreters in seperate threads!
+( really cheap to create and destroy! )
+
+we should allocate memory dynamically for this to work well
+
+ALLOC and related calls do not allocate more memory if we run out...
+
+profiling does not work for this, as we need the stdlib exit(2) to work to generate a gmon.out
+
+assembler is not working yet.
+
+Things to do differently the second time:
+	link to glibc (no point in making a standalone executable if you're using linux syscalls anyways, lot of wasted effort)
+	use autotools to check platform compliance, better than hacked together shell script
+	make the interpreter a lot safer.  performance isn't really anh issue here right now and there are a _lot_ of areas that could use checks (stack underflow, heap overflow, etc.)
+
