@@ -1,49 +1,66 @@
 #include "task.h"
 
+
+//TODO:
+    //add priority scheduling - figure out how to avoid resource starvation!
+    //make sure this stuff works... none of it is tested yet
+    //forcing everything through a void* is really annoying... is there a better way to do this?
+
+
 static jmp_buf task_main; //processor state of master task to come back to
 task_buf *task_bufbot; //pointer to bottom of queue
 task_buf *task_buftop; //pointer to top of queue
 //the difference between the two above pointers is pretty minimal
 //since the buffer is circular
 
+//this has to be volatile since tasks do not return, instead they yield
 static volatile int *num_tasks;
 
 //null task that does nothing
 //this is to ensure that there is always at least one task running
-static void system_task_null(void *args) {
+static void task_null(void *args) {
     printf("in null task...\n");
     task_yield(0);
 }
 
 //bump the tick counter
-static void system_task_timer(void *timer_arg) {
+//check against random magic number!
+static void task_timer(void *timer_arg) {
     int *p = (int*) timer_arg;
     (*p > 0xFF00) ? *p = 0 : (*p)++;
 }
 
 //allocate resources for the system tick counter
-static void system_task_timer_init(void) {
+static void task_timer_init(void) {
     int *p = calloc(1, sizeof(int));
-    task_add(system_task_timer, 1, (void *)p);
+    task_add(task_timer, 1, (void *)p);
 }
+
+//if the task is a system task, assume it is issued with a fixed tid
+//task_null - 0
+//task_timer - 1
 
 int get_system_tick(void) {
     //find the timer task
-    //
+    task_buf *timer = task_find(1);
+    return *((int*) timer->args);
     return NULL;
 }
 
 //find a task by pid, returns NULL if not found
-task_buf *task_find(int pid) {
-    //1 note start
-    //2 check node
-    //3 if node has right pid, return with pointer to it
-    //4 if node is == to start, return NULL
-    //5 if not, goto 2
-    return NULL;
+task_buf *task_find(int target) {
+    task_buf *n = task_buftop;
+    int start = n->tid;
+    
+    for (; n->tid != target; n = n->next) {
+        if (n->tid == start) {
+            return NULL;
+        }
+    }
+    return n;
 }
 
-//add a task to the task pool
+//add a task to the task pool, return that task's task_buf
 task_buf *task_add(void (*task_func)(void *), int priority, void *args) {
     task_buf *task_new = malloc(sizeof(task_buf));
     if (!task_new) {
@@ -81,9 +98,10 @@ static int task_noncrit_init(include incl) {
     switch (incl) {
         case TASK_MONITOR: break;
         case TASK_TIMER:
-            system_task_timer_init();
+            task_timer_init();
             break;
         case TASK_NONE: break;
+        default: break;
     }
     return 0;
 }
@@ -93,7 +111,7 @@ int task_init(include incl) {
     num_tasks = calloc(1, sizeof(int));
     
     if (!num_tasks) {
-        printf("heap not configured.\n");
+        printf("ERROR: heap not configured.\n");
         return -1;
     }
     
@@ -104,7 +122,7 @@ int task_init(include incl) {
     }
     //the null task has to be created seperately from everything else
     //as there are no tasks to build off of
-    task_null_buf->func = system_task_null;
+    task_null_buf->func = task_null;
     task_null_buf->next = task_null_buf;
     task_null_buf->priority = 0;
     task_null_buf->tid = 0;
