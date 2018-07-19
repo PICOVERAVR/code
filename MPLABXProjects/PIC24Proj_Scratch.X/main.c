@@ -18,10 +18,11 @@ void thing(void *args) {
 
 int main(void) {
     SYSTEM_Initialize();
-    task_init();
+    printf("initializing task system... ");
+    printf((!task_init(TASK_TIMER)) ? "success.\n" : "fail.\n");
     
-    task_add(task0, 1);
-    task_add(thing, 1);
+    task_add(task0, 1, NULL);
+    task_add(thing, 1, NULL);
     
     printf("system ready.\n");
     task_start();
