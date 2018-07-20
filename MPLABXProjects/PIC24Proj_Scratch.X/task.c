@@ -3,8 +3,8 @@
 
 //TODO:
     //add priority scheduling - figure out how to avoid resource starvation!
-    //make sure this stuff works... none of it is tested yet
     //forcing everything through a void* is really annoying... is there a better way to do this?
+    //add a monitor task that indicates an error
 
 
 static jmp_buf task_main; //processor state of master task to come back to
@@ -19,21 +19,24 @@ static volatile int *num_tasks;
 //null task that does nothing
 //this is to ensure that there is always at least one task running
 static void task_null(void *args) {
-    printf("in null task...\n");
+    //printf("in null task...\n");
     task_yield(0);
 }
 
 //bump the tick counter
 //check against random magic number!
 static void task_timer(void *timer_arg) {
+    //printf("in timer task...\n");
     int *p = (int*) timer_arg;
     (*p > 0xFF00) ? *p = 0 : (*p)++;
+    task_yield(0);
+    
 }
 
 //allocate resources for the system tick counter
 static void task_timer_init(void) {
     int *p = calloc(1, sizeof(int));
-    task_add(task_timer, 1, (void *)p);
+    task_add(task_timer, 0, (void *)p);
 }
 
 //if the task is a system task, assume it is issued with a fixed tid
@@ -43,8 +46,11 @@ static void task_timer_init(void) {
 int get_system_tick(void) {
     //find the timer task
     task_buf *timer = task_find(1);
+    if (timer == NULL) {
+        printf("ERROR: timer not found!\n");
+        return -1;
+    }
     return *((int*) timer->args);
-    return NULL;
 }
 
 //find a task by pid, returns NULL if not found
@@ -53,7 +59,7 @@ task_buf *task_find(int target) {
     int start = n->tid;
     
     for (; n->tid != target; n = n->next) {
-        if (n->tid == start) {
+        if (n->next->tid == start) {
             return NULL;
         }
     }
@@ -70,11 +76,21 @@ task_buf *task_add(void (*task_func)(void *), int priority, void *args) {
     task_new->next = task_bufbot;
     task_buftop->next = task_new;
     task_new->priority = priority;
-    task_new->tid = *num_tasks + 1;
+    task_new->tid = (*num_tasks)++;
+    
+//    if (priority == 1) {
+//        printf("made a task with tid %d, fp 0x%p\n", task_new->tid, task_func);
+//    } else {
+//        printf("made a user task with tid %d, fp 0x%p\n", task_new->tid, task_func);
+//    }
     task_new->args = args;
     
     task_buftop = task_new;
     return task_new;
+}
+
+task_buf *user_task_add(void (*task_func)(void *), void *args) {
+    return task_add(task_func, 1, args);
 }
 
 //remove a task from the pool
@@ -125,7 +141,9 @@ int task_init(include incl) {
     task_null_buf->func = task_null;
     task_null_buf->next = task_null_buf;
     task_null_buf->priority = 0;
-    task_null_buf->tid = 0;
+    task_null_buf->tid = *num_tasks;
+    task_null_buf->args = NULL;
+    (*num_tasks)++;
     
     task_buftop = task_null_buf;
     task_bufbot = task_null_buf;
@@ -140,6 +158,7 @@ int task_init(include incl) {
 //calls a function with the argument pointer stored in the task_buf
 void task_start(void) {
     setjmp(task_main);
+    //at this point, the monitor task would indicate what a thing returned with
     task_switch();
     task_buftop->func(task_buftop->args);
 }
