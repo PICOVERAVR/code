@@ -89,7 +89,7 @@ task_buf *task_add(void (*task_func)(void *), int priority, void *args) {
     return task_new;
 }
 
-task_buf *user_task_add(void (*task_func)(void *), void *args) {
+inline task_buf *user_task_add(void (*task_func)(void *), void *args) {
     return task_add(task_func, 1, args);
 }
 
@@ -141,10 +141,8 @@ int task_init(include incl) {
     task_null_buf->func = task_null;
     task_null_buf->next = task_null_buf;
     task_null_buf->priority = 0;
-    task_null_buf->tid = *num_tasks;
+    task_null_buf->tid = (*num_tasks)++;;
     task_null_buf->args = NULL;
-    (*num_tasks)++;
-    
     task_buftop = task_null_buf;
     task_bufbot = task_null_buf;
     

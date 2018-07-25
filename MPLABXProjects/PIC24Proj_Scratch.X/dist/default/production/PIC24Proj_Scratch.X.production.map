@@ -32,7 +32,7 @@ Command:
   --local-stack \
   --defsym=__MPLAB_BUILD=1 \
   -Tp24EP512GP202.gld.00 \
-  --heap=16384 \
+  --heap=8192 \
   --stack=16 \
   --check-sections \
   --data-init \
@@ -195,17 +195,17 @@ section                    address      alignment gaps    total length  (dec)
 .ndata                      0x1006                   0             0x2  (2)
 .data                       0x1008                   0           0x132  (306)
 .bss                        0x113a                   0            0x5c  (92)
-.heap                       0x1196                   0          0x4000  (16384)
+.heap                       0x1196                   0          0x2000  (8192)
 
-                 Total "data" memory used (bytes):         0x4196  (16790) 34%
+                 Total "data" memory used (bytes):         0x2196  (8598) 17%
 
 
 Dynamic Memory Usage
 
 region                     address                      maximum length  (dec)
 ------                     -------                      ---------------------
-heap                        0x1196                              0x4000  (16384)
-stack                       0x5196                              0x2e6a  (11882)
+heap                        0x1196                              0x2000  (8192)
+stack                       0x3196                              0x4e6a  (20074)
 
                  Maximum dynamic memory (bytes):         0x6e6a  (28266)
 
@@ -692,7 +692,9 @@ __FOSCSEL
 
 __FGS             0x0557fa          0x2
  *(__FGS.sec*)
- __FGS.sec        0x0557fa          0x2 /CW/_FGS†≠‘≠__FGS.sec
+ __FGS.sec        0x0557fa          0x2 /CW/_FGS†¡
+‘¡
+__FGS.sec
                   0x0557fa                  __FGS.sec
 
 __FUID0
@@ -1711,7 +1713,9 @@ LOAD /Applications/microchip/xc16/v1.34/bin/bin/../../lib/libm-elf.a
 LOAD /Applications/microchip/xc16/v1.34/bin/bin/../../lib/libc-elf.a
 END GROUP
 OUTPUT(dist/default/production/PIC24Proj_Scratch.X.production.elf elf32-pic30)
-LOAD /CW/_FGS†≠‘≠__FGS.sec
+LOAD /CW/_FGS†¡
+‘¡
+__FGS.sec
 LOAD jump_table
 LOAD default_isr
 LOAD heap
@@ -1896,8 +1900,8 @@ __c30_signature
  .bss               0x1194          0x2 /Applications/microchip/xc16/v1.34/bin/bin/../../lib/libpic30-elf.a(brkep.elo)
                     0x1194                  ___curbrk
 
-.heap               0x1196       0x4000
- .heap              0x1196       0x4000 heap
+.heap               0x1196       0x2000
+ .heap              0x1196       0x2000 heap
 
 .config_IESO      0x0557f8          0x2
  .config_IESO     0x0557f8          0x2 build/default/production/mcc_generated_files/mcc.o
