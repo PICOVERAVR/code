@@ -2,9 +2,13 @@
 
 	.text
 main:
-	mov $96, %rdi
-	call putchar
+	
+	//use strtol!!
+	
 	ret
 
-msg:
-	.asciz "Hello, world"
+msg_1:
+	.asciz "-4"
+
+msg_2:
+	.saciz "

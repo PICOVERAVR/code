@@ -446,22 +446,6 @@ defcode "CMOVE",5,,CMOVE
 	mov %rdx, %rsi
 	NEXT
 
-// ( a b flag -- b a | a b )
-//swaps top two items if flag is true
-defcode "CSWAP",5,,CSWAP
-	pop %rbx
-	pop %rcx
-	
-	pop %rax
-	cmovnz %rbx, %rdx
-	cmovnz %rcx, %rbx
-	cmovnz %rdx, %rcx
-	
-	push %rbx
-	push %rcx
-
-	NEXT
-
 //variable macro to hold a few variables outside of the stack (global state)
 .macro defvar name, namelen, flags=0, label, initial=0
 	defcode \name, \namelen, \flags, \label
@@ -574,8 +558,9 @@ _KEY:
 	mov %rsi, bufftop
 	jmp _KEY
 2: //error / EOF, exit
+	mov $60, %rax
 	mov $1, %rdi //return exit code 1
-	call exit
+	syscall
 	
 	.data
 	.align 8
@@ -584,7 +569,27 @@ currkey:
 bufftop:
 	.quad buffer //last valid data
 
-defcode "EMIT",4,,EMIT
+//write a byte to stdout
+defcode "EMIT_L",4,,EMIT
+	pop %rax
+	call _EMIT
+	NEXT
+_EMIT:
+	mov %rsi, %r14 //save rsi again
+	mov $1, %rdi
+	mov %al, emit_byte
+	mov $emit_byte, %rsi //write needs an address
+	mov $1, %rdx
+	mov $1, %rax
+	syscall
+	mov %r14, %rsi //restore rsi
+	ret
+	
+	.data
+emit_byte:
+	.space 1 //scratch byte
+
+defcode "EMIT",6,,EMIT_C
 	mov %rdi, %r14
 	mov %rsi, %r15
 	
