@@ -3,7 +3,7 @@
 
 //register map:
 //rsi -> pointer to next word
-//rax -> pointer to current word?
+//rax -> pointer to current word
 //rbp -> pointer to return stack (as usual)
 //rsp -> pointer to parameter stack
 
@@ -35,8 +35,13 @@ DOCOL:
 	NEXT
 
 .text
-.globl _start
-_start:
+.globl main
+main:
+	//turn off line buffering for stdout
+	mov stdout, %rdi
+	mov $0, %rsi
+	call setbuf
+	
 	cld //set string ops to move the right way
 	mov %rsp, var_S0 //save initial stack frame
 	mov $return_stack_top, %rbp //set up rbp to point to the right area
@@ -565,7 +570,7 @@ bufftop:
 	.quad buffer //last valid data
 
 //write a byte to stdout
-defcode "EMIT",4,,EMIT
+defcode "EMIT_L",4,,EMIT
 	pop %rax
 	call _EMIT
 	NEXT
@@ -583,6 +588,17 @@ _EMIT:
 	.data
 emit_byte:
 	.space 1 //scratch byte
+
+defcode "EMIT",6,,EMIT_C
+	mov %rdi, %r14
+	mov %rsi, %r15
+	
+	pop %rdi
+	call putchar
+	
+	mov %r15, %rsi
+	mov %r14, %rdi
+	NEXT
 
 //get a valid word (search for a space)
 defcode "WORD",4,,WORD

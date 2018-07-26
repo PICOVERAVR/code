@@ -11,6 +11,8 @@ assembler is not working yet.
 
 Things to do differently the second time:
 	link to glibc (no point in making a standalone executable if you're using linux syscalls anyways, lot of wasted effort)
+		probably smaller (ended up being larger, ~19K vs 24K without -nostdlib
+		new idea: replace a lot of the weird hand-written stuff with stdlib stuff
 	use autotools to check platform compliance, better than hacked together shell script
 	make the interpreter a lot safer.  performance isn't really anh issue here right now and there are a _lot_ of areas that could use checks (stack underflow, heap overflow, etc.)
-
+	better choice of registers, register choice conflicts with parameter passing

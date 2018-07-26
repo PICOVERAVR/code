@@ -1,6 +1,6 @@
 CC = gcc
 SRC = $(filter-out test.S, $(wildcard *.S)) # grab all asm files except the test one
-FLAGS = -nostdlib -no-pie # make this a standalone executable, no stdlib dependancies
+FLAGS = -no-pie # make this a standalone executable, no stdlib dependancies
 DFLAGS = $(FLAGS) -g
 
 UNAME := $(shell uname)
@@ -16,7 +16,7 @@ release: pre
 
 pre:
 	@echo "building on: $(UNAME)"
-
+	
 clean:
 	@rm -f	*.out #remove executable and any leftover object files
 	@rm -f *.o
