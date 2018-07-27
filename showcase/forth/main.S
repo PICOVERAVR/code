@@ -24,6 +24,16 @@
 	lea 8(%rbp), %rbp //delete reg space
 .endm
 
+.macro SAVEREG
+	mov %rsi, %r14
+	mov %rdi, %r15
+.endm
+
+.macro RESTREG
+	mov %r15, %rdi
+	mov %r14, %rsi
+.endm
+
 .text
 .align 8 //align to 8-byte boundaries
 
@@ -351,6 +361,22 @@ defcode "0>=",3,,ZGE
 	pushq %rax
 	NEXT
 
+
+// ( a b flag -- b a | a b )
+//not sure if above is correct...
+//swaps top two items if flag is true
+defcode "CSWAP",5,,CSWAP
+	pop %rbx
+	pop %rcx
+	pop %rax
+	test %rax, %rax
+	cmovnz %rbx, %rdx
+	cmovnz %rcx, %rbx
+	cmovnz %rdx, %rcx
+	push %rbx
+	push %rcx
+	NEXT
+
 //finally at the bitwise ops
 defcode "AND",3,,AND
 	pop %rax
@@ -446,22 +472,6 @@ defcode "CMOVE",5,,CMOVE
 	mov %rdx, %rsi
 	NEXT
 
-// ( a b flag -- b a | a b )
-//swaps top two items if flag is true
-defcode "CSWAP",5,,CSWAP
-	pop %rbx
-	pop %rcx
-	
-	pop %rax
-	cmovnz %rbx, %rdx
-	cmovnz %rcx, %rbx
-	cmovnz %rdx, %rcx
-	
-	push %rbx
-	push %rcx
-
-	NEXT
-
 //variable macro to hold a few variables outside of the stack (global state)
 .macro defvar name, namelen, flags=0, label, initial=0
 	defcode \name, \namelen, \flags, \label
@@ -479,8 +489,6 @@ defvar "LATEST",6,,LATEST,name_SYSCALL0 //must be last for some reason...?
 defvar "S0",2,,SZ
 defvar "BASE",4,,BASE,10 //radix
 
-
-defvar "TEST",4,,TEST
 //constant macro, similar to defvar but only pushes to stack
 .macro defconst name, namelen, flags=0, label, value
 	defcode \name,\namelen,\flags,\label
@@ -585,14 +593,12 @@ bufftop:
 	.quad buffer //last valid data
 
 defcode "EMIT",4,,EMIT
-	mov %rdi, %r14
-	mov %rsi, %r15
+	SAVEREG
 	
 	pop %rdi
 	call putchar
 	
-	mov %r15, %rsi
-	mov %r14, %rdi
+	RESTREG
 	NEXT
 
 //get a valid word (search for a space)

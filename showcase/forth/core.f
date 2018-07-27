@@ -177,7 +177,7 @@
 ( .S prints the whole stack, useful for debugging )
 : .S ( -- )
 	DSP@ ( get current stack pointer )
-	62 EMIT SPACE ( nice printing for user )
+	62 45 EMIT EMIT SPACE ( nice printing for user )
 	BEGIN
 		DUP S0 @ <
 	WHILE
