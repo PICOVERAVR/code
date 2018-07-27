@@ -7,16 +7,24 @@ main:
 	// $scratch is address
 	// scratch is data
 	
-	movq $42, scratch
+	//mov $msg_3, %rdi
+	//mov $nullptr, %rsi
+	//mov $10, %rdx
 	
-	// need to figure out how to translate char ** to asm
-	// and the different sections of this file.
-	mov $scratch, %rax
-	mov scratch, %rbx
-	mov (%rax), %rcx //same as line 12
+	//call strtol
 	
-	//figure out strtol
-	//lea %rax, %rcx
+	//push %rax
+	
+	mov $word_buffer, %rdi
+	mov $512, %rsi
+	mov stdin, %rdx
+	
+	call fgets
+	
+	call strlen
+	dec %rax
+	push %rax
+	push $word_buffer
 	
 	ret
 	
@@ -27,6 +35,9 @@ msg_2:
 	.asciz "4F"
 msg_3:
 	.asciz "592"
+
+nullptr:
+	.quad 0
 	
 	.bss
 scratch:
