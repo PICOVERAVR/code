@@ -10,9 +10,9 @@ void task(void *args) {
 
 int main(void) {
     SYSTEM_Initialize();
-    printf("initializing task system... \n\n");
+    printf("initializing task system... ");
     printf((!task_init(TASK_TIMER)) ? "success.\n" : "fail.\n");
-    
+        
     user_task_add(task, NULL);
     
     printf("system ready.\n");

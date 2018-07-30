@@ -18,7 +18,6 @@ pre:
 	@echo "building on: $(UNAME)"
 	
 clean:
-	@rm -f	*.out #remove executable and any leftover object files
-	@rm -f *.o
+	@rm -f	{*.out,*.o} #remove executable and any leftover object files
 	@rm -f KForth.tar.gz
 

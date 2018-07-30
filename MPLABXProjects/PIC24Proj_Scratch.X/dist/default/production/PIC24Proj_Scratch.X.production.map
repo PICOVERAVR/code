@@ -180,11 +180,12 @@ xc16-ld 1.34 (A)
 section                    address   length (PC units)   length (bytes) (dec)
 -------                    -------   -----------------   --------------------
 .text                        0x200              0x217c          0x323a  (12858)
-.const                      0x237c                0xd2           0x13b  (315)
-.dinit                      0x244e               0x116           0x1a1  (417)
-.text                       0x2564               0x43a           0x657  (1623)
+.const                      0x237c                0xf8           0x174  (372)
+.text                       0x2474               0x124           0x1b6  (438)
+.dinit                      0x2598               0x116           0x1a1  (417)
+.text                       0x26ae               0x32e           0x4c5  (1221)
 
-                 Total "program" memory used (bytes):         0x3b6d  (15213) 2%
+                 Total "program" memory used (bytes):         0x3bca  (15306) 2%
 
 
 "data" Memory  [Origin = 0x1000, Length = 0xc000]
@@ -308,88 +309,88 @@ External Symbols in Program Memory (by address):
                   0x001e2c                  __vfprintf_cdnopuxX
                   0x001e2c                  __vfprintf_s
                   0x001e2c                  __vfprintf_cdnopsuxX
-                  0x00256c                  _task_find
-                  0x002588                  _get_system_tick
-                  0x00259e                  _task_add
-                  0x0025e6                  _user_task_add
-                  0x0025ee                  _task_del
-                  0x0025f6                  _task_yield
-                  0x0025fc                  build/default/production/task.o:_task_timer
-                  0x002610                  build/default/production/task.o:_task_null
-                  0x002616                  _task_init
-                  0x002664                  _task_start
-                  0x002674                  _SPI2_Initialize
-                  0x002682                  _SPI2_Exchange
-                  0x0026ac                  _SPI2_ExchangeBuffer
-                  0x002756                  _SPI2_Exchange8bit
-                  0x002766                  _SPI2_Exchange8bitBuffer
-                  0x00276a                  _SPI2_StatusGet
-                  0x00277a                  _OSCILLATOR_Initialize
-                  0x00279e                  _SYSTEM_Initialize
-                  0x0027b2                  _SYSTEM_GetResetCause
-                  0x0027b6                  _SYSTEM_ResetCauseFromTrap
-                  0x0027ba                  _SYSTEM_ResetCauseFromIllegalOpcode
-                  0x0027c4                  _SYSTEM_ResetCauseFromConfigurationMismatch
-                  0x0027ca                  _SYSTEM_ResetCauseFromExternal
-                  0x0027d0                  _SYSTEM_ResetCauseFromSoftware
-                  0x0027d6                  _SYSTEM_ResetCauseFromWatchdogTimer
-                  0x0027dc                  _SYSTEM_ResetCauseClear
-                  0x002836                  _SYSTEM_ResetCauseClearAll
-                  0x00283a                  _PIN_MANAGER_Initialize
-                  0x0028ac                  _TMR2_Initialize
-                  0x0028bc                  _TMR2_Tasks_32BitOperation
-                  0x0028c4                  _TMR2_Period32BitSet
-                  0x0028ca                  _TMR2_Period32BitGet
-                  0x0028dc                  _TMR2_Counter32BitSet
-                  0x0028e2                  _TMR2_Counter32BitGet
-                  0x0028f4                  _TMR2_Start
-                  0x0028f8                  _TMR2_Stop
-                  0x0028fc                  _task
-                  0x002914                  _main
-                  0x00293c                  _UART1_Initialize
-                  0x00294c                  _UART1_Read
-                  0x00295a                  _UART1_Write
-                  0x002968                  _UART1_StatusGet
-                  0x002984                  _ADC1_Initialize
-                  0x002998                  _ADC1_Tasks
-                  0x00299c                  _INTERRUPT_Initialize
+                  0x00247c                  _task_find
+                  0x002498                  _get_system_tick
+                  0x0024ae                  _task_add
+                  0x0024f6                  _user_task_add
+                  0x0024fe                  _task_del
+                  0x002506                  _task_yield
+                  0x00250c                  build/default/production/task.o:_task_timer
+                  0x002520                  build/default/production/task.o:_task_null
+                  0x002526                  _task_init
+                  0x002574                  _task_start
+                  0x0026ae                  _SPI2_Initialize
+                  0x0026bc                  _SPI2_Exchange
+                  0x0026e6                  _SPI2_ExchangeBuffer
+                  0x002790                  _SPI2_Exchange8bit
+                  0x0027a0                  _SPI2_Exchange8bitBuffer
+                  0x0027a4                  _SPI2_StatusGet
+                  0x0027b4                  _OSCILLATOR_Initialize
+                  0x0027d8                  _SYSTEM_Initialize
+                  0x0027ec                  _SYSTEM_GetResetCause
+                  0x0027f0                  _SYSTEM_ResetCauseFromTrap
+                  0x0027f4                  _SYSTEM_ResetCauseFromIllegalOpcode
+                  0x0027fe                  _SYSTEM_ResetCauseFromConfigurationMismatch
+                  0x002804                  _SYSTEM_ResetCauseFromExternal
+                  0x00280a                  _SYSTEM_ResetCauseFromSoftware
+                  0x002810                  _SYSTEM_ResetCauseFromWatchdogTimer
+                  0x002816                  _SYSTEM_ResetCauseClear
+                  0x002870                  _SYSTEM_ResetCauseClearAll
+                  0x002874                  _PIN_MANAGER_Initialize
+                  0x0028e6                  _TMR2_Initialize
+                  0x0028f6                  _TMR2_Tasks_32BitOperation
+                  0x0028fe                  _TMR2_Period32BitSet
+                  0x002904                  _TMR2_Period32BitGet
+                  0x002916                  _TMR2_Counter32BitSet
+                  0x00291c                  _TMR2_Counter32BitGet
+                  0x00292e                  _TMR2_Start
+                  0x002932                  _TMR2_Stop
+                  0x002936                  _task
+                  0x00294e                  _main
+                  0x00297a                  _UART1_Initialize
+                  0x00298a                  _UART1_Read
+                  0x002998                  _UART1_Write
+                  0x0029a6                  _UART1_StatusGet
+                  0x0029c2                  _ADC1_Initialize
+                  0x0029d6                  _ADC1_Tasks
+                  0x0029da                  _INTERRUPT_Initialize
                   0x0557fa                  __FGS.sec
 
 External Symbols in Program Memory (by name):
 
-                  0x002984                  _ADC1_Initialize
-                  0x002998                  _ADC1_Tasks
-                  0x00299c                  _INTERRUPT_Initialize
-                  0x00277a                  _OSCILLATOR_Initialize
-                  0x00283a                  _PIN_MANAGER_Initialize
-                  0x002682                  _SPI2_Exchange
-                  0x002756                  _SPI2_Exchange8bit
-                  0x002766                  _SPI2_Exchange8bitBuffer
-                  0x0026ac                  _SPI2_ExchangeBuffer
-                  0x002674                  _SPI2_Initialize
-                  0x00276a                  _SPI2_StatusGet
-                  0x0027b2                  _SYSTEM_GetResetCause
-                  0x00279e                  _SYSTEM_Initialize
-                  0x0027dc                  _SYSTEM_ResetCauseClear
-                  0x002836                  _SYSTEM_ResetCauseClearAll
-                  0x0027c4                  _SYSTEM_ResetCauseFromConfigurationMismatch
-                  0x0027ca                  _SYSTEM_ResetCauseFromExternal
-                  0x0027ba                  _SYSTEM_ResetCauseFromIllegalOpcode
-                  0x0027d0                  _SYSTEM_ResetCauseFromSoftware
-                  0x0027b6                  _SYSTEM_ResetCauseFromTrap
-                  0x0027d6                  _SYSTEM_ResetCauseFromWatchdogTimer
-                  0x0028e2                  _TMR2_Counter32BitGet
-                  0x0028dc                  _TMR2_Counter32BitSet
-                  0x0028ac                  _TMR2_Initialize
-                  0x0028ca                  _TMR2_Period32BitGet
-                  0x0028c4                  _TMR2_Period32BitSet
-                  0x0028f4                  _TMR2_Start
-                  0x0028f8                  _TMR2_Stop
-                  0x0028bc                  _TMR2_Tasks_32BitOperation
-                  0x00293c                  _UART1_Initialize
-                  0x00294c                  _UART1_Read
-                  0x002968                  _UART1_StatusGet
-                  0x00295a                  _UART1_Write
+                  0x0029c2                  _ADC1_Initialize
+                  0x0029d6                  _ADC1_Tasks
+                  0x0029da                  _INTERRUPT_Initialize
+                  0x0027b4                  _OSCILLATOR_Initialize
+                  0x002874                  _PIN_MANAGER_Initialize
+                  0x0026bc                  _SPI2_Exchange
+                  0x002790                  _SPI2_Exchange8bit
+                  0x0027a0                  _SPI2_Exchange8bitBuffer
+                  0x0026e6                  _SPI2_ExchangeBuffer
+                  0x0026ae                  _SPI2_Initialize
+                  0x0027a4                  _SPI2_StatusGet
+                  0x0027ec                  _SYSTEM_GetResetCause
+                  0x0027d8                  _SYSTEM_Initialize
+                  0x002816                  _SYSTEM_ResetCauseClear
+                  0x002870                  _SYSTEM_ResetCauseClearAll
+                  0x0027fe                  _SYSTEM_ResetCauseFromConfigurationMismatch
+                  0x002804                  _SYSTEM_ResetCauseFromExternal
+                  0x0027f4                  _SYSTEM_ResetCauseFromIllegalOpcode
+                  0x00280a                  _SYSTEM_ResetCauseFromSoftware
+                  0x0027f0                  _SYSTEM_ResetCauseFromTrap
+                  0x002810                  _SYSTEM_ResetCauseFromWatchdogTimer
+                  0x00291c                  _TMR2_Counter32BitGet
+                  0x002916                  _TMR2_Counter32BitSet
+                  0x0028e6                  _TMR2_Initialize
+                  0x002904                  _TMR2_Period32BitGet
+                  0x0028fe                  _TMR2_Period32BitSet
+                  0x00292e                  _TMR2_Start
+                  0x002932                  _TMR2_Stop
+                  0x0028f6                  _TMR2_Tasks_32BitOperation
+                  0x00297a                  _UART1_Initialize
+                  0x00298a                  _UART1_Read
+                  0x0029a6                  _UART1_StatusGet
+                  0x002998                  _UART1_Write
                   0x000318                  __AddressError
                   0x000328                  __DMACError
                   0x000350                  __DefaultInterrupt
@@ -446,25 +447,25 @@ External Symbols in Program Memory (by name):
                   0x000834                  _fputs
                   0x0007e2                  _free
                   0x001c9e                  _frexpf
-                  0x002588                  _get_system_tick
+                  0x002498                  _get_system_tick
                   0x000354                  _longjmp
-                  0x002914                  _main
+                  0x00294e                  _main
                   0x0006d0                  _malloc
                   0x000826                  _printf
                   0x000850                  _puts
                   0x000386                  _setjmp
-                  0x0028fc                  _task
-                  0x00259e                  _task_add
-                  0x0025ee                  _task_del
-                  0x00256c                  _task_find
-                  0x002616                  _task_init
-                  0x002664                  _task_start
-                  0x0025f6                  _task_yield
-                  0x0025e6                  _user_task_add
+                  0x002936                  _task
+                  0x0024ae                  _task_add
+                  0x0024fe                  _task_del
+                  0x00247c                  _task_find
+                  0x002526                  _task_init
+                  0x002574                  _task_start
+                  0x002506                  _task_yield
+                  0x0024f6                  _user_task_add
                   0x0009bc                  _vfprintf
                   0x0003e4                  _write
-                  0x002610                  build/default/production/task.o:_task_null
-                  0x0025fc                  build/default/production/task.o:_task_timer
+                  0x002520                  build/default/production/task.o:_task_null
+                  0x00250c                  build/default/production/task.o:_task_timer
 
 Memory Configuration
 
@@ -692,9 +693,7 @@ __FOSCSEL
 
 __FGS             0x0557fa          0x2
  *(__FGS.sec*)
- __FGS.sec        0x0557fa          0x2 /CW/_FGS†¡
-‘¡
-__FGS.sec
+ __FGS.sec        0x0557fa          0x2 /CW/_FGS†ô<‘ô<__FGS.sec
                   0x0557fa                  __FGS.sec
 
 __FUID0
@@ -712,7 +711,7 @@ __FUID3
 .comment
  *(.comment)
 
-.debug_info       0x000000       0xb9f1
+.debug_info       0x000000       0xba01
  *(.debug_info)
  .debug_info      0x000000       0x179f build/default/production/mcc_generated_files/mcc.o
  .debug_info      0x00179f        0x166 build/default/production/mcc_generated_files/interrupt_manager.o
@@ -726,10 +725,10 @@ __FUID3
  .debug_info      0x006057       0x1371 build/default/production/core.o
  .debug_info      0x0073c8       0x1ae1 build/default/production/i2c.o
  .debug_info      0x008ea9       0x1707 build/default/production/tft.o
- .debug_info      0x00a5b0       0x1441 build/default/production/task.o
+ .debug_info      0x00a5b0       0x1451 build/default/production/task.o
  *(.gnu.linkonce.wi.*)
 
-.debug_abbrev     0x000000       0x107e
+.debug_abbrev     0x000000       0x1069
  *(.debug_abbrev)
  .debug_abbrev    0x000000        0x1f5 build/default/production/mcc_generated_files/mcc.o
  .debug_abbrev    0x0001f5         0x34 build/default/production/mcc_generated_files/interrupt_manager.o
@@ -743,9 +742,9 @@ __FUID3
  .debug_abbrev    0x0009e9        0x1a6 build/default/production/core.o
  .debug_abbrev    0x000b8f        0x12b build/default/production/i2c.o
  .debug_abbrev    0x000cba        0x1b0 build/default/production/tft.o
- .debug_abbrev    0x000e6a        0x214 build/default/production/task.o
+ .debug_abbrev    0x000e6a        0x1ff build/default/production/task.o
 
-.debug_line       0x000000        0xd6f
+.debug_line       0x000000        0xd70
  *(.debug_line)
  .debug_line      0x000000        0x131 build/default/production/mcc_generated_files/mcc.o
  .debug_line      0x000131         0x52 build/default/production/mcc_generated_files/interrupt_manager.o
@@ -755,13 +754,13 @@ __FUID3
  .debug_line      0x000491        0x111 build/default/production/mcc_generated_files/uart1.o
  .debug_line      0x0005a2        0x144 build/default/production/mcc_generated_files/spi2.o
  .debug_line      0x0006e6         0xe8 build/default/production/mcc_generated_files/adc1.o
- .debug_line      0x0007ce         0xdf build/default/production/main.o
- .debug_line      0x0008ad        0x10f build/default/production/core.o
- .debug_line      0x0009bc         0xe6 build/default/production/i2c.o
- .debug_line      0x000aa2        0x18e build/default/production/tft.o
- .debug_line      0x000c30        0x13f build/default/production/task.o
+ .debug_line      0x0007ce         0xe0 build/default/production/main.o
+ .debug_line      0x0008ae        0x10f build/default/production/core.o
+ .debug_line      0x0009bd         0xe6 build/default/production/i2c.o
+ .debug_line      0x000aa3        0x18e build/default/production/tft.o
+ .debug_line      0x000c31        0x13f build/default/production/task.o
 
-.debug_frame      0x000000        0x80e
+.debug_frame      0x000000        0x846
  *(.debug_frame)
  .debug_frame     0x000000         0xee build/default/production/mcc_generated_files/mcc.o
  .debug_frame     0x0000ee         0x24 build/default/production/mcc_generated_files/interrupt_manager.o
@@ -771,11 +770,11 @@ __FUID3
  .debug_frame     0x00028a         0x64 build/default/production/mcc_generated_files/uart1.o
  .debug_frame     0x0002ee         0x94 build/default/production/mcc_generated_files/spi2.o
  .debug_frame     0x000382         0x34 build/default/production/mcc_generated_files/adc1.o
- .debug_frame     0x0003b6         0x74 build/default/production/main.o
- .debug_frame     0x00042a         0xa2 build/default/production/core.o
- .debug_frame     0x0004cc         0x64 build/default/production/i2c.o
- .debug_frame     0x000530        0x1c2 build/default/production/tft.o
- .debug_frame     0x0006f2        0x11c build/default/production/task.o
+ .debug_frame     0x0003b6         0x82 build/default/production/main.o
+ .debug_frame     0x000438         0xa2 build/default/production/core.o
+ .debug_frame     0x0004da         0x64 build/default/production/i2c.o
+ .debug_frame     0x00053e        0x1c2 build/default/production/tft.o
+ .debug_frame     0x000700        0x146 build/default/production/task.o
 
 .debug_str        0x000000        0x589
  *(.debug_str)
@@ -1713,9 +1712,7 @@ LOAD /Applications/microchip/xc16/v1.34/bin/bin/../../lib/libm-elf.a
 LOAD /Applications/microchip/xc16/v1.34/bin/bin/../../lib/libc-elf.a
 END GROUP
 OUTPUT(dist/default/production/PIC24Proj_Scratch.X.production.elf elf32-pic30)
-LOAD /CW/_FGS†¡
-‘¡
-__FGS.sec
+LOAD /CW/_FGS†ô<‘ô<__FGS.sec
 LOAD jump_table
 LOAD default_isr
 LOAD heap
@@ -1956,69 +1953,71 @@ __c30_signature
  .ivt._SoftTrapError
                   0x000010          0x2 build/default/production/mcc_generated_files/traps.o
 
-.const              0xa37c         0xd2 load address 0x00237c  
- .const             0xa37c         0x5c build/default/production/main.o
- .const             0xa3d8         0x54 build/default/production/task.o
- .const             0xa42c         0x22 build/default/production/mcc_generated_files/traps.o
+.const              0xa37c         0xf8 load address 0x00237c  
+ .const             0xa37c         0x7a build/default/production/task.o
+ .const             0xa3f6         0x5c build/default/production/main.o
+ .const             0xa452         0x22 build/default/production/mcc_generated_files/traps.o
 
-.dinit            0x00244e        0x116
- .dinit           0x00244e        0x116 data_init
+.text             0x002474        0x124
+ .text            0x002474        0x124 build/default/production/task.o
+                  0x00247c                  _task_find
+                  0x002498                  _get_system_tick
+                  0x0024ae                  _task_add
+                  0x0024f6                  _user_task_add
+                  0x0024fe                  _task_del
+                  0x002506                  _task_yield
+                  0x00250c                  build/default/production/task.o:_task_timer
+                  0x002520                  build/default/production/task.o:_task_null
+                  0x002526                  _task_init
+                  0x002574                  _task_start
 
-.text             0x002564        0x43a
- .text            0x002564        0x110 build/default/production/task.o
-                  0x00256c                  _task_find
-                  0x002588                  _get_system_tick
-                  0x00259e                  _task_add
-                  0x0025e6                  _user_task_add
-                  0x0025ee                  _task_del
-                  0x0025f6                  _task_yield
-                  0x0025fc                  build/default/production/task.o:_task_timer
-                  0x002610                  build/default/production/task.o:_task_null
-                  0x002616                  _task_init
-                  0x002664                  _task_start
- .text            0x002674         0xfa build/default/production/mcc_generated_files/spi2.o
-                  0x002674                  _SPI2_Initialize
-                  0x002682                  _SPI2_Exchange
-                  0x0026ac                  _SPI2_ExchangeBuffer
-                  0x002756                  _SPI2_Exchange8bit
-                  0x002766                  _SPI2_Exchange8bitBuffer
-                  0x00276a                  _SPI2_StatusGet
- .text            0x00276e         0xcc build/default/production/mcc_generated_files/mcc.o
-                  0x00277a                  _OSCILLATOR_Initialize
-                  0x00279e                  _SYSTEM_Initialize
-                  0x0027b2                  _SYSTEM_GetResetCause
-                  0x0027b6                  _SYSTEM_ResetCauseFromTrap
-                  0x0027ba                  _SYSTEM_ResetCauseFromIllegalOpcode
-                  0x0027c4                  _SYSTEM_ResetCauseFromConfigurationMismatch
-                  0x0027ca                  _SYSTEM_ResetCauseFromExternal
-                  0x0027d0                  _SYSTEM_ResetCauseFromSoftware
-                  0x0027d6                  _SYSTEM_ResetCauseFromWatchdogTimer
-                  0x0027dc                  _SYSTEM_ResetCauseClear
-                  0x0027e4                  _SYSTEM_ResetCauseHandler
-                  0x002836                  _SYSTEM_ResetCauseClearAll
- .text            0x00283a         0x72 build/default/production/mcc_generated_files/pin_manager.o
-                  0x00283a                  _PIN_MANAGER_Initialize
- .text            0x0028ac         0x50 build/default/production/mcc_generated_files/tmr2.o
-                  0x0028ac                  _TMR2_Initialize
-                  0x0028bc                  _TMR2_Tasks_32BitOperation
-                  0x0028c4                  _TMR2_Period32BitSet
-                  0x0028ca                  _TMR2_Period32BitGet
-                  0x0028dc                  _TMR2_Counter32BitSet
-                  0x0028e2                  _TMR2_Counter32BitGet
-                  0x0028f4                  _TMR2_Start
-                  0x0028f8                  _TMR2_Stop
- .text            0x0028fc         0x40 build/default/production/main.o
-                  0x0028fc                  _task
-                  0x002914                  _main
- .text            0x00293c         0x30 build/default/production/mcc_generated_files/uart1.o
-                  0x00293c                  _UART1_Initialize
-                  0x00294c                  _UART1_Read
-                  0x00295a                  _UART1_Write
-                  0x002968                  _UART1_StatusGet
- .text            0x00296c         0x18 build/default/production/mcc_generated_files/traps.o
-                  0x002976                  _TRAPS_halt_on_error
- .text            0x002984         0x18 build/default/production/mcc_generated_files/adc1.o
-                  0x002984                  _ADC1_Initialize
-                  0x002998                  _ADC1_Tasks
- .text            0x00299c          0x2 build/default/production/mcc_generated_files/interrupt_manager.o
-                  0x00299c                  _INTERRUPT_Initialize
+.dinit            0x002598        0x116
+ .dinit           0x002598        0x116 data_init
+
+.text             0x0026ae        0x32e
+ .text            0x0026ae         0xfa build/default/production/mcc_generated_files/spi2.o
+                  0x0026ae                  _SPI2_Initialize
+                  0x0026bc                  _SPI2_Exchange
+                  0x0026e6                  _SPI2_ExchangeBuffer
+                  0x002790                  _SPI2_Exchange8bit
+                  0x0027a0                  _SPI2_Exchange8bitBuffer
+                  0x0027a4                  _SPI2_StatusGet
+ .text            0x0027a8         0xcc build/default/production/mcc_generated_files/mcc.o
+                  0x0027b4                  _OSCILLATOR_Initialize
+                  0x0027d8                  _SYSTEM_Initialize
+                  0x0027ec                  _SYSTEM_GetResetCause
+                  0x0027f0                  _SYSTEM_ResetCauseFromTrap
+                  0x0027f4                  _SYSTEM_ResetCauseFromIllegalOpcode
+                  0x0027fe                  _SYSTEM_ResetCauseFromConfigurationMismatch
+                  0x002804                  _SYSTEM_ResetCauseFromExternal
+                  0x00280a                  _SYSTEM_ResetCauseFromSoftware
+                  0x002810                  _SYSTEM_ResetCauseFromWatchdogTimer
+                  0x002816                  _SYSTEM_ResetCauseClear
+                  0x00281e                  _SYSTEM_ResetCauseHandler
+                  0x002870                  _SYSTEM_ResetCauseClearAll
+ .text            0x002874         0x72 build/default/production/mcc_generated_files/pin_manager.o
+                  0x002874                  _PIN_MANAGER_Initialize
+ .text            0x0028e6         0x50 build/default/production/mcc_generated_files/tmr2.o
+                  0x0028e6                  _TMR2_Initialize
+                  0x0028f6                  _TMR2_Tasks_32BitOperation
+                  0x0028fe                  _TMR2_Period32BitSet
+                  0x002904                  _TMR2_Period32BitGet
+                  0x002916                  _TMR2_Counter32BitSet
+                  0x00291c                  _TMR2_Counter32BitGet
+                  0x00292e                  _TMR2_Start
+                  0x002932                  _TMR2_Stop
+ .text            0x002936         0x44 build/default/production/main.o
+                  0x002936                  _task
+                  0x00294e                  _main
+ .text            0x00297a         0x30 build/default/production/mcc_generated_files/uart1.o
+                  0x00297a                  _UART1_Initialize
+                  0x00298a                  _UART1_Read
+                  0x002998                  _UART1_Write
+                  0x0029a6                  _UART1_StatusGet
+ .text            0x0029aa         0x18 build/default/production/mcc_generated_files/traps.o
+                  0x0029b4                  _TRAPS_halt_on_error
+ .text            0x0029c2         0x18 build/default/production/mcc_generated_files/adc1.o
+                  0x0029c2                  _ADC1_Initialize
+                  0x0029d6                  _ADC1_Tasks
+ .text            0x0029da          0x2 build/default/production/mcc_generated_files/interrupt_manager.o
+                  0x0029da                  _INTERRUPT_Initialize

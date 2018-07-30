@@ -89,7 +89,7 @@ task_buf *task_add(void (*task_func)(void *), int priority, void *args) {
     return task_new;
 }
 
-inline task_buf *user_task_add(void (*task_func)(void *), void *args) {
+task_buf *user_task_add(void (*task_func)(void *), void *args) {
     return task_add(task_func, 1, args);
 }
 
@@ -155,8 +155,10 @@ int task_init(include incl) {
 //this is to actually hand off control to a task
 //calls a function with the argument pointer stored in the task_buf
 void task_start(void) {
-    setjmp(task_main);
-    //at this point, the monitor task would indicate what a thing returned with
+    int i;
+    if ((i = setjmp(task_main))) {
+        printf("WARNING: task %d exited with code %d\n", task_buftop->tid, i);
+    }
     task_switch();
     task_buftop->func(task_buftop->args);
 }
