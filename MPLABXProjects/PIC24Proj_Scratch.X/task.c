@@ -148,15 +148,16 @@ int task_init(include incl) {
     
     //if software timers or other stuff are needed, init them here
     task_noncrit_init(incl);
+    task_start();
     
     return 0;
 }
 
 //this is to actually hand off control to a task
 //calls a function with the argument pointer stored in the task_buf
-void task_start(void) {
+static inline void task_start(void) {
     int i;
-    if ((i = setjmp(task_main))) {
+    if ((i = setjmp(task_main)) != 1) {
         printf("WARNING: task %d exited with code %d\n", task_buftop->tid, i);
     }
     task_switch();

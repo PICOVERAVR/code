@@ -27,4 +27,4 @@ task_buf *task_find(int target);
 void task_yield(int exit);
 
 int task_init(enum include);
-void task_start(void);
+static inline void task_start(void);
