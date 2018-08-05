@@ -11,14 +11,16 @@ static sd_block_addr mbr_addr, vbr_addr, fat_addr, root_addr;
 //have different initialization methods here that all do the same thing
 int fat_init(void) {
     //initialize the SD card driver
-    int i;
-    if ((i = sd_init())) {
-        return i;
+    if (sd_init() == SD_INIT_FAIL) {
+        return -1;
     }
     
     //start out by reading block 0, figure out where the VBR is
     mbr_addr.uint = 0;
     sd_readBlock(mbr_addr, &mbr);
+    
+    
+    //need verification that we are indeed dealing with a FAT32 filesystem here!
     
     //read bytes 0x1C6 -> 0x1CA for VBR block
     for (int i = 0; i < 4; i++) {
@@ -47,9 +49,26 @@ int fat_init(void) {
     
     sd_readBlock(root_addr, &root);
     
-    sd_printBlock(&fat);
+//    sd_printBlock(&mbr);
+//    printf("\n\n");
+//    sd_printBlock(&vbr);
+//    printf("\n\n");
+//    sd_printBlock(&fat);
     printf("\n\n");
-    sd_printBlock(&root);
+    sd_printBlock(&root); //root dir may span two blocks
+//    
+//    
+//    
+//    
+//    
+//    
+//    
+//    printf("\nroot addr: %ld", root_addr.uint);
+//    root_addr.uint += (0x102 * 64);
+//    printf("\nnew root addr: %ld", root_addr.uint);
+//    sd_readBlock(root_addr, &root);
+//    printf("\n\n");
+//    sd_printBlock(&root);
     
     return 0;
     
@@ -63,7 +82,22 @@ int fat_init(void) {
 //will still work!
 
 //open a file from the SD card
-int fat_open(void) {
+//maybe have this malloc required memory?
+int fat_open(char *filename) {
+    char name_buf[12]; //always 11 bytes wide, +1 for NULL
+    
+    for (int i = 32; i < 512; i += 32) { //we can skip the directory info itself, not a file
+        if (root.data[i] != 0xE5 && (root.data[i + 0x0B] >> 5) & 1) { //not an unused file and not a directory
+            
+            memcpy(name_buf, root.data + i, 11);
+            name_buf[11] = NULL;
+            printf("got name %s\n", name_buf);
+            
+            //strip whitespace out of name
+            
+        }
+    }
+    
     return -1;
 }
 

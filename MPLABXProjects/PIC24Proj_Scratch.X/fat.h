@@ -8,7 +8,7 @@ typedef struct {
 } sd_file;
 
 int fat_init(void);
-int fat_open(void);
+int fat_open(char *filename);
 int fat_close(void);
 int fat_traverse(void);
 int fat_search(void);

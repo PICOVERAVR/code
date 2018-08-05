@@ -25,7 +25,7 @@ uint8_t sd_writeCommand(sd_command *c) {
     int time = 0;
     uint8_t result = 0xFF;
     do {
-        result = SPI2_Exchange8bit(0xFF); //have to keep the MOSI line high, cycle dummy writes 
+        result = SPI2_Exchange8bit(0xFF); //have to keep the MOSI line high, cycle dummy writes
         //until we get a response or the request times out
     } while (result > 0x80 && time++ < SD_TIMEOUT);
     
@@ -102,23 +102,29 @@ uint8_t sd_init(void) {
     
     uint8_t result = sd_writeCommand(&CMD0);
     if ((uint16_t) result == SD_ERROR) {
-        return -1;
+        return SD_INIT_FAIL;
     }
     
     delay_poll(MS_100);
     sd_resp r = sd_writeCommandLong(&CMD8);
     if ((uint16_t) r.resp[0] == SD_ERROR) {
-        return -1;
+        return SD_INIT_FAIL;
     }
     
-    //forego error checking from this point on since previous commands succeeded...
     result = 0xFF;
+    uint8_t time = 0;
     do {
         sd_writeCommand(&CMD55);
         result = sd_writeCommand(&ACMD41);
-    } while (result != 0);
+    } while (result != 0 && time++ < SD_TIMEOUT);
+    if (time >= SD_TIMEOUT) {
+        return SD_INIT_FAIL;
+    }
     
-    r = sd_writeCommandLong(&CMD58);    
+    r = sd_writeCommandLong(&CMD58);
+    if ((uint16_t) r.resp[0] == SD_ERROR) {
+        return SD_INIT_FAIL;
+    }
     SPI2CON1bits.PPRE = 0b11; //return clock speed to ~8MHz
     
     return 0;
@@ -161,7 +167,7 @@ void sd_printBlock(sd_block *block) {
             if (getHexDigits(item) == 2) {
                 printf("%x ", item);
             } else {
-                printf("%x  ", item);
+                printf("0%x ", item);
             }
             
         }
