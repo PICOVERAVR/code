@@ -4,8 +4,6 @@
 #define SD_TIMEOUT 100 //should be long enough?
 #define SD_ERROR 0xFF //impossible command
 #define SD_INIT_FAIL 0xFE //keep this unsigned so that uint8_t and int treat this as the same number
-                          //uint8_t: -1 == 254
-                          //int:     -1 == 65534
 
 typedef struct sd_command { //basic SD command structure
     uint8_t command; //command with the form of 0b01xxxxxx

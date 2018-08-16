@@ -3,8 +3,13 @@
 //NOTE: this lib only supports FAT32 filesystems coming from SD cards.  Other versions of FAT or exFAT
 //have not been tested and will probably crash.
 
+//Hacks that I have to fix:
+//  fix all the constants in fat_exists
+//  refactor the crap out of that
+
 static sd_block mbr, vbr, fat, root;
 static sd_block_addr mbr_addr, vbr_addr, fat_addr, root_addr;
+static sd_block *current_dir;
 //sd_block_addr current;
 //add a thing here to keep track of current location in filesystem
 
@@ -48,6 +53,7 @@ int fat_init(void) {
     root_addr.uint += fat_addr.uint; //??
     
     sd_readBlock(root_addr, &root);
+    current_dir = &root;
     
 //    sd_printBlock(&mbr);
 //    printf("\n\n");
@@ -55,7 +61,7 @@ int fat_init(void) {
 //    printf("\n\n");
 //    sd_printBlock(&fat);
     printf("\n\n");
-    sd_printBlock(&root); //root dir may span two blocks
+    sd_printBlock(&root); //root dir may span >1 blocks!!
 //    
 //    
 //    
@@ -81,19 +87,39 @@ int fat_init(void) {
 //TODO: link all this stuff to standard C read/write commands maybe, so that fprintf and related calls
 //will still work!
 
-//open a file from the SD card
-//maybe have this malloc required memory?
-int fat_open(char *filename) {
-    char name_buf[12]; //always 11 bytes wide, +1 for NULL
+//check if a file exists on card
+//if so, returns the location of the filename in the dir (DOES NOT WORK FOR MORE THAN ONE BLOCK!)
+static int fat_exists(const char *filename) {
+    char name_buf_raw[12]; //always 11 bytes wide, +1 for NULL
+    char name_buf[12];
     
     for (int i = 32; i < 512; i += 32) { //we can skip the directory info itself, not a file
-        if (root.data[i] != 0xE5 && (root.data[i + 0x0B] >> 5) & 1) { //not an unused file and not a directory
+        if (current_dir->data[i] != 0xE5 && (current_dir->data[i + 0x0B] >> 5) & 1) { //not an unused file and not a directory
             
-            memcpy(name_buf, root.data + i, 11);
-            name_buf[11] = NULL;
-            printf("got name %s\n", name_buf);
+            memcpy(name_buf_raw, current_dir->data + i, 11);
+            name_buf_raw[11] = NULL;
             
-            //strip whitespace out of name
+            //redundant, easy
+            for (int j = 0; name_buf_raw[j] != NULL; j++) {
+                name_buf_raw[j] = tolower(name_buf_raw[j]);
+            }
+            
+            if (memchr(name_buf_raw, ' ', 12) != NULL) { //if spaces are found
+                int j;
+                for (j = 0; j < 12 && name_buf_raw[j] != ' '; j++) {
+                    name_buf[j] = name_buf_raw[j];
+                }
+                name_buf[j] = '.';
+                name_buf[j+1] = name_buf_raw[8];
+                name_buf[j+2] = name_buf_raw[9];
+                name_buf[j+3] = name_buf_raw[10];
+            } else {
+                memcpy(name_buf, name_buf_raw, 12); //what if there are 8 chars? no '.' gets added!
+            }
+            
+            if (strcmp(name_buf, filename) == 0) {
+                return i;
+            }
             
         }
     }
@@ -101,8 +127,19 @@ int fat_open(char *filename) {
     return -1;
 }
 
+int fat_open(const char *filename) {
+    if (!fat_exists(filename)) {
+        
+    }
+    return 0;
+}
+
 //close a file
-int fat_close(void) {
+int fat_close(const char *filename) {
+    //close file:
+    //write new filesize to directory
+    //update FAT x2 if large modification
+    
     return -1;
 }
 
