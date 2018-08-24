@@ -1,0 +1,20 @@
+CC := gcc
+SRC := $(filter-out test.S, $(wildcard *.S))
+FLAGS := -no-pie # gcc tries to make a PIC by default, we don't want that
+DFLAGS := $(FLAGS) -g
+
+UNAME := $(shell uname)
+
+debug: pre
+	@$(CC) $(DFLAGS) $(SRC) -o debug.out
+	@echo "debug build completed."
+
+release: pre
+	@$(CC) $(FLAGS) $(SRC)-o release.out
+	@echo "zipped build completed."
+
+pre:
+	@echo "building on: $(UNAME)"
+	
+clean:
+	@rm -f	{*.out,*.o}
