@@ -1,0 +1,69 @@
+ISA
+=======
+
+16 bit RISC processor
+
+//give a reason this is different than RISC-V.
+	//special hardware instructions for stuff?
+	//not a good reason.
+
+
+16 16-bit registers (R0 - R15), R0 hardwired to 0
+
+Three operand format for everything
+register-register architecture
+
+no status register, just compare and branch
+
+math
+
+	ADD s0, s1, d	s0 + s1 (signed 16b)   -> d
+	ADDU s0, s1, d	s0 + s1 (unsigned 16b) -> d
+	ADDB s0, s1, d	s0 + s1 (signed 8b)    -> d
+	ADDUB s0, s1, d s0 + s1 (unsigned 8b)  -> d
+	
+	SUB s0, s1, d	s0 - s1 (signed 16b)   -> d
+	SUBU s0, s1, d	s0 - s1 (unsigned 16b) -> d
+	SUBB s0, s1, d	s0 - s1 (signed 8b)    -> d
+	SUBUB s0, s1, d s0 - s1 (unsigned 8b)  -> d
+
+	MUL s0, s1, h, L	s0 * s1 (signed 32b)    -> {h, L}
+	MULU s0, s1, h, L	s0 * s1 (unsigned 32b)  -> {h, L}
+	MULB s0, s1, d		s0 * s1 (signed 16b)    -> d
+	MULUB s0, s1, d 	s0 * s1 (unsigned 16b)  -> d
+	
+	DIV s0, s1, p, r	s0 / s1 (signed 16b)   -> {d0, d1}
+	DIVU s0, s1, p, r	s0 / s1 (unsigned 16b) -> {d0, d1}
+	DIVB s0, s1, p, r	s0 / s1 (signed 16b)   -> {d0, d1}
+	DIVUB s0, s1, p, r	s0 / s1 (unsigned 16b) -> {d0, d1} //do we need all this?
+	
+	SEX			read about sign extension and number representation
+	
+	and, or, not, shift, etc.
+
+moving
+	MOV s, d	s (signed 16b)  -> d
+	MOVB s, d	s (signed 8b)   -> d
+	
+	LD addr, r	addr		-> r //no LDB or STB, makes things easier for memory accesses?
+	ST r, addr	r		-> addr
+	
+	//indirect or scaled addressing modes?
+	
+branching
+	BN addr		addr		-> pc
+	BN r		r		-> pc
+
+	BR r		pc + r		-> pc
+	
+	BE s, d, r	(s == d)?	-> r
+	BNE s, d, r	(s != d)?	-> r
+	
+	BGT
+	BGE
+
+	BLT
+	BLE	
+	
+
+

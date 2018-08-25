@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -std=c11 #use C11
+CFLAGS = -std=c11
 DFLAGS = $(CFLAGS) -g -Wall -pg #generate symbol information
 
 SRC = $(wildcard *.c) #grab anything with a .c ending
@@ -14,9 +14,7 @@ all:
 
 clean:
 	@rm -f *.out
+	@rm -f *.s *.o
 	
 	@rm -rf *.out.dSYM # get rid of debug info, macOS specific
 	@rm -f *.gch
-	
-	@rm -f *.s *.o
-

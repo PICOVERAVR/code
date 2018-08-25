@@ -1,0 +1,1 @@
+/root/main/common/makefiles/makefile_c
