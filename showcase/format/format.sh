@@ -14,11 +14,10 @@ shopt -s nullglob
 for f in $SRC; do
 	
 	# enable verbose output
-	if [[ "$1" == "-v" ]]; then
+	if [[ "$@" == *"-v"* ]]; then
 		echo "formatting file $f."
 	fi
 
-	# should learn and use sed here instead of this echo thing
 	(echo "
 /*
     Name: $NAME
@@ -28,11 +27,16 @@ for f in $SRC; do
     Name of file: $f
     
     Description:
-        
+        <insert>
         
         
 
 */
-	"; cat $f) | clang-format -style=file > $f.new
+	"; cat $f; echo "
+/*
+    console output:
+        <insert>
+*/
+	") | clang-format -style=file > $f.new
 	# call clang-format for actual code linting
 done

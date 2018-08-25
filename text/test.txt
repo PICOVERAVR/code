@@ -1,0 +1,6 @@
+# cat test.txt; echo "-----"; sed 's/\([a-z]*\).*/\1/' < test.txt
+
+/usr/bin/shared
+
+stuff and things and more stuff and more things
+stuff and things and more stuff and more things
