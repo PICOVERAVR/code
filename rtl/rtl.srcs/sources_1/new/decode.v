@@ -4,11 +4,19 @@
     
 */
 
-module decode(input clk, input en, input [15:0] instr);
-    //make a regfile, send out decoded instructions to EX, MEM, and WB units
-    // :D
+module decode(input clk, input en, input [31:0] instr,
+        output alu_en
+        
+        
+    );
     
     
     
     
+    
+endmodule
+
+module decode_buffer();
+
+
 endmodule
