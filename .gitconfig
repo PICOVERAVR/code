@@ -1,0 +1,8 @@
+[alias]
+	st = status
+	last = log -1 HEAD --oneline
+	hist = log --oneline --graph --decorate -15
+	b = git branch -v
+[user]
+	email = kyle@johnneil.net
+	name = Kyle Neil
