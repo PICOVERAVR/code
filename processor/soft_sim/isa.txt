@@ -4,16 +4,22 @@ ISA
 16 bit RISC processor
 
 //give a reason this is different than RISC-V.
-	//special hardware instructions for stuff?
-	//not a good reason.
 
-
-16 16-bit registers (R0 - R15), R0 hardwired to 0
+32 16-bit registers (R0 - R31)
+	R31: PC
+	R30: SP
+	R29: BP
+	R0:  0x0
+	
 
 Three operand format for everything
 register-register architecture
 
 no status register, just compare and branch
+
+control
+	NOP
+	HALT			stop the processor
 
 math
 
@@ -37,33 +43,67 @@ math
 	DIVB s0, s1, p, r	s0 / s1 (signed 16b)   -> {d0, d1}
 	DIVUB s0, s1, p, r	s0 / s1 (unsigned 16b) -> {d0, d1} //do we need all this?
 	
-	SEX			read about sign extension and number representation
+	SEX s, d		sign of 8b num 	       -> 16b sign(d)
 	
-	and, or, not, shift, etc.
+	INC r		r + 1 (signed 16b) 	-> r
+	INCU r		r + 1 (unsigned 16b)	-> r
+
+	DEC r		r - 1 (signed 16b) 	-> r
+	DECU r		r - 1 (unsigned 16b)	-> r	
+	
+	AND s0, s1, d	s0 & s1 (signed 16b)   -> d
+	ANDU s0, s1, d	s0 & s1 (unsigned 16b) -> d
+	ANDB s0, s1, d  s0 & s1 (signed 8b)    -> d
+	ANDUB s0, s1, d s0 & s1 (unsigned 8b)  -> d
+	
 
 moving
-	MOV s, d	s (signed 16b)  -> d
-	MOVB s, d	s (signed 8b)   -> d
+	MOV s, d	s (16b)		-> d
+	MOVB s, d	s (8b)		-> d
 	
-	LD addr, r	addr		-> r //no LDB or STB, makes things easier for memory accesses?
+	LD addr, r	mem[addr]	-> r //no LDB or STB, makes things easier for memory accesses?
+	LD i, r		mem[i]		-> r
+	LD imm, r	imm		-> r
+	
 	ST r, addr	r		-> addr
-	
-	//indirect or scaled addressing modes?
+	ST r, i		r		-> mem[i]
+	ST r, imm	r		-> mem[imm]
 	
 branching
-	BN addr		addr		-> pc
+	BN lit		lit		-> pc
 	BN r		r		-> pc
 
 	BR r		pc + r		-> pc
 	
-	BE s, d, r	(s == d)?	-> r
+	BE s, d, r	(s == d)?	-> r //no literal jumping like this
 	BNE s, d, r	(s != d)?	-> r
 	
-	BGT
-	BGE
+	BGT s, d, r	(s > d)?	-> r
+	BGE s, d, r	(s >= d)?	-> r
 
-	BLT
-	BLE	
+	BLT s, d, r	(s < d)?	-> r
+	BLE s, d, r	(s <= d)?	-> r
 	
+	BZ s, r		(s == 0)?	-> r
+	BNZ s, r	(s != 0)?	-> r
+
+instruction encoding
+	31 30 29 28 27 26 25 24 23 22 21 20 19 18 17 16 15 14 13 12 11 10 9 8 7 6 5 4 3 2 1 0
+	|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx| pm  |    op    |  -> NOP/HALT (A)
+	|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|              imm              | pm  |    op    |  -> BR imm (B)
+	|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|      r      | pm  |    op    |  -> INC r (C)
+	|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|      s       |      d      | pm  |    op    |  -> MOV s, d (D)
+	|xxxxxxxxxxxxxxxxxxxxxx|              imm            |      r      | pm  |    op    |  -> LD imm, r (E)
+	|xxxxxxxxxxxxxxxxxxxxxx|      s0      |      s1      |      d      | pm  |    op    |  -> ADD s0, s1, d (F)
+	
+opcode encoding
+	all 0 opcode is illegal!
+	 9 8 7 6 5 4 3 2 1 0
+	  |x x h|  NOP(1)  | h = 1 for halt
+	  |x b s|  ADD(x)  | b = 1 for word, s = 1 for signed
+	  |x b x|  MOV(x)  | b = 1 for word
+	  |x x x|  LD(x)   | 
+	  |x b i|  INC(x)  | i = 1 for inc, b = 1 for word
+	  |x x x|  
 
 
