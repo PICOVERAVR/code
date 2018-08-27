@@ -3,8 +3,24 @@ NAME="Kyle Neil"
 CLASS="CIS 278 (online)"
 INSTR="Dave Harden"
 
-# get anything with a .cpp or .hpp headers
 SRC=./*.?pp
+
+VERB=
+INP=
+while [ "$1" != "" ]; do
+	case $1 in 
+		-v | --verbose )   VERB=1
+				   ;;
+		-f | --file )      shift
+				   SRC=$1
+				   ;;
+		-i | --inplace )   INP=1
+				   ;;
+		* )		 echo "error: unknown argument"
+				 exit 1
+	esac
+	shift
+done
 
 # remove any files already touched
 rm -f *.new
@@ -14,7 +30,7 @@ shopt -s nullglob
 for f in $SRC; do
 	
 	# enable verbose output
-	if [[ "$@" == *"-v"* ]]; then
+	if [[ $VERB == 1 ]]; then
 		echo "formatting file $f."
 	fi
 
@@ -39,4 +55,7 @@ for f in $SRC; do
 */
 	") | clang-format -style=file > $f.new
 	# call clang-format for actual code linting
+	if [[ $INP == 1 ]]; then
+		mv $f.new $f
+	fi
 done
