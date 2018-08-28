@@ -1,0 +1,108 @@
+#!/usr/bin/env python3
+import os # for calling other programs
+import argparse # for arg processing
+import xml.etree.ElementTree as ET # for XML parsing
+import subprocess # for calling other programs gracefully
+import shutil # to test for clang-format
+
+
+def header_get(root, filename):	
+	lb = '\n\t'
+	
+	header_text = '/*'
+	# get proper sections of xml file to insert
+	header_text += root.find('header').text + lb
+	
+	header_text += root.find('./header/name').text + lb
+	header_text += root.find('./header/date').text + lb
+	
+	date = subprocess.run(['date'], stdout=subprocess.PIPE)
+	date = date.stdout.decode('utf-8')
+	header_text += date + '\t'
+	
+	# DRY, should be a better way to do this
+	header_text += root.find('./header/class').text + lb
+	header_text += root.find('./header/instr').text + lb
+	header_text += root.find('./header/nof').text
+	header_text += filename + lb
+	
+	header_text += root.find('./header/descr').text + '\n'
+	
+	header_text += '*/\n\n'
+	
+	return header_text
+
+def output_get(root):
+	lb = '\n\t'
+	
+	output_text = '/*'
+	output_text += root.find('output').text + lb
+	output_text += root.find('./output/descr').text + '\n'
+	
+	output_text += '*/\n\n'
+	
+	return output_text
+
+parser = argparse.ArgumentParser(description='Format c++ source files according to insert.xml doc')
+parser.add_argument('--version', action='version', version='c++ classroom std checker v0.2')
+parser.add_argument('-v', '--verbose', action='store_true', help='enables verbose output.')
+parser.add_argument('-i', '--in_place', action='store_true', help='use the same file when editing.')
+parser.add_argument('-f', '--file', type=str, help='specify explicit file(s) to format')
+
+args = parser.parse_args()
+
+
+if not shutil.which('clang-format'):
+	print('ERROR: clang-format not installed or in PATH')
+	exit(2)
+
+
+
+# remove any previous modified files
+os.system('rm -f *.new')
+
+in_dir = subprocess.run(['ls'], stdout=subprocess.PIPE)
+# get and parse 'ls' to string
+files = in_dir.stdout.decode('utf-8').split('\n')
+files.remove('')
+
+parse_files = []
+
+# accept a list of user-supplied files and check for invalid files 
+if args.file:
+	parse_files = args.file.split(" ")
+	for i in parse_files:
+		if i.name == 'format':
+			print("ERROR: format cannot overwrite itself")
+			exit(1)
+else:
+# grab everything in local directory with .cpp or .hpp ending
+	for i in files:	
+		if i.find('.cpp') != -1 or i.find('.hpp') != -1:
+			parse_files.append(i)
+
+tree = ET.parse('insert.xml')
+root = tree.getroot()
+
+# acually rewrite the file with header and tailer
+# then call clang-format for actual code formatting
+for cur_file in parse_files:
+	with open(cur_file) as current_file:
+		header_str = header_get(root, current_file.name)
+		output_str = output_get(root)
+		
+		if args.verbose:
+			print('formatting file', cur_file)
+		
+		if args.in_place:
+			current_file.write(header_str + current_file.read() + output_str)
+		else:
+			with open(current_file.name + '.temp', "w") as temp:
+				temp.write(header_str + current_file.read() + output_str)
+				temp.close()
+			with open(current_file.name + '.new', 'w') as final:
+				subprocess.run(['clang-format', '-style=file', current_file.name + '.temp'], stdout=final, check=True)
+				final.close()
+		current_file.close()
+
+os.system('rm *.temp')
