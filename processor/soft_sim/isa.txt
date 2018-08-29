@@ -90,10 +90,10 @@ branching
 instruction encoding
 	31 30 29 28 27 26 25 24 23 22 21 20 19 18 17 16 15 14 13 12 11 10 9 8 7 6 5 4 3 2 1 0
 	|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx| pm  |    op    |  -> NOP/HALT (A)
-	|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|              imm              | pm  |    op    |  -> BR imm (B)
+	|xxxxxxxxxxxxxxxx|                        imm                      | pm  |    op    |  -> BR imm (B)
 	|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|      r      | pm  |    op    |  -> INC r (C)
 	|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|      s       |      d      | pm  |    op    |  -> MOV s, d (D)
-	|xxxxxxxxxxxxxxxxxxxxxx|              imm            |      r      | pm  |    op    |  -> LD imm, r (E)
+	|x|                   imm                            |      r      | pm  |    op    |  -> LD imm, r (E)
 	|xxxxxxxxxxxxxxxxxxxxxx|      s0      |      s1      |      d      | pm  |    op    |  -> ADD s0, s1, d (F)
 	
 opcode encoding
@@ -102,7 +102,7 @@ opcode encoding
 	  |x x h|  NOP(1)  | h = 1 for halt
 	  |x b s|  ADD(x)  | b = 1 for word, s = 1 for signed
 	  |x b x|  MOV(x)  | b = 1 for word
-	  |x x x|  LD(x)   | 
+	  |x b x|  LD(x)   | b = 1 for word
 	  |x b i|  INC(x)  | i = 1 for inc, b = 1 for word
 	  |x x x|  
 

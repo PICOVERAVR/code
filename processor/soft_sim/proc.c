@@ -43,7 +43,7 @@ int main(int argc, char **argv) {
 			case NOP: break;
 			case RST: longjmp(start, 1);
 			case ADD:
-				instr_add(&(s->p));
+				instr_add(&(s->p)); //do more error checking here!
 				break;
 			case SUB:
 				instr_sub(&(s->p));

@@ -74,7 +74,7 @@ typedef struct {
 	
 } state;
 
-enum instructions {
+enum instruction_opcode {
 	STOP = 0,
 	NOP,
 	ADD,

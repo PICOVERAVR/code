@@ -1,35 +1,37 @@
 #include "execute.h"
 
-int instr_sanity_check(instr *i) {
-	if (false) {
+#define regfile p->regfile
+
+int instr_sanity_check(instr *i, int def) {
+	if (i->opcode != def) {
 		fprintf(stderr, "EXP: wrong instruction passed execute!\n");
-		return -1;
+		return EXCP_ILL_OPCODE;
 	}
 	return 0;
 }
 
 // F type instruction
-void instr_add(proc *p) {
-	//uint16_t temp;
+int instr_add(proc *p) {
 	
-	if (instr_sanity_check(&(p->i))) {
-		return; // do not change state on error
+	if (instr_sanity_check(&(p->i), ADD)) {
+		return EXCP_ILL_OPCODE;
 	}
-	
-	//do actual add here, then modify according to flags
-	
-	if ((p->i.pm & 1)) { //1 for signed add
-		printf("signed add\n");
-	} else {
-		printf("unsigned add\n");
+	switch (p->i.pm) {
+		case 0: 
+			regfile[p->i.f_d] = regfile[p->i.f_s0] + regfile[p->i.f_s1];
+			return 0;
+		case 1: 
+			regfile[p->i.f_d] = (int16_t) regfile[p->i.f_s0] + (int16_t) regfile[p->i.f_s1];
+			return 0;
+		case 2: 
+			regfile[p->i.f_d] = (uint8_t) regfile[p->i.f_s0] + (uint8_t) regfile[p->i.f_s1];
+			return 0;
+		case 3: 
+			regfile[p->i.f_d] = (int8_t) regfile[p->i.f_s0] + (int8_t) regfile[p->i.f_s1];
+			return 0;
+		default:
+			return EXCP_ILL_OPCODE;
 	}
-	if ((p->i.pm & 2)) {
-		printf("8b add\n");
-	} else {
-		printf("16b add\n");
-	}
-	
-	//modify instruction state here
 }
 
 void instr_sub(proc *p) {

@@ -2,9 +2,9 @@
 
 #pragma once
 
-int instr_sanity_check(instr *i);
+int instr_sanity_check(instr *i, int instr);
 
-void instr_add(proc *p);
+int instr_add(proc *p);
 void instr_sub(proc *p);
 
 void instr_sex(proc *p);
