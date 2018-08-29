@@ -4,15 +4,19 @@
 #include <string.h>
 #include <stdbool.h>
 #include <setjmp.h>
+#include <stdarg.h>
 
 #pragma once
 
-#define ERR_NO_FILE -1
-#define ERR_CANNOT_LOAD_FILE -2
 #define EXCP_ILL_OPCODE 1
 
+#define INTERNAL_ERROR 2
+
+#define EXCP_NO_HEX 3
+#define SIM_STOP 4
+
 #define PROC_RAM 2048
-#define PROC_ROM 2048
+//rom is as big as the hex file
 
 typedef union {
 	uint32_t raw_instr;
@@ -67,18 +71,24 @@ typedef union {
 
 typedef struct {
 	proc p;
-	bool in_reset;
 	
 } state;
 
-void proc_setup(int argc, char **argv, uint32_t *hex_mem, state *s);
-void proc_teardown();
-
 enum instructions {
-	NOP = 1,
+	STOP = 0,
+	NOP,
 	ADD,
 	SUB,
 	MUL,
 	DIV,
-	HALT,
+	SEX,
+	RST,
 };
+
+uint32_t fetch(uint16_t addr, uint32_t *hex_mem);
+void break_ill_opcode();
+void break_stop();
+
+void free_state(int num_free, ...);
+
+

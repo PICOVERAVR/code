@@ -1,1 +1,1 @@
-docker run -it --rm -v /Users/kyleneil/code/main:/root/ -v /Users/kyleneil:/mnt --cap-add=SYS_PTRACE base bash
+docker run -it --rm -v /Users/kyleneil/code:/root/ -v /Users/kyleneil:/mnt --cap-add=SYS_PTRACE base bash
