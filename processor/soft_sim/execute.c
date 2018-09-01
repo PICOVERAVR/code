@@ -1,21 +1,10 @@
 #include "execute.h"
 
 #define regfile p->regfile
-
-int instr_sanity_check(instr *i, int def) {
-	if (i->opcode != def) {
-		fprintf(stderr, "EXP: wrong instruction passed execute!\n");
-		return EXCP_ILL_OPCODE;
-	}
-	return 0;
-}
+#define REGISTER_R0 0
 
 // F type instruction
 int instr_add(proc *p) {
-	
-	if (instr_sanity_check(&(p->i), ADD)) {
-		return EXCP_ILL_OPCODE;
-	}
 	switch (p->i.pm) {
 		case 0: 
 			regfile[p->i.f_d] = regfile[p->i.f_s0] + regfile[p->i.f_s1];
@@ -34,8 +23,22 @@ int instr_add(proc *p) {
 	}
 }
 
-void instr_sub(proc *p) {
-	return;
+int instr_sub(proc *p) {
+	return 0;
+}
+
+int instr_ld(proc *p, uint16_t *ram) {
+
+	if (p->i.e_s == REGISTER_R0) { 
+		return 0; //writing to R0 has no effect
+	}
+
+	if (p->i.pm == 1) {
+		regfile[p->i.e_s] = ram[regfile[p->i.e_imm]];
+		return 0;
+	}
+	regfile[p->i.e_s] = p->i.e_imm;
+	return 0;
 }
 
 void instr_sex(proc *p) {

@@ -20,36 +20,38 @@
 
 typedef union {
 	uint32_t raw_instr;
-	struct {
+	struct { // A type instruction
 		unsigned int opcode   : 6;
 		unsigned int pm       : 3;
-		unsigned int ext      : 23;
 	};
-	struct { // A type instruction
-		unsigned int a_opcode : 6;
-		unsigned int a_pm     : 3;
-		unsigned int a_ext    : 23;
-	};
-	struct { // F type instruction (also D, C types)
+	struct { // F type instruction
 		unsigned int f_opcode : 6;
 		unsigned int f_pm     : 3;
 		unsigned int f_d      : 5;
 		unsigned int f_s1     : 5;
 		unsigned int f_s0     : 5;
-		unsigned int f_ext    : 8;
+	};
+	struct { // D type instruction
+		unsigned int d_opcode : 6;
+		unsigned int d_pm     : 3;
+		unsigned int d_d      : 5;
+		unsigned int d_s      : 5;
+	};
+	struct { // C type instruction
+		unsigned int c_opcode : 6;
+		unsigned int c_pm     : 3;
+		unsigned int c_s      : 5;
 	};
 	struct { // B type instruction
 		unsigned int b_code   : 6;
 		unsigned int b_pm     : 3;
 		unsigned int b_imm    : 16;
-		unsigned int b_ext    : 7;
 	};
 	struct { // E type instruction
 		unsigned int e_opcode : 6;
 		unsigned int e_pm     : 3;
-		unsigned int e_reg    : 5;
+		unsigned int e_s      : 5;
 		unsigned int e_imm    : 16;
-		unsigned int e_ext    : 2;
 	};
 	
 } instr;
@@ -71,17 +73,20 @@ typedef union {
 
 typedef struct {
 	proc p;
-	
+	//other stuff possible here
 } state;
 
 enum instruction_opcode {
-	STOP = 0,
+	STOP,
 	NOP,
 	ADD,
 	SUB,
 	MUL,
 	DIV,
 	SEX,
+	BN,
+	BS,
+	LD,
 	RST,
 };
 
@@ -90,5 +95,4 @@ void break_ill_opcode();
 void break_stop();
 
 void free_state(int num_free, ...);
-
 

@@ -71,9 +71,9 @@ moving
 	
 branching
 	BN lit		lit		-> pc
-	BN r		r		-> pc
+	BS r, add	s0 + s1		-> pc //BS s = BS s, R0
 
-	BR r		pc + r		-> pc
+	BR r		pc + r		-> pc //r treated as 16bu
 	
 	BE s, d, r	(s == d)?	-> r //no literal jumping like this
 	BNE s, d, r	(s != d)?	-> r
@@ -90,20 +90,29 @@ branching
 instruction encoding
 	31 30 29 28 27 26 25 24 23 22 21 20 19 18 17 16 15 14 13 12 11 10 9 8 7 6 5 4 3 2 1 0
 	|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx| pm  |    op    |  -> NOP/HALT (A)
-	|xxxxxxxxxxxxxxxx|                        imm                      | pm  |    op    |  -> BR imm (B)
+	|xxxxxxxxxxxxxxxx|                        imm                      | pm  |    op    |  -> BN imm (B)
 	|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|      r      | pm  |    op    |  -> INC r (C)
 	|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|      s       |      d      | pm  |    op    |  -> MOV s, d (D)
 	|x|                   imm                            |      r      | pm  |    op    |  -> LD imm, r (E)
 	|xxxxxxxxxxxxxxxxxxxxxx|      s0      |      s1      |      d      | pm  |    op    |  -> ADD s0, s1, d (F)
 	
 opcode encoding
-	all 0 opcode is illegal!
+	all 0 opcode is illegal (STOP pseudo-i in this sim)
 	 9 8 7 6 5 4 3 2 1 0
 	  |x x h|  NOP(1)  | h = 1 for halt
-	  |x b s|  ADD(x)  | b = 1 for word, s = 1 for signed
+	  |x b s|  ADD(1)  | b = 1 for word, s = 1 for signed
 	  |x b x|  MOV(x)  | b = 1 for word
-	  |x b x|  LD(x)   | b = 1 for word
+	  |x x m|  LD(x)   | m = 1 for mem, 0 for imm
 	  |x b i|  INC(x)  | i = 1 for inc, b = 1 for word
-	  |x x x|  
+	  |x x x|  BN(x)   |
+	  |x x r|  BR(x)   | r = 1 for +r //has to be seperate from BN due to differing instruction encoding
 
 
+
+test program:
+org (0x0000):
+	LD 3, R1
+	LD 1, R2
+	ADDU R1, R2, R1
+	BR org
+	

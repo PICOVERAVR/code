@@ -2,14 +2,7 @@
 #include "setup.h"
 #include "execute.h" // for individual instruction implementations
 
-#define FREE_ALL() free_state(3, (void*) hex_mem, (void*) s, (void*) ram);
-
-//fetch the next instruction from hex_mem
-uint32_t fetch(uint16_t addr, uint32_t *hex_mem) {
-	return hex_mem[addr];
-}
-
-//varadic macro to free everything we allocated
+//varadic macro to free everything we allocated at start
 void free_state(int num_free, ...) {
 	va_list args;
 	va_start(args, num_free);
@@ -22,7 +15,7 @@ void free_state(int num_free, ...) {
 int main(int argc, char **argv) {
 	
 	state *s = malloc(sizeof(state));
-	uint32_t *ram = malloc(PROC_RAM);
+	uint16_t *ram = malloc(PROC_RAM);
 
 	jmp_buf start;
 	if (setjmp(start)) {
@@ -36,7 +29,7 @@ int main(int argc, char **argv) {
 	}
 
 	for(;;) {
-		s->p.i.raw_instr = fetch(s->p.PC, hex_mem);
+		s->p.i.raw_instr = hex_mem[s->p.PC];
 		s->p.PC += 4;
 		
 		switch (s->p.i.opcode) {
@@ -48,21 +41,33 @@ int main(int argc, char **argv) {
 			case SUB:
 				instr_sub(&(s->p));
 				break;
+			case MUL:
+				//
+				break;
+			case DIV:
+				//
+				break;
 			case SEX:
 				instr_sub(&(s->p));
 				break;
+			case LD:
+				instr_ld(&(s->p), ram);
+				break;
+			case BN:
+				s->p.PC = s->p.i.b_imm;
+				break;
+			case BS:
+				s->p.PC = s->p.regfile[s->p.i.d_s] + s->p.regfile[s->p.i.d_d];
+				break;
 			case STOP:
 				printf("reached STOP instr\n");
-				FREE_ALL();
 				return SIM_STOP;
 			default: 
 				printf("unknown opcode!\n");
-				FREE_ALL();
 				return EXCP_ILL_OPCODE;
 		};
 		
 	}
 	fprintf(stderr, "reached end of program somehow...\n");
-	FREE_ALL();
 	return INTERNAL_ERROR;
 }
