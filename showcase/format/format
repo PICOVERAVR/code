@@ -7,7 +7,7 @@ import shutil # to test for clang-format
 
 
 def header_get(root, filename):	
-	lb = '\n\t'
+	lb = '    \t' # use a standard number of spaces
 	
 	header_text = '/*'
 	# get proper sections of xml file to insert
@@ -35,7 +35,7 @@ def header_get(root, filename):
 def output_get(root):
 	lb = '\n\t'
 	
-	output_text = '/*'
+	output_text = '\n/*'
 	output_text += root.find('output').text + lb
 	output_text += root.find('./output/descr').text + '\n'
 	
