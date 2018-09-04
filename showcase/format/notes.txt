@@ -1,6 +1,6 @@
 TO FIX/ADD:
+
+problems with clang-format:
 	clang-format removes spaces between functions!
 	clang-format inlines functions when told not to!
-	
-	name of file is full path instead of short name
 	

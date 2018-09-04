@@ -5,9 +5,8 @@ import xml.etree.ElementTree as ET # for XML parsing
 import subprocess # for calling other programs gracefully
 import shutil # to test for clang-format
 
-
 def header_get(root, filename):	
-	lb = '    \t' # use a standard number of spaces
+	lb = '\n    ' # use a standard number of spaces (4)
 	
 	header_text = '/*'
 	# get proper sections of xml file to insert
@@ -33,7 +32,7 @@ def header_get(root, filename):
 	return header_text
 
 def output_get(root):
-	lb = '\n\t'
+	lb = '\n    '
 	
 	output_text = '\n/*'
 	output_text += root.find('output').text + lb
@@ -43,20 +42,17 @@ def output_get(root):
 	
 	return output_text
 
-parser = argparse.ArgumentParser(description='Format c++ source files according to insert.xml doc')
+parser = argparse.ArgumentParser(description='Format c++ source files according to insert.xml doc.  If no arguments are supplied, format will pick up all \'.cpp\' and all \'.hpp\' files in current directory, and emit a new \'.new\' for each one.')
 parser.add_argument('--version', action='version', version='c++ classroom std checker v0.2')
 parser.add_argument('-v', '--verbose', action='store_true', help='enables verbose output.')
-parser.add_argument('-i', '--in_place', action='store_true', help='use the same file when editing.')
+parser.add_argument('-i', '--in_place', action='store_true', help='use the same file when editing, rather than creating a .new file.')
 parser.add_argument('-f', '--file', type=str, help='specify explicit file(s) to format')
 
 args = parser.parse_args()
 
-
 if not shutil.which('clang-format'):
 	print('ERROR: clang-format not installed or in PATH')
 	exit(2)
-
-
 
 # remove any previous modified files
 os.system('rm -f *.new')
@@ -84,12 +80,16 @@ root = tree.getroot()
 # then call clang-format for actual code formatting
 for cur_file in parse_files:
 	with open(cur_file, "r") as current_file:
-		header_str = header_get(root, current_file.name)
+		short_namelist = current_file.name.split('/')
+		short_filename = short_namelist[-1]
+
+		header_str = header_get(root, short_filename)
 		output_str = output_get(root)
 		
 		if args.verbose:
-			print('formatting file', cur_file)
+			print('formatting file', short_filename)
 		
+		# use full path for actual file operations because it is clearer and is not user-visible
 		with open(current_file.name + '.temp', "w") as temp:
 			temp.write(header_str + current_file.read() + output_str)
 			temp.close()
@@ -97,8 +97,6 @@ for cur_file in parse_files:
 			subprocess.run(['clang-format', '-style=file', current_file.name + '.temp'], stdout=final, check=True)
 			final.close()
 			if args.in_place:
-				# current_file.write(header_str + current_file.read() + output_str)
-				
 				os.system('mv ' + current_file.name + '.new ' + current_file.name)
 
 os.system('rm -f *.temp')
