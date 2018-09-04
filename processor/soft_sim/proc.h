@@ -5,6 +5,7 @@
 #include <stdbool.h>
 #include <setjmp.h>
 #include <stdarg.h>
+#include <assert.h>
 
 #pragma once
 
@@ -86,6 +87,7 @@ enum instruction_opcode {
 	SEX,
 	BN,
 	BS,
+	Bcc,
 	LD,
 	RST,
 };

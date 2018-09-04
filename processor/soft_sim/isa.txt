@@ -43,13 +43,9 @@ math
 	DIVB s0, s1, p, r	s0 / s1 (signed 16b)   -> {d0, d1}
 	DIVUB s0, s1, p, r	s0 / s1 (unsigned 16b) -> {d0, d1} //do we need all this?
 	
-	SEX s, d		sign of 8b num 	       -> 16b sign(d)
+	SEX s, d		sign of 8b num 	       -> 16b sign(d) //always two's compliment
 	
-	INC r		r + 1 (signed 16b) 	-> r
-	INCU r		r + 1 (unsigned 16b)	-> r
-
-	DEC r		r - 1 (signed 16b) 	-> r
-	DECU r		r - 1 (unsigned 16b)	-> r	
+	// inc and dec functionality provided by ADD r, 1, r
 	
 	AND s0, s1, d	s0 & s1 (signed 16b)   -> d
 	ANDU s0, s1, d	s0 & s1 (unsigned 16b) -> d
@@ -71,7 +67,7 @@ moving
 	
 branching
 	BN lit		lit		-> pc
-	BS r, add	s0 + s1		-> pc //BS s = BS s, R0
+	BS r, add	s0 + s1		-> pc //branch to r = BS r, R0
 
 	BR r		pc + r		-> pc //r treated as 16bu
 	
@@ -89,30 +85,33 @@ branching
 
 instruction encoding
 	31 30 29 28 27 26 25 24 23 22 21 20 19 18 17 16 15 14 13 12 11 10 9 8 7 6 5 4 3 2 1 0
-	|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx| pm  |    op    |  -> NOP/HALT (A)
+	|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx| pm  |    op    |  -> HALT (A)
 	|xxxxxxxxxxxxxxxx|                        imm                      | pm  |    op    |  -> BN imm (B)
 	|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|      r      | pm  |    op    |  -> INC r (C)
 	|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|      s       |      d      | pm  |    op    |  -> MOV s, d (D)
 	|x|                   imm                            |      r      | pm  |    op    |  -> LD imm, r (E)
+	|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|      s       |     addr    | pm  |    op    |  -> ST r, addr(D)
 	|xxxxxxxxxxxxxxxxxxxxxx|      s0      |      s1      |      d      | pm  |    op    |  -> ADD s0, s1, d (F)
 	
 opcode encoding
 	all 0 opcode is illegal (STOP pseudo-i in this sim)
 	 9 8 7 6 5 4 3 2 1 0
-	  |x x h|  NOP(1)  | h = 1 for halt
-	  |x b s|  ADD(1)  | b = 1 for word, s = 1 for signed
+	  |x x h|  NOP(x)  | h = 1 for halt
+	  |x b s|  ADD(x)  | b = 1 for word, s = 1 for signed
 	  |x b x|  MOV(x)  | b = 1 for word
 	  |x x m|  LD(x)   | m = 1 for mem, 0 for imm
+	  |x x x|  ST(x)   | 
 	  |x b i|  INC(x)  | i = 1 for inc, b = 1 for word
 	  |x x x|  BN(x)   |
-	  |x x r|  BR(x)   | r = 1 for +r //has to be seperate from BN due to differing instruction encoding
-
+	  |x x r|  BR(x)   | r = 1 for +r //has to be seperate from BN due to differing encoding
+	  |x x n|  BNZ(x)  | n = not equal
 
 
 test program:
-org (0x0000):
-	LD 3, R1
-	LD 1, R2
+org:
+	LD 4, R1 0x
+test:
+	LD 4, R2
 	ADDU R1, R2, R1
-	BR org
+	BN test (4)
 	

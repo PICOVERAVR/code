@@ -16,6 +16,8 @@ int main(int argc, char **argv) {
 	
 	state *s = malloc(sizeof(state));
 	uint16_t *ram = malloc(PROC_RAM);
+	
+	uint64_t instr_counter = 0;
 
 	jmp_buf start;
 	if (setjmp(start)) {
@@ -29,9 +31,17 @@ int main(int argc, char **argv) {
 	}
 
 	for(;;) {
-		s->p.i.raw_instr = hex_mem[s->p.PC];
-		s->p.PC += 4;
+		s->p.i.raw_instr = hex_mem[s->p.PC / sizeof(uint32_t)];
 		
+		s->p.PC += 4;
+		instr_counter++;
+
+		if (instr_counter == 8192) {
+			return 0;
+		}
+		
+		// every op is broken out into a function in order for profiler to catch all
+		// instructions that get executed
 		switch (s->p.i.opcode) {
 			case NOP: break;
 			case RST: longjmp(start, 1);
@@ -48,16 +58,18 @@ int main(int argc, char **argv) {
 				//
 				break;
 			case SEX:
-				instr_sub(&(s->p));
 				break;
 			case LD:
 				instr_ld(&(s->p), ram);
 				break;
 			case BN:
-				s->p.PC = s->p.i.b_imm;
+				instr_bn(&(s->p));
 				break;
 			case BS:
-				s->p.PC = s->p.regfile[s->p.i.d_s] + s->p.regfile[s->p.i.d_d];
+				instr_bs(&(s->p));
+				break;
+			case Bcc:
+				
 				break;
 			case STOP:
 				printf("reached STOP instr\n");
