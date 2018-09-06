@@ -2,7 +2,7 @@
 #include "setup.h"
 #include "execute.h" // for individual instruction implementations
 
-//varadic macro to free everything we allocated at start
+//varadic macro to free everything we allocated at start, in case we need this
 void free_state(int num_free, ...) {
 	va_list args;
 	va_start(args, num_free);
@@ -17,7 +17,7 @@ int main(int argc, char **argv) {
 	state *s = malloc(sizeof(state));
 	uint16_t *ram = malloc(PROC_RAM);
 	
-	uint64_t instr_counter = 0;
+	uint64_t perf_counter = 0;
 
 	jmp_buf start;
 	if (setjmp(start)) {
@@ -29,24 +29,39 @@ int main(int argc, char **argv) {
 		fprintf(stderr, "ERR: setup error.\n");
 		exit(EXCP_NO_HEX);
 	}
-
+	
+	/*
+		idea: write sim of peripherals as well
+			simple:
+				ultra-basic MMU
+					checking for jumping to 0x0
+					checking for execution outside of ROM/RAM area
+				timer
+				I/O handling
+				etc.
+		
+		make linked list of function pointers to update functions, pass processor state
+		run through all updates every processor cycle
+		should be able to trigger other stuff (cause list pointer to go back/forward)
+		
+	*/
+	
 	for(;;) {
 		s->p.i.raw_instr = hex_mem[s->p.PC / sizeof(uint32_t)];
 		
 		s->p.PC += 4;
-		instr_counter++;
-
-		if (instr_counter == 8192) {
-			return 0;
-		}
+		perf_counter++;
+		
 		
 		// every op is broken out into a function in order for profiler to catch all
 		// instructions that get executed
+		// also looks better
 		switch (s->p.i.opcode) {
 			case NOP: break;
 			case RST: longjmp(start, 1);
 			case ADD:
-				instr_add(&(s->p)); //do more error checking here!
+				instr_add(&(s->p)); //possible and a good idea to 
+						    //do more error checking here!
 				break;
 			case SUB:
 				instr_sub(&(s->p));
@@ -58,6 +73,7 @@ int main(int argc, char **argv) {
 				//
 				break;
 			case SEX:
+				instr_sex(&(s->p));
 				break;
 			case LD:
 				instr_ld(&(s->p), ram);
@@ -80,6 +96,6 @@ int main(int argc, char **argv) {
 		};
 		
 	}
-	fprintf(stderr, "reached end of program somehow...\n");
+	fprintf(stderr, "ERR: reached end of sim\n");
 	return INTERNAL_ERROR;
 }

@@ -54,6 +54,14 @@ typedef union {
 		unsigned int e_s      : 5;
 		unsigned int e_imm    : 16;
 	};
+	struct { // G type instruction
+		unsigned int g_opcode : 6;
+		unsigned int g_pm     : 3;
+		unsigned int g_l      : 5;
+		unsigned int g_h      : 5;
+		unsigned int g_s1     : 5;
+		unsigned int g_s0     : 5;
+	};
 	
 } instr;
 
@@ -74,7 +82,6 @@ typedef union {
 
 typedef struct {
 	proc p;
-	//other stuff possible here
 } state;
 
 enum instruction_opcode {

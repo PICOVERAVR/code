@@ -21,8 +21,8 @@ uint32_t *proc_setup(int argc, char **argv, state *s) {
 	fread(hex_mem, sizeof(uint32_t), hex_size, hex);
 	fclose(hex);
 	
-	hex_mem[hex_size] = 0; //make the file a string?
-	
+	hex_mem[hex_size-1] = 0; //make the file NULL-terminated, for ease of mind
+
 	memset(s, 0, sizeof(state)); //initialize processor state and set to zero
 	return hex_mem;
 }
