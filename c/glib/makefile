@@ -12,12 +12,8 @@ debug: pre
 	@$(CC) $(SRC) $(DFLAGS) `pkg-config --cflags --libs glib-2.0` -o 'db.out'
 	@echo "Debug build completed."
 
-all: pre
-	@$(CC) $(SRC) $(CFLAGS) -O3 -march=native -o 'prod.out' 
-	@echo "Optimized build completed."
-
 pre:
-	@echo "Building on: $(UNAME), user params: $(USER_FLAGS)"
+	@echo "Building on: $(UNAME), params: $(USER_FLAGS)"
 
 clean:
 	@rm -f *.out

@@ -9,12 +9,11 @@ WORKDIR /root
 SHELL ["/bin/bash", "-c"]
 
 # Update package cache and install all the packages I want
-RUN apt-get -y upgrade --yes
-RUN apt-get update --yes
+RUN apt-get -y update --yes
 
 RUN apt-get install --yes gcc g++ golang-go python3 # compilers/interpreters for languages I want
+RUN apt-get install --yes libglib2.0-dev # c data structures, cause rolling my own is stupid unless I want to
 RUN apt-get install --yes man strace valgrind vim gdb make git binutils # system/debugging tools
-RUN apt-get install --yes autotools-dev autoconf
 RUN apt-get install --yes flex bison # gnu parse tools
 RUN apt-get install --yes autotools-dev autoconf # gnu packaging tools
 
@@ -22,13 +21,15 @@ RUN apt-get update --yes
 RUN apt-get upgrade --yes
 RUN apt-get dist-upgrade --yes
 
-# Make port 80 available for anything and port 22 available for SSH
+# get .bashrc read here, not applying for some reason...
+
+# make port 80 available for networking
 EXPOSE 80
-EXPOSE 22 
 
 # build with: docker build -t base .
 # run with:
 # 	(Windows) docker run -it --rm -v C:\Users\kyle\Desktop\dev\:/root/ -v C:\Users\kyle\:/mnt --privileged --name base base bash
-#	(mscOS) docker run -it --rm -v /Users/kyleneil/code/main:/root/ -v /Users/kyleneil:/mnt base bash
+#	(macOS) docker run -it --rm -v /Users/kyleneil/code/main:/root/ -v /Users/kyleneil:/mnt --name base base bash
 # to clean "<none>:<none>" files: docker system prune
-# NOTE: docker system prune makes updating the dockerfile take forever to re-install everything
+
+

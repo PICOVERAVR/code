@@ -3,6 +3,7 @@
 	last = log -1 HEAD --oneline
 	hist = log -15 --graph --decorate --oneline
 	b =  branch -av
+	stash = stash -u
 [user]
 	email = kyle@johnneil.net
 	name = Kyle Neil
