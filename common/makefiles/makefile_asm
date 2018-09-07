@@ -6,15 +6,15 @@ DFLAGS := $(FLAGS) -g
 UNAME := $(shell uname)
 
 debug: pre
-	@$(CC) $(DFLAGS) $(SRC) -o debug.out
-	@echo "debug build completed."
+	@$(CC) $(DFLAGS) $(SRC) -o db.out
+	@echo "Debug build completed."
 
 release: pre
 	@$(CC) $(FLAGS) $(SRC)-o release.out
-	@echo "zipped build completed."
+	@echo "Zipped build completed."
 
 pre:
-	@echo "building on: $(UNAME)"
+	@echo "Building on: $(UNAME)"
 	
 clean:
 	@rm -f	{*.out,*.o}
