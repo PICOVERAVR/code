@@ -10,10 +10,12 @@ int instr_add(proc *p);
 int instr_sub(proc *p);
 
 int instr_mul(proc *p);
-
+int instr_div(proc *p);
 
 void instr_ld(proc *p, uint16_t *ram);
 void instr_st(proc *p, uint16_t *ram);
+
+void instr_mov(proc *p);
 
 void instr_bn(proc *p);
 void instr_bs(proc *p);

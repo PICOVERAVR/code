@@ -1,7 +1,7 @@
 memory map:
 
      0xffff
- ______________
+ ==============
 |              |
 |              |
 |              |
@@ -9,16 +9,33 @@ memory map:
        ...     
 |              |
 |              |
-|              | 
-|------rom-----| 0x900 (2048)
-|xxxxxxxxxxxxxx|
-|------rom-----| 0x100 (256)
+|------ram-----| 0x1100 
+|xxxxxxxxxxxxxx|		2KB data ram
+|------ram-----| 0x900 
+|------rom-----| 0x900
+|xxxxxxxxxxxxxx|		2KB program memory
+|------rom-----| 0x100
 |              |
 |              |
  ==============  0x0
 
-test program:
+ABI:
+	parameters passed in R1 -> R4
+	result returned in R1 (-> R4?)
+	
+	int func(arg1, arg2, arg3, arg4);
+		arg1 -> R1
+		arg2 -> R2
+		arg3 -> R3
+		arg4 -> R4
+		return -> R1
+	
+	R1 - R15: caller saved, usable as temp registers
+	R16 - R31: callee saved, save before touching
+	
+	
 
+(jmp_add.bin)
 .org 0x100
 org:
 	LD 4, R1
@@ -27,6 +44,15 @@ test:
 	ADDU R1, R2, R1
 	INC R2 -- ADD 1, R2, R2
 	BN 0x104
+
+(exp.bin)
+.org 0x100
+org:
+	LD 2, R1
+	MOV R1, R2
+	MUL R1, R2, R1
 	
+	
+
 I should write a flex/bison parser for the assembly, it would make writing programs way easier!
 

@@ -53,15 +53,23 @@ int instr_mul(proc *p) {
 			p->regfile[p->i.g_l] = temp & 0xffff;
 			break;
 		case 1:
+			p->regfile[p->i.g_h] = (int16_t) ((temp >> 16) & 0xffff);
+			p->regfile[p->i.g_l] = (int16_t) (temp & 0xffff);
 			break;
 		case 2:
+			p->regfile[p->i.g_l] = (uint8_t) (temp & 0xffff);
 			break;
 		case 3:
+			p->regfile[p->i.g_l] = (int8_t) (temp & 0xffff);
 			break;
-
 		default:
 			return EXCP_ILL_OPCODE;
 	}
+	return 0;
+}
+
+int instr_div(proc *p) {
+	
 	return 0;
 }
 
@@ -75,6 +83,13 @@ void instr_ld(proc *p, uint16_t *ram) {
 		p->regfile[p->i.e_s] = ram[p->regfile[p->i.e_imm]];
 	}
 	p->regfile[p->i.e_s] = p->i.e_imm;
+}
+
+void instr_mov(proc *p) {
+	if (p->i.d_s == REGISTER_R0) {
+		return;
+	}
+	p->regfile[p->i.d_d] = p->regfile[p->i.d_s];
 }
 
 void instr_st(proc *p, uint16_t *ram) {

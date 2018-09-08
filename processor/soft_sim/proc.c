@@ -2,16 +2,6 @@
 #include "setup.h"
 #include "execute.h" // for individual instruction implementations
 
-//varadic macro to free everything we allocated at start, in case we need this
-void free_state(int num_free, ...) {
-	va_list args;
-	va_start(args, num_free);
-	for (int i = 0; i < num_free; i++) {
-		free(va_arg(args, void *));
-	}
-	va_end(args);
-}
-
 int main(int argc, char **argv) {
 	
 	state *s = malloc(sizeof(state));
@@ -29,22 +19,6 @@ int main(int argc, char **argv) {
 		fprintf(stderr, "ERR: setup error.\n");
 		exit(EXCP_NO_HEX);
 	}
-	
-	/*
-		idea: write sim of peripherals as well
-			simple:
-				ultra-basic MMU
-					checking for jumping to 0x0
-					checking for execution outside of ROM/RAM area
-				timer
-				I/O handling
-				etc.
-		
-		make linked list of function pointers to update functions, pass processor state
-		run through all updates every processor cycle
-		should be able to trigger other stuff (cause list pointer to go back/forward)
-		
-	*/
 	
 	for(;;) {
 		s->p.i.raw_instr = hex_mem[s->p.PC / sizeof(uint32_t)];
