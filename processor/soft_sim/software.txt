@@ -38,7 +38,7 @@ ABI:
 (jmp_add.bin)
 .org 0x100
 org:
-	LD 4, R1
+	LD 3, R1
 	LD 0, R2
 test:
 	ADDU R1, R2, R1
