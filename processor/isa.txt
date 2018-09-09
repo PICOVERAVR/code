@@ -40,12 +40,13 @@ math
 	MULB s0, s1, d		s0 * s1 (signed 16b)    -> d
 	MULUB s0, s1, d 	s0 * s1 (unsigned 16b)  -> d
 	
-	DIV s0, s1, p, r	s0 / s1 (signed 16b)   -> {d0, d1} //d0 = res, d1 = rem
-	DIVU s0, s1, p, r	s0 / s1 (unsigned 16b) -> {d0, d1}
-	DIVB s0, s1, p, r	s0 / s1 (signed 16b)   -> {d0, d1}
-	DIVUB s0, s1, p, r	s0 / s1 (unsigned 16b) -> {d0, d1}
+	//d0 = res, d1 = rem
+	DIV s0, s1, p, r	s0 / s1 (32bs)   -> {d0, d1} 	
+	DIVU s0, s1, p, r	s0 / s1 (32bu) -> {d0, d1}
+	DIVB s0, s1, p, r	s0 / s1 (16bs)   -> {d0, d1}
+	DIVUB s0, s1, p, r	s0 / s1 (16bu) -> {d0, d1}
 	
-	SEX s			sign of 8b num 	       -> 16b sign(d) //always two's compliment
+	SEX s			8b sign(s) -> 16b sign(d)	s
 	
 	// inc and dec functionality provided by ADD r, 1, r
 	
@@ -69,9 +70,10 @@ math
 	
 moving
 	MOV s, d	s (16b)		-> d		s
-	MOVB s, d	s (8b)		-> d
+	MOVB s, d	s (8b)		-> d		s
 	
-	LD addr, r	mem[addr]	-> r //no LDB or STB, aligns stuff on 2-byte boundary
+	//no LDB or STB, aligns stuff on 2-byte boundary
+	LD addr, r	mem[addr]	-> r 	
 	LD i, r		mem[i]		-> r
 	LD imm, r	imm		-> r
 	
@@ -144,7 +146,6 @@ opcode encoding
 	  |x b i|  INC(x)  | i = 1 for inc, b = 1 for word
 	  |x x x|  BN(x)   |
 	  |x x r|  BR(x)   | r = 1 for +r //has to be seperate from BN due to differing encoding
-	  |x x n|  BNZ(x)  | n = not equal
-
+	  |c c c|  Bcc(x)  | c = condition code
 
 

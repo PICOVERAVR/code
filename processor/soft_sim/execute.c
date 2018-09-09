@@ -57,10 +57,10 @@ int instr_mul(proc *p) {
 			p->regfile[p->i.g_l] = (int16_t) (temp & 0xffff);
 			break;
 		case 2:
-			p->regfile[p->i.g_l] = (uint8_t) (temp & 0xffff);
+			p->regfile[p->i.g_l] = (uint16_t) (temp & 0xffff);
 			break;
 		case 3:
-			p->regfile[p->i.g_l] = (int8_t) (temp & 0xffff);
+			p->regfile[p->i.g_l] = (int16_t) (temp & 0xffff);
 			break;
 		default:
 			return EXCP_ILL_OPCODE;
@@ -74,22 +74,27 @@ int instr_div(proc *p) {
 }
 
 void instr_ld(proc *p, uint16_t *ram) {
-
 	if (p->i.e_s == REGISTER_R0) { 
 		return; //writing to R0 has no effect
 	}
 
 	if (p->i.pm == 1) {
 		p->regfile[p->i.e_s] = ram[p->regfile[p->i.e_imm]];
+	} else {
+		p->regfile[p->i.e_s] = p->i.e_imm;
 	}
-	p->regfile[p->i.e_s] = p->i.e_imm;
 }
 
 void instr_mov(proc *p) {
-	if (p->i.d_s == REGISTER_R0) {
+	if (p->i.d_d == REGISTER_R0) {
 		return;
 	}
-	p->regfile[p->i.d_d] = p->regfile[p->i.d_s];
+	
+	if (p->i.pm == 2) {
+		p->regfile[p->i.d_d] = (uint8_t) p->regfile[p->i.d_s];
+	} else {	
+		p->regfile[p->i.d_d] = p->regfile[p->i.d_s];
+	}
 }
 
 void instr_st(proc *p, uint16_t *ram) {
@@ -107,7 +112,30 @@ void instr_bn(proc *p) {
 void instr_sex(proc *p) {
 	// don't really need to know how to do this at any level, verilog 
 	// handles this?
+	// s assumed to be 8bs
 	p->regfile[p->i.c_s] = (int16_t) p->regfile[p->i.c_s];
 }
 
+void instr_bcc(proc *p) { // F type
+	switch (p->i.pm) {
+		case BRANCH_EQ: 
+			if (p->regfile[p->i.f_s0] == p->regfile[p->i.f_s1]) { 
+				p->PC = p->regfile[p->i.f_d]; 
+			} break;
 
+		case BRANCH_NE:
+			break;
+		case BRANCH_GT:
+			break;
+		case BRANCH_GE:
+			break;
+		case BRANCH_LT:
+			break;
+		case BRANCH_LE:
+			break;
+		case BRANCH_Z:
+			break;
+		case BRANCH_NZ:
+			break;
+	}
+}
