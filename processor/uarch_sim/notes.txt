@@ -1,0 +1,16 @@
+1. Get software sim working! -- test out instructions we may want?
+2. Translate to execution units
+	how to execute in parallel:
+		have two linked lists of function pointers, traverse through and write
+		results to other linked list
+		
+		only one list is running at a time
+		unsure if this works...
+		
+	still pass the entire processor state between stages
+	here we get to deal with hazards!
+
+3. verify output of uarch sim against soft_sim
+4. update isa.txt
+5. write into hardware
+

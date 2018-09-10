@@ -1,7 +1,5 @@
 # bashrc read when starting subshells
 
-
-
 export SHELL=/bin/bash
 export EDITOR=/usr/bin/vim
 

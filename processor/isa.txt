@@ -1,0 +1,151 @@
+ISA
+=======
+
+16 bit RISC processor
+
+//give a reason as to how this is different than RISC-V.
+
+32 16-bit registers (R0 - R31)
+	R31: PC - hardwired
+	R30: SP
+	R29: BP
+	R0:  0x0 - hardwired
+
+Three operand format for everything
+register-register architecture
+
+no status register, just compare and branch
+
+"s" indicates implemented in soft_sim
+
+control
+	HALT			stop the processor	s
+	//not specified whether this is a seperate bus or just extra pin
+	IN p, r			in_port	       -> r
+	OUT r, p		r	       -> p
+
+math
+	ADD s0, s1, d	s0 + s1 (signed 16b)   -> d	s
+	ADDU s0, s1, d	s0 + s1 (unsigned 16b) -> d	s
+	ADDB s0, s1, d	s0 + s1 (signed 8b)    -> d	s
+	ADDUB s0, s1, d s0 + s1 (unsigned 8b)  -> d	s
+	
+	SUB s0, s1, d	s0 - s1 (signed 16b)   -> d	s
+	SUBU s0, s1, d	s0 - s1 (unsigned 16b) -> d	s
+	SUBB s0, s1, d	s0 - s1 (signed 8b)    -> d	s
+	SUBUB s0, s1, d s0 - s1 (unsigned 8b)  -> d	s
+
+	MUL s0, s1, h, L	s0 * s1 (signed 32b)    -> {h, L}
+	MULU s0, s1, h, L	s0 * s1 (unsigned 32b)  -> {h, L}
+	MULB s0, s1, d		s0 * s1 (signed 16b)    -> d
+	MULUB s0, s1, d 	s0 * s1 (unsigned 16b)  -> d
+	
+	//d0 = res, d1 = rem
+	DIV s0, s1, p, r	s0 / s1 (32bs)   -> {d0, d1} 	
+	DIVU s0, s1, p, r	s0 / s1 (32bu) -> {d0, d1}
+	DIVB s0, s1, p, r	s0 / s1 (16bs)   -> {d0, d1}
+	DIVUB s0, s1, p, r	s0 / s1 (16bu) -> {d0, d1}
+	
+	SEX s			8b sign(s) -> 16b sign(d)	s
+	
+	// inc and dec functionality provided by ADD r, 1, r
+	
+	AND s0, s1, d	s0 & s1 (signed 16b)   -> d
+	ANDU s0, s1, d	s0 & s1 (unsigned 16b) -> d
+	ANDB s0, s1, d  s0 & s1 (signed 8b)    -> d
+	ANDUB s0, s1, d s0 & s1 (unsigned 8b)  -> d
+	
+	OR s0, s1, d	s0 | s1 (signed 16b)   -> d
+	ORU s0, s1, d	s0 | s1 (unsigned 16b) -> d
+	ORB s0, s1, d   s0 | s1 (signed 8b)    -> d
+	ORUB s0, s1, d  s0 | s1 (unsigned 8b)  -> d
+
+	XOR s0, s1, d	s0 ^ s1 (signed 16b)   -> d
+	XORU s0, s1, d	s0 ^ s1 (unsigned 16b) -> d
+	XORB s0, s1, d  s0 ^ s1 (signed 8b)    -> d
+	XORUB s0, s1, d s0 ^ s1 (unsigned 8b)  -> d
+
+	NOT s		~s		       -> d
+	INV s		twos_comp(s)	       -> d
+	
+moving
+	MOV s, d	s (16b)		-> d		s
+	MOVB s, d	s (8b)		-> d		s
+	
+	//no LDB or STB, aligns stuff on 2-byte boundary
+	LD addr, r	mem[addr]	-> r 	
+	LD i, r		mem[i]		-> r
+	LD imm, r	imm		-> r
+	
+	ST r, addr	r		-> addr
+	ST r, i		r		-> mem[i]
+	ST r, imm	r		-> mem[imm]
+	
+branching
+	BN lit		lit		-> pc		s
+	
+	BS r, add	s0 + s1		-> pc		s
+	//branch to r = BS r, R0
+
+	BR r		pc + r		-> pc		s
+	//r treated as 16bu
+	
+	//no literal jumping like this
+	BE s, d, r	(s == d)?	-> r 	
+	BNE s, d, r	(s != d)?	-> r
+	
+	BGT s, d, r	(s > d)?	-> r
+	BGE s, d, r	(s >= d)?	-> r
+
+	BLT s, d, r	(s < d)?	-> r
+	BLE s, d, r	(s <= d)?	-> r
+	
+	BZ s, r		(s == 0)?	-> r
+	BNZ s, r	(s != 0)?	-> r
+
+stack
+	// manipulated using existing instructions
+	// 
+
+instruction encoding
+
+31 30 29 28 27 26 25 24 23 22 21 20 19 18 17 16 15 14 13 12 11 10 9 8 7 6 5 4 3 2 1 0
+|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx| pm  |    op    |  -> HALT (A)
+|xxxxxxxxxxxxxxxx|                        imm                      | pm  |    op    |  -> BN imm (B)
+|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|      r      | pm  |    op    |  -> INC r (C)
+|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|      s       |      d      | pm  |    op    |  -> MOV s, d (D)
+|x|                   imm                            |      r      | pm  |    op    |  -> LD imm, r (E)
+|xxxxxxxxxxxxxxxxxxxxxx|      s0      |      s1      |      d      | pm  |    op    |  -> ADD s0, s1, d (F)
+|xxxxxxx|      s0      |      s1      |      h       |      l      | pm  |    op    |  -> MUL s0, s1, h, L (G)
+
+possible formats to add
+
+// branch to literal, max jump distance +-4K
+// extra possible encoding, not sure if we need this
+|                 imm                 |      s0      |      s1     | pm  |    op    |  -> BNZ s0, s1, imm (X)
+
+possible instructions to add
+
+//two operand
+//more explicit than
+	LD 1, ri
+	ADD r, ri, r
+//math can now happen in more than one format, slows down decoding?
+//less RISC
+ADD imm, r	imm + r -> r
+
+	
+opcode encoding
+	all 0 opcode is illegal (STOP pseudo-i in this sim)
+	 9 8 7 6 5 4 3 2 1 0
+	  |x x h|  NOP(x)  | h = 1 for halt
+	  |x b s|  ADD(x)  | b = 1 for word, s = 1 for signed
+	  |x b x|  MOV(x)  | b = 1 for word
+	  |x x m|  LD(x)   | m = 1 for mem, 0 for imm
+	  |x x x|  ST(x)   | 
+	  |x b i|  INC(x)  | i = 1 for inc, b = 1 for word
+	  |x x x|  BN(x)   |
+	  |x x r|  BR(x)   | r = 1 for +r //has to be seperate from BN due to differing encoding
+	  |c c c|  Bcc(x)  | c = condition code
+
+

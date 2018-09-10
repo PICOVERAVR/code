@@ -1,23 +1,23 @@
 to do:
 	write simulator in C
 		have some way of verifying that the output is correct!
-		nothing low level, just identify instructions we want/need
+		nothing low level, just identify instructions we want/need and encoding
 		a great chance to use new features of c that I wouldn't touch!
 	? write assembler in yacc/bison (normally would create backend for gcc)
 	write low-level simulator in C
 		include microarchitecture this time
 		start with something that works properly, then play around with optimizations
-		once happy, freeze the design
 	write verilog code
 		interface to actual FPGA
 		learn Xilinx-specific IP and use it (block memory, etc.)
 		simulate it
 	upload to actual FPGA
 		should work after all this testing... hopefully
-		write support verliog (UART, memory, etc.)
+		write support verilog (UART, memory, etc.)
 	
 	THEN
 		name it
+		add doc
 		show people
-		put on github
+		put in showcase
 

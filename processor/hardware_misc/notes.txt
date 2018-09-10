@@ -1,0 +1,11 @@
+bus:
+
+32b addr
+16b data
+
+1b r/w
+1b periph/mem
+
+1b clk
+1b rst
+

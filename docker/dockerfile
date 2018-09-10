@@ -23,7 +23,6 @@ RUN apt-get dist-upgrade --yes
 
 # get .bashrc read here, not applying for some reason...
 
-# make port 80 available for networking
 EXPOSE 80
 
 # build with: docker build -t base .
