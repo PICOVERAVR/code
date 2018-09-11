@@ -8,7 +8,7 @@ s->proc_ext_state |= val << bitpos
 #define PROC_FEAT_GET(bitpos) \
 (s->proc_ext_state >> bitpos) & 1
 
-bool interrupt_requested;
+volatile sig_atomic_t interrupt_requested = 0;
 
 static void interrupt_handle(state *s) {
 	
@@ -25,7 +25,7 @@ static void interrupt_handle(state *s) {
 }
 
 void signal_handler(int signum) {
-	interrupt_requested = true;
+	interrupt_requested = 1;
 }
 
 int main(int argc, char **argv) {

@@ -159,6 +159,6 @@ opcode encoding
 interrupt architecture:
 	jump to proper vector
 	no saving of registers, extra instructions
-	
+	undefined behavior for executing unused interrupt vector
 
 
