@@ -11,6 +11,13 @@ ISA
 	R29: BP
 	R0:  0x0 - hardwired
 
+seperate external processor feature register
+ 15 14 13 12 11 10  9  8  7  6  5  4  3  2  1  0
+| x  x  x  x  x  x  x  x  x  x  x  x  x  x  r  i |
+
+i = interrupt enable
+r = processor reset
+
 Three operand format for everything
 register-register architecture
 
@@ -21,9 +28,9 @@ no status register, just compare and branch
 control
 	HALT			stop the processor	s
 	//not specified whether this is a seperate bus or just extra pin
-	IN p, r			in_port	       -> r
-	OUT r, p		r	       -> p
-
+	IO			r	       -> out
+				in	       -> r
+	
 math
 	ADD s0, s1, d	s0 + s1 (signed 16b)   -> d	s
 	ADDU s0, s1, d	s0 + s1 (unsigned 16b) -> d	s
@@ -35,10 +42,10 @@ math
 	SUBB s0, s1, d	s0 - s1 (signed 8b)    -> d	s
 	SUBUB s0, s1, d s0 - s1 (unsigned 8b)  -> d	s
 
-	MUL s0, s1, h, L	s0 * s1 (signed 32b)    -> {h, L}
-	MULU s0, s1, h, L	s0 * s1 (unsigned 32b)  -> {h, L}
-	MULB s0, s1, d		s0 * s1 (signed 16b)    -> d
-	MULUB s0, s1, d 	s0 * s1 (unsigned 16b)  -> d
+	MUL s0, s1, h, L	s0 * s1 (signed 32b)    -> {h, L}	s
+	MULU s0, s1, h, L	s0 * s1 (unsigned 32b)  -> {h, L}	s
+	MULB s0, s1, d		s0 * s1 (signed 16b)    -> d		s
+	MULUB s0, s1, d 	s0 * s1 (unsigned 16b)  -> d		s
 	
 	//d0 = res, d1 = rem
 	DIV s0, s1, p, r	s0 / s1 (32bs)   -> {d0, d1} 	
@@ -147,6 +154,7 @@ opcode encoding
 	  |x x x|  BN(x)   |
 	  |x x r|  BR(x)   | r = 1 for +r //has to be seperate from BN due to differing encoding
 	  |c c c|  Bcc(x)  | c = condition code
+	  |x x i|  IO(x)   | i = 1 for input
 
 interrupt architecture:
 	jump to proper vector

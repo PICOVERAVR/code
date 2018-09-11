@@ -23,6 +23,8 @@ void instr_bcc(proc *p);
 
 void instr_sex(proc *p);
 
+void instr_io(proc *p);
+
 enum COND_BRANCH_TYPES {
 	BRANCH_EQ,
 	BRANCH_NE,

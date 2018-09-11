@@ -43,10 +43,9 @@ ABI:
 .org 0x100
 org:
 	LD 3, R1
-	LD 0, R2
+	LD 3, R2
 test:
 	ADDU R1, R2, R1
-	INC R2 -- ADD 1, R2, R2
 	BN 0x104
 
 (exp.bin)
@@ -55,8 +54,8 @@ org:
 	LD 2, R1
 	MOV R1, R2
 	MUL R1, R2, R1
-	
-	
+	BN 0x104	
+
 
 I should write a flex/bison parser for the assembly, it would make writing programs way easier!
 

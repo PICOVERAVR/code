@@ -141,3 +141,17 @@ void instr_bcc(proc *p) { // F type
 			break;
 	}
 }
+
+void instr_io(proc *p) { // E type
+	if (p->i.e_pm) { // input op
+		int temp;
+		printf("16bu io input: ");
+		scanf("%d", &temp);
+		p->regfile[p->i.e_s] = (uint16_t) temp;
+	} else { // output op
+		printf("16bu io output: %d\n", p->regfile[p->i.e_s]);
+	}
+}
+
+
+

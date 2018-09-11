@@ -12,13 +12,17 @@
 
 #define EXCP_ILL_OPCODE 1
 
+// organize into enums
 #define INTERNAL_ERROR 2
+#define NO_HEX_ERROR 3
 
-#define EXCP_NO_HEX 3
 #define SIM_STOP 4
 
 #define PROC_RAM 2048
 //rom is as big as the hex file
+
+#define PROC_FEAT_IE 0
+
 
 typedef union {
 	uint32_t raw_instr;
@@ -83,6 +87,7 @@ typedef union {
 
 typedef struct {
 	proc p;
+	uint16_t proc_ext_state;
 } state;
 
 enum instruction_opcode {
@@ -97,6 +102,7 @@ enum instruction_opcode {
 	BS,
 	Bcc,
 	LD,
+	IO,
 	RST,
 };
 
