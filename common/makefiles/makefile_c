@@ -1,7 +1,7 @@
 CC = gcc
 STANDARD = -std=gnu11
 CFLAGS = -Wall $(STANDARD) # use gnu11 as default...
-DFLAGS = $(CFLAGS) $(STANDARD) -g -pg # generate symbol information
+DFLAGS = $(CFLAGS) $(STANDARD) -g # generate symbol information
 
 SRC := $(filter-out test.c, $(wildcard *.c)) # grab anything with a .c ending
 

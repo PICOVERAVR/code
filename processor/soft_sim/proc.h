@@ -6,6 +6,7 @@
 #include <setjmp.h>
 #include <stdarg.h>
 #include <assert.h>
+#include <signal.h>
 
 #pragma once
 
@@ -71,7 +72,7 @@ typedef union {
 		instr raw_i;
 	};
 	struct {
-		uint16_t R0;
+		const uint16_t R0;
 		uint16_t user_regfile[28];
 		uint16_t BP;
 		uint16_t SP;

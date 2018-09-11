@@ -124,7 +124,9 @@ void instr_bcc(proc *p) { // F type
 			} break;
 
 		case BRANCH_NE:
-			break;
+			if (p->regfile[p->i.f_s0] != p->regfile[p->i.f_s1]) {
+				p->PC = p->regfile[p->i.f_d];
+			} break;
 		case BRANCH_GT:
 			break;
 		case BRANCH_GE:

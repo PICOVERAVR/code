@@ -11,13 +11,17 @@ memory map:
 |              |
 |------ram-----| 0x1100 
 |xxxxxxxxxxxxxx|		2KB data ram
-|------ram-----| 0x900 
-|------rom-----| 0x900
+|---rom/ram----| 0x900
 |xxxxxxxxxxxxxx|		2KB program memory
 |------rom-----| 0x100
 |              |
 |              |
  ==============  0x0
+
+
+0x0: reset vector
+0x1 - 0x8: interrupt level vector
+// other error vectors here
 
 ABI:
 	parameters passed in R1 -> R4

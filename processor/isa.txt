@@ -120,7 +120,7 @@ instruction encoding
 
 possible formats to add
 
-// branch to literal, max jump distance +-4K
+// branch to literal, max jump distance +-4K (12b, not 16b literal!)
 // extra possible encoding, not sure if we need this
 |                 imm                 |      s0      |      s1     | pm  |    op    |  -> BNZ s0, s1, imm (X)
 
@@ -147,5 +147,10 @@ opcode encoding
 	  |x x x|  BN(x)   |
 	  |x x r|  BR(x)   | r = 1 for +r //has to be seperate from BN due to differing encoding
 	  |c c c|  Bcc(x)  | c = condition code
+
+interrupt architecture:
+	jump to proper vector
+	no saving of registers, extra instructions
+	
 
 

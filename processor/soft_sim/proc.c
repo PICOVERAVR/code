@@ -2,12 +2,20 @@
 #include "setup.h"
 #include "execute.h" // for individual instruction implementations
 
+bool interrupt_requested;
+
+void signal_handler(int signum) {
+	interrupt_requested = true;
+}
+
 int main(int argc, char **argv) {
-	
 	state *s = malloc(sizeof(state));
 	uint16_t *ram = malloc(PROC_RAM);
 	
 	uint64_t perf_counter = 0;
+	
+	interrupt_requested = false;
+	unsigned int interrupt_level = 0;
 
 	jmp_buf start;
 	if (setjmp(start)) {
@@ -20,13 +28,32 @@ int main(int argc, char **argv) {
 		exit(EXCP_NO_HEX);
 	}
 	
+	interrupt_requested = false;
+	signal(SIGQUIT, signal_handler);
+
+	printf("starting simulation... (ctl-\\ for interrupt)\n");
 	for(;;) {
-		s->p.i.raw_instr = hex_mem[s->p.PC / sizeof(uint32_t)];
-		
-		s->p.PC += 4;
+		if (interrupt_requested) {
+			printf("Caught interrupt\n");
+			printf("3bu ilevel: ");
+			scanf("%d", &interrupt_level);
+			
+			if (interrupt_level > 7) {
+				printf("WARN: invalid interrupt level!\n");
+			}
+
+			s->p.PC = 4 * interrupt_level; // jump to interrupt vector
+			interrupt_requested = false; // clear interrupt flag
+
+			// if we save registers here, we'll have to restore them later, and provide instructions to do so.
+			
+		} else {
+			s->p.i.raw_instr = hex_mem[s->p.PC / sizeof(uint32_t)];
+			s->p.PC += 4;
+		}
+
 		perf_counter++;
-		
-		
+			
 		// every op is broken out into a function in order for profiler to catch all
 		// instructions that get executed
 		// also looks better
@@ -59,13 +86,13 @@ int main(int argc, char **argv) {
 				instr_bs(&(s->p));
 				break;
 			case Bcc:
-				
+				instr_bcc(&(s->p));
 				break;
 			case STOP:
-				printf("reached STOP instr\n");
+				printf("WARN: reached STOP instr\n");
 				return SIM_STOP;
 			default: 
-				printf("unknown opcode!\n");
+				printf("ERR: unknown opcode!\n");
 				return EXCP_ILL_OPCODE;
 		};
 		
