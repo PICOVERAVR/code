@@ -82,6 +82,21 @@ int main(int argc, char **argv) {
 			case DIV:
 				//
 				break;
+			case AND:
+				instr_and(&(s->p));
+				break;
+			case OR:
+				instr_or(&(s->p));
+				break;
+			case XOR:
+				instr_xor(&(s->p));
+				break;
+			case NOT:
+				instr_not(&(s->p));
+				break;
+			case INV:
+				instr_inv(&(s->p));
+				break;
 			case SEX:
 				instr_sex(&(s->p));
 				break;

@@ -103,6 +103,11 @@ enum instruction_opcode {
 	Bcc,
 	LD,
 	IO,
+	AND,
+	OR,
+	XOR,
+	NOT,
+	INV,
 	RST,
 };
 

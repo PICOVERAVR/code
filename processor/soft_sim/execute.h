@@ -9,6 +9,13 @@
 int instr_add(proc *p);
 int instr_sub(proc *p);
 
+int instr_and(proc *p);
+int instr_or(proc *p);
+int instr_xor(proc *p);
+
+int instr_not(proc *p);
+int instr_inv(proc *p);
+
 int instr_mul(proc *p);
 int instr_div(proc *p);
 

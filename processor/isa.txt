@@ -110,9 +110,16 @@ branching
 	BZ s, r		(s == 0)?	-> r
 	BNZ s, r	(s != 0)?	-> r
 
-stack
-	// manipulated using existing instructions
-	// 
+control
+	
+	CALL imm16
+		ST PC, SP
+		SUB 4, SP, SP
+		BN imm16
+	
+	RET
+		ADD 4, SP, SP
+		LD SP, PC
 
 instruction encoding
 
@@ -161,4 +168,6 @@ interrupt architecture:
 	no saving of registers, extra instructions
 	undefined behavior for executing unused interrupt vector
 
+	does a hardware-initiated CALL instruction to vector
+	RET returns to normal code
 

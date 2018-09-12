@@ -2,7 +2,8 @@
 
 #define REGISTER_R0 0
 
-// F type instruction
+// F type instructions for arithmetic
+// there is no checking for R0 write for any of this.
 int instr_add(proc *p) {
 	switch (p->i.pm) {
 		case 0: 
@@ -70,6 +71,108 @@ int instr_mul(proc *p) {
 
 int instr_div(proc *p) {
 	
+	return 0;
+}
+
+int instr_and(proc *p) {
+	switch (p->i.pm) {
+		case 0: 
+			p->regfile[p->i.f_d] = p->regfile[p->i.f_s0] & p->regfile[p->i.f_s1];
+			break;;
+		case 1: 
+			p->regfile[p->i.f_d] = (int16_t) p->regfile[p->i.f_s0] & (int16_t) p->regfile[p->i.f_s1];
+			break;
+		case 2: 
+			p->regfile[p->i.f_d] = (uint8_t) p->regfile[p->i.f_s0] & (uint8_t) p->regfile[p->i.f_s1];
+			break;
+		case 3: 
+			p->regfile[p->i.f_d] = (int8_t) p->regfile[p->i.f_s0] & (int8_t) p->regfile[p->i.f_s1];
+			break;
+		default:
+			return EXCP_ILL_OPCODE;
+	}
+	return 0;
+}
+
+int instr_or(proc *p) {
+	switch (p->i.pm) {
+		case 0: 
+			p->regfile[p->i.f_d] = p->regfile[p->i.f_s0] | p->regfile[p->i.f_s1];
+			break;;
+		case 1: 
+			p->regfile[p->i.f_d] = (int16_t) p->regfile[p->i.f_s0] | (int16_t) p->regfile[p->i.f_s1];
+			break;
+		case 2: 
+			p->regfile[p->i.f_d] = (uint8_t) p->regfile[p->i.f_s0] | (uint8_t) p->regfile[p->i.f_s1];
+			break;
+		case 3: 
+			p->regfile[p->i.f_d] = (int8_t) p->regfile[p->i.f_s0] | (int8_t) p->regfile[p->i.f_s1];
+			break;
+		default:
+			return EXCP_ILL_OPCODE;
+	}
+	return 0;
+}
+
+int instr_xor(proc *p) {
+	switch (p->i.pm) {
+		case 0: 
+			p->regfile[p->i.f_d] = p->regfile[p->i.f_s0] ^ p->regfile[p->i.f_s1];
+			break;;
+		case 1: 
+			p->regfile[p->i.f_d] = (int16_t) p->regfile[p->i.f_s0] ^ (int16_t) p->regfile[p->i.f_s1];
+			break;
+		case 2: 
+			p->regfile[p->i.f_d] = (uint8_t) p->regfile[p->i.f_s0] ^ (uint8_t) p->regfile[p->i.f_s1];
+			break;
+		case 3: 
+			p->regfile[p->i.f_d] = (int8_t) p->regfile[p->i.f_s0] ^ (int8_t) p->regfile[p->i.f_s1];
+			break;
+		default:
+			return EXCP_ILL_OPCODE;
+	}
+	return 0;
+	
+}
+
+int instr_not(proc *p) {
+	switch (p->i.pm) {
+		case 0: 
+			p->regfile[p->i.f_d] = ~p->regfile[p->i.f_s0];
+			break;
+		case 1: 
+			p->regfile[p->i.f_d] = (int16_t) ~p->regfile[p->i.f_s0];
+			break;
+		case 2: 
+			p->regfile[p->i.f_d] = (uint8_t) ~p->regfile[p->i.f_s0];
+			break;
+		case 3: 
+			p->regfile[p->i.f_d] = (int8_t) ~p->regfile[p->i.f_s0];
+			break;
+		default:
+			return EXCP_ILL_OPCODE;
+	}
+	return 0;
+
+}
+
+int instr_inv(proc *p) {
+	switch (p->i.pm) {
+		case 0: 
+			p->regfile[p->i.f_d] = !p->regfile[p->i.f_s0];
+			break;
+		case 1: 
+			p->regfile[p->i.f_d] = (int16_t) !p->regfile[p->i.f_s0];
+			break;
+		case 2: 
+			p->regfile[p->i.f_d] = (uint8_t) !p->regfile[p->i.f_s0];
+			break;
+		case 3: 
+			p->regfile[p->i.f_d] = (int8_t) !p->regfile[p->i.f_s0];
+			break;
+		default:
+			return EXCP_ILL_OPCODE;
+	}
 	return 0;
 }
 
