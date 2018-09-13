@@ -28,8 +28,9 @@ no status register, just compare and branch
 control
 	HALT			stop the processor	s
 	//not specified whether this is a seperate bus or just extra pin
-	IO			r	       -> out
-				in	       -> r
+	IO			r	       -> out	s
+				in	       -> r	s
+	PS			proc_state     -> r	
 	
 math
 	ADD s0, s1, d	s0 + s1 (signed 16b)   -> d	s
@@ -57,23 +58,23 @@ math
 	
 	// inc and dec functionality provided by ADD r, 1, r
 	
-	AND s0, s1, d	s0 & s1 (signed 16b)   -> d
-	ANDU s0, s1, d	s0 & s1 (unsigned 16b) -> d
-	ANDB s0, s1, d  s0 & s1 (signed 8b)    -> d
-	ANDUB s0, s1, d s0 & s1 (unsigned 8b)  -> d
+	AND s0, s1, d	s0 & s1 (signed 16b)   -> d	s
+	ANDU s0, s1, d	s0 & s1 (unsigned 16b) -> d	s
+	ANDB s0, s1, d  s0 & s1 (signed 8b)    -> d	s
+	ANDUB s0, s1, d s0 & s1 (unsigned 8b)  -> d	s
 	
-	OR s0, s1, d	s0 | s1 (signed 16b)   -> d
-	ORU s0, s1, d	s0 | s1 (unsigned 16b) -> d
-	ORB s0, s1, d   s0 | s1 (signed 8b)    -> d
-	ORUB s0, s1, d  s0 | s1 (unsigned 8b)  -> d
+	OR s0, s1, d	s0 | s1 (signed 16b)   -> d	s
+	ORU s0, s1, d	s0 | s1 (unsigned 16b) -> d	s
+	ORB s0, s1, d   s0 | s1 (signed 8b)    -> d	s
+	ORUB s0, s1, d  s0 | s1 (unsigned 8b)  -> d	s
 
-	XOR s0, s1, d	s0 ^ s1 (signed 16b)   -> d
-	XORU s0, s1, d	s0 ^ s1 (unsigned 16b) -> d
-	XORB s0, s1, d  s0 ^ s1 (signed 8b)    -> d
-	XORUB s0, s1, d s0 ^ s1 (unsigned 8b)  -> d
+	XOR s0, s1, d	s0 ^ s1 (signed 16b)   -> d	s
+	XORU s0, s1, d	s0 ^ s1 (unsigned 16b) -> d	s
+	XORB s0, s1, d  s0 ^ s1 (signed 8b)    -> d	s
+	XORUB s0, s1, d s0 ^ s1 (unsigned 8b)  -> d	s
 
-	NOT s		~s		       -> d
-	INV s		twos_comp(s)	       -> d
+	NOT s		~s		       -> d	s
+	INV s		twos_comp(s)	       -> d	s
 	
 moving
 	MOV s, d	s (16b)		-> d		s
@@ -97,29 +98,20 @@ branching
 	BR r		pc + r		-> pc		s
 	//r treated as 16bu
 	
+	Bcc s, d, r	(s op d)?	-> r		s
+	
 	//no literal jumping like this
-	BE s, d, r	(s == d)?	-> r 	
-	BNE s, d, r	(s != d)?	-> r
+	BE s, d, r	(s == d)?	-> r 		s
+	BNE s, d, r	(s != d)?	-> r		s
 	
-	BGT s, d, r	(s > d)?	-> r
-	BGE s, d, r	(s >= d)?	-> r
+	BGT s, d, r	(s > d)?	-> r		s
+	BGE s, d, r	(s >= d)?	-> r		s
 
-	BLT s, d, r	(s < d)?	-> r
-	BLE s, d, r	(s <= d)?	-> r
+	BLT s, d, r	(s < d)?	-> r		s
+	BLE s, d, r	(s <= d)?	-> r		s
 	
-	BZ s, r		(s == 0)?	-> r
-	BNZ s, r	(s != 0)?	-> r
-
-control
-	
-	CALL imm16
-		ST PC, SP
-		SUB 4, SP, SP
-		BN imm16
-	
-	RET
-		ADD 4, SP, SP
-		LD SP, PC
+	BZ s, r		(s == 0)?	-> r		s
+	BNZ s, r	(s != 0)?	-> r		s
 
 instruction encoding
 
@@ -130,6 +122,7 @@ instruction encoding
 |xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|      s       |      d      | pm  |    op    |  -> MOV s, d (D)
 |x|                   imm                            |      r      | pm  |    op    |  -> LD imm, r (E)
 |xxxxxxxxxxxxxxxxxxxxxx|      s0      |      s1      |      d      | pm  |    op    |  -> ADD s0, s1, d (F)
+|                     imm             |      s       |      d      | pm  |    op    |  -> ADD imm16, s, d (F2)
 |xxxxxxx|      s0      |      s1      |      h       |      l      | pm  |    op    |  -> MUL s0, s1, h, L (G)
 
 possible formats to add
@@ -139,25 +132,16 @@ possible formats to add
 |                 imm                 |      s0      |      s1     | pm  |    op    |  -> BNZ s0, s1, imm (X)
 
 possible instructions to add
-
-//two operand
-//more explicit than
-	LD 1, ri
-	ADD r, ri, r
-//math can now happen in more than one format, slows down decoding?
-//less RISC
-ADD imm, r	imm + r -> r
-
+	IRET vs RET // would make a difference if we saved out registers!
 	
 opcode encoding
 	all 0 opcode is illegal (STOP pseudo-i in this sim)
 	 9 8 7 6 5 4 3 2 1 0
-	  |x x h|  NOP(x)  | h = 1 for halt
-	  |x b s|  ADD(x)  | b = 1 for word, s = 1 for signed
+	  |x x h|  NOP(1)  | h = 1 for halt
+	  |i b s|  ADD(x)  | b = 1 for word, s = 1 for signed, i = 1 for 12bu imm, 0 for reg
 	  |x b x|  MOV(x)  | b = 1 for word
 	  |x x m|  LD(x)   | m = 1 for mem, 0 for imm
 	  |x x x|  ST(x)   | 
-	  |x b i|  INC(x)  | i = 1 for inc, b = 1 for word
 	  |x x x|  BN(x)   |
 	  |x x r|  BR(x)   | r = 1 for +r //has to be seperate from BN due to differing encoding
 	  |c c c|  Bcc(x)  | c = condition code
@@ -171,3 +155,7 @@ interrupt architecture:
 	does a hardware-initiated CALL instruction to vector
 	RET returns to normal code
 
+stack:
+	starts wherever
+	grows down
+	

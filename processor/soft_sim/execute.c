@@ -2,21 +2,35 @@
 
 #define REGISTER_R0 0
 
+#define REGISTER_DEST p->regfile[p->i.c_s]
+
+#define REGISTER_SRC0 p->regfile[p->i.f_s0]
+#define REGISTER_SRC1 p->regfile[p->i.f_s1]
+
+static int imm_or_reg(proc *p) {
+	if ((p->i.pm >> 2) & 1) {
+		return p->i.f2_short_imm;
+	} else {
+		return p->regfile[p->i.c_s];
+	}
+}
+
 // F type instructions for arithmetic
 // there is no checking for R0 write for any of this.
 int instr_add(proc *p) {
+	
 	switch (p->i.pm) {
 		case 0: 
-			p->regfile[p->i.f_d] = p->regfile[p->i.f_s0] + p->regfile[p->i.f_s1];
+			REGISTER_DEST = REGISTER_SRC0 + imm_or_reg(p);
 			break;;
 		case 1: 
-			p->regfile[p->i.f_d] = (int16_t) p->regfile[p->i.f_s0] + (int16_t) p->regfile[p->i.f_s1];
+			REGISTER_DEST = (int16_t) REGISTER_SRC0 + (int16_t) imm_or_reg(p);
 			break;
 		case 2: 
-			p->regfile[p->i.f_d] = (uint8_t) p->regfile[p->i.f_s0] + (uint8_t) p->regfile[p->i.f_s1];
+			REGISTER_DEST = (uint8_t) REGISTER_SRC0 + (uint8_t) imm_or_reg(p);
 			break;
 		case 3: 
-			p->regfile[p->i.f_d] = (int8_t) p->regfile[p->i.f_s0] + (int8_t) p->regfile[p->i.f_s1];
+			REGISTER_DEST = (int8_t) REGISTER_SRC0 + (int8_t) imm_or_reg(p);
 			break;
 		default:
 			return EXCP_ILL_OPCODE;
@@ -27,16 +41,16 @@ int instr_add(proc *p) {
 int instr_sub(proc *p) {
 	switch (p->i.pm) {
 		case 0: 
-			p->regfile[p->i.f_d] = p->regfile[p->i.f_s0] - p->regfile[p->i.f_s1];
+			REGISTER_DEST = REGISTER_SRC0 - imm_or_reg(p);
 			break;
 		case 1: 
-			p->regfile[p->i.f_d] = (int16_t) p->regfile[p->i.f_s0] - (int16_t) p->regfile[p->i.f_s1];
+			REGISTER_DEST = (int16_t) REGISTER_SRC0 - (int16_t) imm_or_reg(p);
 			break;
 		case 2: 
-			p->regfile[p->i.f_d] = (uint8_t) p->regfile[p->i.f_s0] - (uint8_t) p->regfile[p->i.f_s1];
+			REGISTER_DEST = (uint8_t) REGISTER_SRC0 - (uint8_t) imm_or_reg(p);
 			break;
 		case 3: 
-			p->regfile[p->i.f_d] = (int8_t) p->regfile[p->i.f_s0] - (int8_t) p->regfile[p->i.f_s1];
+			REGISTER_DEST = (int8_t) REGISTER_SRC0 - (int8_t) imm_or_reg(p);
 			break;
 		default:
 			return EXCP_ILL_OPCODE;
@@ -77,16 +91,16 @@ int instr_div(proc *p) {
 int instr_and(proc *p) {
 	switch (p->i.pm) {
 		case 0: 
-			p->regfile[p->i.f_d] = p->regfile[p->i.f_s0] & p->regfile[p->i.f_s1];
+			REGISTER_DEST = REGISTER_SRC0 & imm_or_reg(p);
 			break;;
 		case 1: 
-			p->regfile[p->i.f_d] = (int16_t) p->regfile[p->i.f_s0] & (int16_t) p->regfile[p->i.f_s1];
+			REGISTER_DEST = (int16_t) REGISTER_SRC0 & (int16_t) imm_or_reg(p);
 			break;
 		case 2: 
-			p->regfile[p->i.f_d] = (uint8_t) p->regfile[p->i.f_s0] & (uint8_t) p->regfile[p->i.f_s1];
+			REGISTER_DEST = (uint8_t) REGISTER_SRC0 & (uint8_t) imm_or_reg(p);
 			break;
 		case 3: 
-			p->regfile[p->i.f_d] = (int8_t) p->regfile[p->i.f_s0] & (int8_t) p->regfile[p->i.f_s1];
+			REGISTER_DEST = (int8_t) REGISTER_SRC0 & (int8_t) imm_or_reg(p);
 			break;
 		default:
 			return EXCP_ILL_OPCODE;
@@ -97,16 +111,16 @@ int instr_and(proc *p) {
 int instr_or(proc *p) {
 	switch (p->i.pm) {
 		case 0: 
-			p->regfile[p->i.f_d] = p->regfile[p->i.f_s0] | p->regfile[p->i.f_s1];
+			REGISTER_DEST = REGISTER_SRC0 | imm_or_reg(p);
 			break;;
 		case 1: 
-			p->regfile[p->i.f_d] = (int16_t) p->regfile[p->i.f_s0] | (int16_t) p->regfile[p->i.f_s1];
+			REGISTER_DEST = (int16_t) REGISTER_SRC0 | (int16_t) imm_or_reg(p);
 			break;
 		case 2: 
-			p->regfile[p->i.f_d] = (uint8_t) p->regfile[p->i.f_s0] | (uint8_t) p->regfile[p->i.f_s1];
+			REGISTER_DEST = (uint8_t) REGISTER_SRC0 | (uint8_t) imm_or_reg(p);
 			break;
 		case 3: 
-			p->regfile[p->i.f_d] = (int8_t) p->regfile[p->i.f_s0] | (int8_t) p->regfile[p->i.f_s1];
+			REGISTER_DEST = (int8_t) REGISTER_SRC0 | (int8_t) imm_or_reg(p);
 			break;
 		default:
 			return EXCP_ILL_OPCODE;
@@ -117,16 +131,16 @@ int instr_or(proc *p) {
 int instr_xor(proc *p) {
 	switch (p->i.pm) {
 		case 0: 
-			p->regfile[p->i.f_d] = p->regfile[p->i.f_s0] ^ p->regfile[p->i.f_s1];
+			REGISTER_DEST = REGISTER_SRC0 ^ imm_or_reg(p);
 			break;;
 		case 1: 
-			p->regfile[p->i.f_d] = (int16_t) p->regfile[p->i.f_s0] ^ (int16_t) p->regfile[p->i.f_s1];
+			REGISTER_DEST = (int16_t) REGISTER_SRC0 ^ (int16_t) imm_or_reg(p);
 			break;
 		case 2: 
-			p->regfile[p->i.f_d] = (uint8_t) p->regfile[p->i.f_s0] ^ (uint8_t) p->regfile[p->i.f_s1];
+			REGISTER_DEST = (uint8_t) REGISTER_SRC0 ^ (uint8_t) imm_or_reg(p);
 			break;
 		case 3: 
-			p->regfile[p->i.f_d] = (int8_t) p->regfile[p->i.f_s0] ^ (int8_t) p->regfile[p->i.f_s1];
+			REGISTER_DEST = (int8_t) REGISTER_SRC0 ^ (int8_t) imm_or_reg(p);
 			break;
 		default:
 			return EXCP_ILL_OPCODE;
@@ -138,16 +152,16 @@ int instr_xor(proc *p) {
 int instr_not(proc *p) {
 	switch (p->i.pm) {
 		case 0: 
-			p->regfile[p->i.f_d] = ~p->regfile[p->i.f_s0];
+			REGISTER_DEST = ~REGISTER_SRC0;
 			break;
 		case 1: 
-			p->regfile[p->i.f_d] = (int16_t) ~p->regfile[p->i.f_s0];
+			REGISTER_DEST = (int16_t) ~REGISTER_SRC0;
 			break;
 		case 2: 
-			p->regfile[p->i.f_d] = (uint8_t) ~p->regfile[p->i.f_s0];
+			REGISTER_DEST = (uint8_t) ~REGISTER_SRC0;
 			break;
 		case 3: 
-			p->regfile[p->i.f_d] = (int8_t) ~p->regfile[p->i.f_s0];
+			REGISTER_DEST = (int8_t) ~REGISTER_SRC0;
 			break;
 		default:
 			return EXCP_ILL_OPCODE;
@@ -159,16 +173,16 @@ int instr_not(proc *p) {
 int instr_inv(proc *p) {
 	switch (p->i.pm) {
 		case 0: 
-			p->regfile[p->i.f_d] = !p->regfile[p->i.f_s0];
+			REGISTER_DEST = !REGISTER_SRC0;
 			break;
 		case 1: 
-			p->regfile[p->i.f_d] = (int16_t) !p->regfile[p->i.f_s0];
+			REGISTER_DEST = (int16_t) !REGISTER_SRC0;
 			break;
 		case 2: 
-			p->regfile[p->i.f_d] = (uint8_t) !p->regfile[p->i.f_s0];
+			REGISTER_DEST = (uint8_t) !REGISTER_SRC0;
 			break;
 		case 3: 
-			p->regfile[p->i.f_d] = (int8_t) !p->regfile[p->i.f_s0];
+			REGISTER_DEST = (int8_t) !REGISTER_SRC0;
 			break;
 		default:
 			return EXCP_ILL_OPCODE;
@@ -194,18 +208,18 @@ void instr_mov(proc *p) {
 	}
 	
 	if (p->i.pm == 2) {
-		p->regfile[p->i.d_d] = (uint8_t) p->regfile[p->i.d_s];
+		REGISTER_DEST = (uint8_t) REGISTER_SRC0;
 	} else {	
-		p->regfile[p->i.d_d] = p->regfile[p->i.d_s];
+		REGISTER_DEST = REGISTER_SRC0;
 	}
 }
 
 void instr_st(proc *p, uint16_t *ram) {
-	ram[p->regfile[p->i.d_d]] = p->regfile[p->i.d_s];
+	ram[REGISTER_DEST] = REGISTER_SRC0;
 }
 
 void instr_bs(proc *p) {
-	p->PC = p->regfile[p->i.d_s] + p->regfile[p->i.d_d];
+	p->PC = REGISTER_SRC0 + REGISTER_DEST;
 }
 
 void instr_bn(proc *p) {
@@ -222,21 +236,33 @@ void instr_sex(proc *p) {
 void instr_bcc(proc *p) { // F type
 	switch (p->i.pm) {
 		case BRANCH_EQ: 
-			if (p->regfile[p->i.f_s0] == p->regfile[p->i.f_s1]) { 
-				p->PC = p->regfile[p->i.f_d]; 
+			if (REGISTER_SRC0 == p->regfile[p->i.c_s]) { 
+				p->PC = REGISTER_DEST; 
 			} break;
 
 		case BRANCH_NE:
-			if (p->regfile[p->i.f_s0] != p->regfile[p->i.f_s1]) {
-				p->PC = p->regfile[p->i.f_d];
+			if (REGISTER_SRC0 != p->regfile[p->i.c_s]) {
+				p->PC = REGISTER_DEST;
 			} break;
 		case BRANCH_GT:
+			if (REGISTER_SRC0 > p->regfile[p->i.c_s]) {
+				p->PC = REGISTER_DEST;
+			} break;
 			break;
 		case BRANCH_GE:
+			if (REGISTER_SRC0 >= p->regfile[p->i.c_s]) {
+				p->PC = REGISTER_DEST;
+			} break;
 			break;
 		case BRANCH_LT:
+			if (REGISTER_SRC0 < p->regfile[p->i.c_s]) {
+				p->PC = REGISTER_DEST;
+			} break;
 			break;
 		case BRANCH_LE:
+			if (REGISTER_SRC0 <= p->regfile[p->i.c_s]) {
+				p->PC = REGISTER_DEST;
+			} break;
 			break;
 		case BRANCH_Z:
 			break;
@@ -248,13 +274,26 @@ void instr_bcc(proc *p) { // F type
 void instr_io(proc *p) { // E type
 	if (p->i.e_pm) { // input op
 		int temp;
-		printf("16bu io input: ");
+		printf("16bu io input at address %d: ", p->i.e_imm);
 		scanf("%d", &temp);
 		p->regfile[p->i.e_s] = (uint16_t) temp;
 	} else { // output op
-		printf("16bu io output: %d\n", p->regfile[p->i.e_s]);
+		printf("16bu io output %d at address %d\n", p->regfile[p->i.e_s], p->i.e_imm);
 	}
 }
 
 
+void instr_call(proc *p) {
+	p->SP = p->PC; // ST PC, SP
+	p->SP -= 4; // SUB 4, SP, SP
+	p->PC = p->i.b_imm; // BN imm16
+}
 
+void instr_ret(proc *p) {
+	p->SP += 4; // ADD 4, SP, SP
+	p->PC = p->SP; // LD SP, PC
+}
+
+void instr_ps(state *s) { // C type
+	s->p.regfile[s->p.i.c_s] = s->proc_ext_state;
+}

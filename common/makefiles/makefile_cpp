@@ -1,12 +1,12 @@
-CC = gcc
-STANDARD = -std=gnu11
-CFLAGS = -Wall $(STANDARD)
-DFLAGS = $(CFLAGS) $(STANDARD) -g -pg # generate symbol information
-
-SRC := $(filter-out test.c, $(wildcard *.c)) # grab anything with a .c ending
+CC = g++
+STANDARD = -std=c++14
+CFLAGS = -Wall $(STANDARD) 
+DFLAGS = $(CFLAGS) $(STANDARD) -g -pg
+ 
+SRC := $(filter-out test.cpp, $(wildcard *.cpp)) # grab anything with a .c ending
 
 USER_FLAGS := $(vars)
-UNAME := $(shell uname -sm)
+UNAME := $(shell uname)
 
 debug: pre
 	@$(CC) $(SRC) $(DFLAGS) -o 'db.out'
@@ -17,7 +17,7 @@ all: pre
 	@echo "Optimized build completed."
 
 pre:
-	@echo "Building on $(UNAME), user params: $(USER_FLAGS)"
+	@echo "Building on: $(UNAME), user params: $(USER_FLAGS)"
 
 clean:
 	@rm -f *.out

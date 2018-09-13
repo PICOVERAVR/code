@@ -32,6 +32,11 @@ void instr_sex(proc *p);
 
 void instr_io(proc *p);
 
+void instr_call(proc *p);
+void instr_ret(proc *p);
+
+void instr_ps(state *s);
+
 enum COND_BRANCH_TYPES {
 	BRANCH_EQ,
 	BRANCH_NE,

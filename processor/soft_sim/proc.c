@@ -1,12 +1,15 @@
 #include "proc.h" 
 #include "setup.h" // for system setup and initialization
 #include "execute.h" // for individual instruction implementations
+#include "dispatch.h" // for individual instruction dispatch
 
-#define PROC_FEAT_SET(bitpos, val) \
-s->proc_ext_state |= val << bitpos
+static void proc_feat_set(state *s, int bitpos, int val) {
+	s->proc_ext_state |= val << bitpos;
+}
 
-#define PROC_FEAT_GET(bitpos) \
-(s->proc_ext_state >> bitpos) & 1
+static uint16_t proc_feat_get(state *s, int bitpos) {
+	return (s->proc_ext_state >> bitpos);
+}
 
 volatile sig_atomic_t interrupt_requested = 0;
 
@@ -20,7 +23,10 @@ static void interrupt_handle(state *s) {
 	if (interrupt_level > 7) {
 		printf("WARN: invalid interrupt level!\n");
 	}
-
+	
+	
+	s->p.SP = s->p.PC; // save PC and jump
+	s->p.SP -= 4;
 	s->p.PC = 4 * interrupt_level; // jump to interrupt vector
 }
 
@@ -46,14 +52,14 @@ int main(int argc, char **argv) {
 	}
 	
 	// configure interrupt system at start
-	PROC_FEAT_SET(PROC_FEAT_IE, 1);
+	proc_feat_set(s, PROC_FEAT_IE, 1);
 	
 	interrupt_requested = false;
 	signal(SIGQUIT, signal_handler);
 
 	printf("starting simulation... (ctl-\\ for interrupt)\n");
 	for(;;) {
-		if (interrupt_requested && s->proc_ext_state) {
+		if (interrupt_requested && proc_feat_get(s, PROC_FEAT_IE)) {
 			interrupt_handle(s);
 			interrupt_requested = false; // clear interrupt flag
 		} else {
@@ -62,66 +68,9 @@ int main(int argc, char **argv) {
 		}
 
 		perf_counter++;
-			
-		// every op is broken out into a function in order for profiler to catch all
-		// instructions that get executed
-		// also looks better
-		switch (s->p.i.opcode) {
-			case NOP: break;
-			case RST: longjmp(start, 1);
-			case ADD:
-				instr_add(&(s->p)); //possible and a good idea to 
-						    //do more error checking here!
-				break;
-			case SUB:
-				instr_sub(&(s->p));
-				break;
-			case MUL:
-				instr_mul(&(s->p));
-				break;
-			case DIV:
-				//
-				break;
-			case AND:
-				instr_and(&(s->p));
-				break;
-			case OR:
-				instr_or(&(s->p));
-				break;
-			case XOR:
-				instr_xor(&(s->p));
-				break;
-			case NOT:
-				instr_not(&(s->p));
-				break;
-			case INV:
-				instr_inv(&(s->p));
-				break;
-			case SEX:
-				instr_sex(&(s->p));
-				break;
-			case LD:
-				instr_ld(&(s->p), ram);
-				break;
-			case BN:
-				instr_bn(&(s->p));
-				break;
-			case BS:
-				instr_bs(&(s->p));
-				break;
-			case Bcc:
-				instr_bcc(&(s->p));
-				break;
-			case IO:
-				instr_io(&(s->p));
-				break;
-			case STOP:
-				printf("WARN: reached STOP instr\n");
-				return SIM_STOP;
-			default: 
-				printf("ERR: unknown opcode!\n");
-				return EXCP_ILL_OPCODE;
-		};
+		if (disp(s, ram)) {
+			return -1;
+		}
 		
 	}
 	fprintf(stderr, "ERR: reached end of sim\n");

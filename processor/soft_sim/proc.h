@@ -37,6 +37,13 @@ typedef union {
 		unsigned int f_s1     : 5;
 		unsigned int f_s0     : 5;
 	};
+	struct {
+		unsigned int f2_opcode : 6;
+		unsigned int f2_pm     : 3;
+		unsigned int f2_d      : 5;
+		unsigned int f2_s      : 5;
+		unsigned int f2_short_imm : 12;
+	};
 	struct { // D type instruction
 		unsigned int d_opcode : 6;
 		unsigned int d_pm     : 3;
@@ -67,7 +74,6 @@ typedef union {
 		unsigned int g_s1     : 5;
 		unsigned int g_s0     : 5;
 	};
-	
 } instr;
 
 typedef union {
@@ -102,18 +108,21 @@ enum instruction_opcode {
 	BS,
 	Bcc,
 	LD,
+	ST,
 	IO,
 	AND,
 	OR,
 	XOR,
 	NOT,
 	INV,
+	CALL,
+	RET,
+	PS,
+	MOV,
 	RST,
 };
 
 uint32_t fetch(uint16_t addr, uint32_t *hex_mem);
 void break_ill_opcode();
 void break_stop();
-
-void free_state(int num_free, ...);
 
