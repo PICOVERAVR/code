@@ -3,7 +3,7 @@ FROM ubuntu:latest
 MAINTAINER Kyle Neil <kyle@johnneil.net>
 
 # Set the start directory to /root
-WORKDIR /root
+WORKDIR /code
 
 # Set default shell to be sure
 SHELL ["/bin/bash", "-c"]
