@@ -9,6 +9,13 @@
 int instr_add(proc *p);
 int instr_sub(proc *p);
 
+int instr_and(proc *p);
+int instr_or(proc *p);
+int instr_xor(proc *p);
+
+int instr_not(proc *p);
+int instr_inv(proc *p);
+
 int instr_mul(proc *p);
 int instr_div(proc *p);
 
@@ -20,8 +27,16 @@ void instr_mov(proc *p);
 void instr_bn(proc *p);
 void instr_bs(proc *p);
 void instr_bcc(proc *p);
+void instr_br(proc *p);
 
 void instr_sex(proc *p);
+
+void instr_io(proc *p);
+
+void instr_call(proc *p);
+void instr_ret(proc *p);
+
+void instr_ps(state *s);
 
 enum COND_BRANCH_TYPES {
 	BRANCH_EQ,
@@ -30,8 +45,6 @@ enum COND_BRANCH_TYPES {
 	BRANCH_GE,
 	BRANCH_LT,
 	BRANCH_LE,
-	BRANCH_Z,
-	BRANCH_NZ,
 };
 
 

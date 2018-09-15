@@ -16,7 +16,6 @@ uint32_t *proc_setup(int argc, char **argv, state *s) {
 	long hex_size = ftell(hex);
 	rewind(hex);
 	
-	
 	uint32_t *hex_mem = malloc(hex_size+1);
 	fread(hex_mem, sizeof(uint32_t), hex_size, hex);
 	fclose(hex);

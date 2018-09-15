@@ -7,18 +7,40 @@
 #include <stdarg.h>
 #include <assert.h>
 #include <signal.h>
+#include <unistd.h>
 
+// locks us into gcc, but I don't care and enables helpful macros
 #pragma once
 
-#define EXCP_ILL_OPCODE 1
+#define EXCP_ILL_INSTR 1
+#define EXCP_RESET 0
+#define EXCP_MISALIGNED_CNTL 2
+#define EXCP_DIV_ZERO 3
 
+enum exception_vec {
+	EXCP_RESET_VEC = 0x0,
+	EXCP_ILL_INSTR_VEC = 0x4,
+	EXCP_MISALIGNED_CNTL_VEC = 0x8,
+	EXCP_DIV_ZERO_VEC = 0xB,
+};
+
+#define SYSTEM_TRAP_VEC_SIZE 4
+
+// organize into enums
 #define INTERNAL_ERROR 2
+#define NO_HEX_ERROR 3
 
-#define EXCP_NO_HEX 3
 #define SIM_STOP 4
 
 #define PROC_RAM 2048
 //rom is as big as the hex file
+
+#define PROC_FEAT_IE 0
+
+#define DEBUG 1
+#define dbprintf(format, ...) \
+	do { if (DEBUG) printf ("DBG: " format "\n", ## __VA_ARGS__); } while(0)
+
 
 typedef union {
 	uint32_t raw_instr;
@@ -32,6 +54,13 @@ typedef union {
 		unsigned int f_d      : 5;
 		unsigned int f_s1     : 5;
 		unsigned int f_s0     : 5;
+	};
+	struct {
+		unsigned int f2_opcode : 6;
+		unsigned int f2_pm     : 3;
+		unsigned int f2_d      : 5;
+		unsigned int f2_s      : 5;
+		unsigned int f2_short_imm : 12;
 	};
 	struct { // D type instruction
 		unsigned int d_opcode : 6;
@@ -63,7 +92,6 @@ typedef union {
 		unsigned int g_s1     : 5;
 		unsigned int g_s0     : 5;
 	};
-	
 } instr;
 
 typedef union {
@@ -79,6 +107,7 @@ typedef union {
 		uint16_t PC;
 		instr i;
 	};
+	uint16_t proc_ext_state;
 } proc;
 
 typedef struct {
@@ -97,6 +126,18 @@ enum instruction_opcode {
 	BS,
 	Bcc,
 	LD,
+	ST,
+	IO,
+	AND,
+	OR,
+	XOR,
+	NOT,
+	INV,
+	CALL,
+	RET,
+	PS,
+	MOV,
+	BR,
 	RST,
 };
 
@@ -104,5 +145,4 @@ uint32_t fetch(uint16_t addr, uint32_t *hex_mem);
 void break_ill_opcode();
 void break_stop();
 
-void free_state(int num_free, ...);
-
+void trap_service(proc *p, int exception_vector);

@@ -21,3 +21,12 @@ to do:
 		show people
 		put in showcase
 
+
+notes:
+	sim should have been written in C++, hungry for overloading.
+		honestly, i'm hungry for something with an eval() statement.
+		the sim would be slow, but a lot cleaner.
+
+bugs:
+	if an instruction returns an illegal opcode, it gets ignored
+

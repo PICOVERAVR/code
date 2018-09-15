@@ -29,20 +29,22 @@ def get_instr_info(instr_type: int) -> int:
 	elif temp == 5: # E
 		return input_shift(9, '5b reg: ') + input_shift(14, '16b imm: ')
 	elif temp == 6: # F
+		if input('f2 version? ') == 'y':
+			return input_shift(9, '5b dest: ') + input_shift(14, '5b s: ') + input_shift(19, '12b imm: ')
 		return input_shift(9, '5b dest: ') + input_shift(14, '5b s1: ') + input_shift(19, '5b s0: ')
 	elif temp == 7: # G
-		print('not implemented.')
-		sys.exit(0)
+			return input_shift(9, '5b ldest: ') + input_shift(14, '5b hdest: ') + input_shift(19, '5b s1: ') + input_shift(24, '5b s0: ')
 	else:
 		return 0
 
-opcode = int(input("opcode: "), 16)
-pm = (int(input("pm[0]: "), 2)) + (int(input("pm[1]: "), 2) << 1) + (int(input("pm[2]: "), 2) << 2)
+while True:
+	opcode = int(input("opcode: "), 16)
+	pm = (int(input("pm[0]: "), 2)) + (int(input("pm[1]: "), 2) << 1) + (int(input("pm[2]: "), 2) << 2)
+	
+	instr = opcode + (pm << 6) + get_instr_info(input('instruction type: '))
+	
+	print('formatted instruction: ')
+	print('\t', format(struct.unpack('<I', struct.pack('>I', instr))[0], '#06x'))
+	print('\t', format(instr, '#032b'))
 
-instr = opcode + (pm << 6) + get_instr_info(input('instruction type: '))
 
-print('note: instructions are in wrong endian!');
-print('formatted instruction: ');
-
-print('\t', format(instr, '#06x'))
-print('\t', format(instr, '#032b'))

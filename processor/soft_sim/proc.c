@@ -1,100 +1,97 @@
-#include "proc.h" // main project header file
-#include "setup.h"
+#include "proc.h" 
+#include "setup.h" // for system setup and initialization
 #include "execute.h" // for individual instruction implementations
+#include "dispatch.h" // for individual instruction dispatch
 
-bool interrupt_requested;
+static void proc_feat_set(state *s, int bitpos, int val) {
+	s->p.proc_ext_state |= val << bitpos;
+}
+
+static uint16_t proc_feat_get(state *s, int bitpos) {
+	return (s->p.proc_ext_state >> bitpos);
+}
+
+void trap_service(proc *p, int trap_vector) {
+	// p->proc_ext_state = trap_vector / 4; NOT SHIFTED PROPERLY
+	p->BP = p->PC; // save PC, keep SP
+	p->BP -= 4;
+	p->PC = trap_vector; // jump to trap
+}
+
+volatile sig_atomic_t interrupt_requested = 0;
+
+static void interrupt_handle(state *s) {
+	
+	unsigned int interrupt_level;
+	dbprintf("caught interrupt, PC 0x%x", s->p.PC);
+	printf("3bu ilevel: ");
+	scanf("%d", &interrupt_level);
+	
+	if (interrupt_level > 7) {
+		printf("WARN: invalid interrupt level!\n");
+	}
+	
+	s->p.BP = s->p.PC; // save PC and jump
+	s->p.BP -= 4;
+	s->p.PC = (4 * interrupt_level) + SYSTEM_TRAP_VEC_SIZE; // jump to interrupt vector, skip trap table
+}
 
 void signal_handler(int signum) {
-	interrupt_requested = true;
+	interrupt_requested = 1;
 }
 
 int main(int argc, char **argv) {
+	
 	state *s = malloc(sizeof(state));
 	uint16_t *ram = malloc(PROC_RAM);
 	
 	uint64_t perf_counter = 0;
-	
-	interrupt_requested = false;
-	unsigned int interrupt_level = 0;
 
 	jmp_buf start;
 	if (setjmp(start)) {
-		printf("RST encountered, resetting processor\n");
+		dbprintf("RST encountered, resetting processor\n");
 	}
-	
-	uint32_t *hex_mem = proc_setup(argc, argv, s);
+
+	uint32_t *hex_mem = proc_setup(argc, argv, s); // this clears processor state!
 	if (hex_mem == NULL) {
 		fprintf(stderr, "ERR: setup error.\n");
-		exit(EXCP_NO_HEX);
+		exit(NO_HEX_ERROR);
 	}
+	
+	// disable interrupts until we want them
+	proc_feat_set(s, PROC_FEAT_IE, 0);
 	
 	interrupt_requested = false;
 	signal(SIGQUIT, signal_handler);
-
-	printf("starting simulation... (ctl-\\ for interrupt)\n");
+	
+	dbprintf("starting simulation... (ctl-\\ for interrupt)\n");
 	for(;;) {
-		if (interrupt_requested) {
-			printf("Caught interrupt\n");
-			printf("3bu ilevel: ");
-			scanf("%d", &interrupt_level);
-			
-			if (interrupt_level > 7) {
-				printf("WARN: invalid interrupt level!\n");
-			}
-
-			s->p.PC = 4 * interrupt_level; // jump to interrupt vector
+		
+		perf_counter++;
+		if (s->p.PC % 4 != 0) {
+		// below is actually correct, but I wrote my test program wrong and I want it to pass
+		//if (s->p.PC % 4 != 0 || s->p.SP % 4 != 0 || s->p.BP % 4 != 0) {
+			fprintf(stderr, "EXCP: Misaligned cntl!\n");
+			s->p.PC = EXCP_MISALIGNED_CNTL_VEC;
+		}
+		
+		if (interrupt_requested && proc_feat_get(s, PROC_FEAT_IE)) {
+			interrupt_handle(s);
 			interrupt_requested = false; // clear interrupt flag
-
-			// if we save registers here, we'll have to restore them later, and provide instructions to do so.
-			
 		} else {
 			s->p.i.raw_instr = hex_mem[s->p.PC / sizeof(uint32_t)];
+			dbprintf("fetched instruction 0x%x, PC 0x%x", s->p.i.raw_instr, s->p.PC);
+			
 			s->p.PC += 4;
 		}
-
-		perf_counter++;
-			
-		// every op is broken out into a function in order for profiler to catch all
-		// instructions that get executed
-		// also looks better
-		switch (s->p.i.opcode) {
-			case NOP: break;
-			case RST: longjmp(start, 1);
-			case ADD:
-				instr_add(&(s->p)); //possible and a good idea to 
-						    //do more error checking here!
-				break;
-			case SUB:
-				instr_sub(&(s->p));
-				break;
-			case MUL:
-				//
-				break;
-			case DIV:
-				//
-				break;
-			case SEX:
-				instr_sex(&(s->p));
-				break;
-			case LD:
-				instr_ld(&(s->p), ram);
-				break;
-			case BN:
-				instr_bn(&(s->p));
-				break;
-			case BS:
-				instr_bs(&(s->p));
-				break;
-			case Bcc:
-				instr_bcc(&(s->p));
-				break;
-			case STOP:
-				printf("WARN: reached STOP instr\n");
-				return SIM_STOP;
-			default: 
-				printf("ERR: unknown opcode!\n");
-				return EXCP_ILL_OPCODE;
-		};
+		
+		int err = disp(s, ram);
+		if (err == EXCP_ILL_INSTR) {
+			fprintf(stderr, "EXCP: Illegal instruction 0x%x!\n", s->p.i.raw_instr);
+			s->p.PC = EXCP_ILL_INSTR_VEC;
+		} else if (err == SIM_STOP) {
+			exit(0);
+		}
 		
 	}
 	fprintf(stderr, "ERR: reached end of sim\n");

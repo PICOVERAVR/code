@@ -1,23 +1,23 @@
 CC = gcc
-STANDARD = -std=gnu11
-CFLAGS = -Wall $(STANDARD) # use gnu11 as default...
-DFLAGS = $(CFLAGS) $(STANDARD) -g # generate symbol information
+STANDARD = -std=gnu11 # default anyways, not necessary
+CFLAGS = -Wall $(STANDARD)
+DFLAGS = $(CFLAGS) $(STANDARD) -g -pg # generate symbol information
 
 SRC := $(filter-out test.c, $(wildcard *.c)) # grab anything with a .c ending
 
 USER_FLAGS := $(vars)
-UNAME := $(shell uname)
+UNAME := $(shell uname -sm)
 
 debug: pre
-	@$(CC) $(SRC) $(DFLAGS) `pkg-config --cflags --libs glib-2.0` -o 'db.out'
+	@$(CC) $(SRC) $(DFLAGS) -o 'db.out'
 	@echo "Debug build completed."
 
-all: pre
+fast: pre
 	@$(CC) $(SRC) $(CFLAGS) -O3 -march=native -o 'prod.out' 
 	@echo "Optimized build completed."
 
 pre:
-	@echo "Building on: $(UNAME), user params: $(USER_FLAGS)"
+	@echo "Building on $(UNAME), user params: $(USER_FLAGS)"
 
 clean:
 	@rm -f *.out
