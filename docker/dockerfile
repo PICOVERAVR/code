@@ -17,6 +17,8 @@ RUN apt-get install --yes man strace valgrind vim gdb make git binutils # system
 RUN apt-get install --yes flex bison # gnu parse tools
 RUN apt-get install --yes autotools-dev autoconf # gnu packaging tools
 
+RUN apt-get install --yes pv # for performance reasons
+
 RUN apt-get update --yes
 RUN apt-get upgrade --yes
 RUN apt-get dist-upgrade --yes

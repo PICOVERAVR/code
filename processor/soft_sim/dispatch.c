@@ -22,7 +22,7 @@ int disp(state *s, uint16_t *ram) {
                                 instr_mul(&(s->p));
                                 break;
                         case DIV:
-                                //
+                                instr_div(&(s->p));
                                 break;
                         case AND:
                                 instr_and(&(s->p));
@@ -54,7 +54,13 @@ int disp(state *s, uint16_t *ram) {
                         case BS:
                                 instr_bs(&(s->p));
                                 break;
-                        case Bcc:
+                        case BR:
+				instr_br(&(s->p));
+				break;
+			case MOV:
+				instr_mov(&(s->p));
+				break;
+			case Bcc:
                                 instr_bcc(&(s->p));
                                 break;
                         case IO:
@@ -69,11 +75,11 @@ int disp(state *s, uint16_t *ram) {
                         case PS:
                                 instr_ps(s);
                         case STOP:
-                                printf("WARN: reached STOP instr\n");
-                                return SIM_STOP;
+                                dbprintf("reached STOP instr, PC 0x%x", s->p.PC);
+				return SIM_STOP;
                         default:
                                 printf("ERR: unknown opcode!\n");
-                                return EXCP_ILL_OPCODE;
+                                return EXCP_ILL_INSTR;
 		}
 		return 0;
 }

@@ -33,8 +33,7 @@ def get_instr_info(instr_type: int) -> int:
 			return input_shift(9, '5b dest: ') + input_shift(14, '5b s: ') + input_shift(19, '12b imm: ')
 		return input_shift(9, '5b dest: ') + input_shift(14, '5b s1: ') + input_shift(19, '5b s0: ')
 	elif temp == 7: # G
-		print('not implemented.')
-		sys.exit(0)
+			return input_shift(9, '5b ldest: ') + input_shift(14, '5b hdest: ') + input_shift(19, '5b s1: ') + input_shift(24, '5b s0: ')
 	else:
 		return 0
 
@@ -44,8 +43,7 @@ while True:
 	
 	instr = opcode + (pm << 6) + get_instr_info(input('instruction type: '))
 	
-	print('formatted instruction: ');
-	
+	print('formatted instruction: ')
 	print('\t', format(struct.unpack('<I', struct.pack('>I', instr))[0], '#06x'))
 	print('\t', format(instr, '#032b'))
 

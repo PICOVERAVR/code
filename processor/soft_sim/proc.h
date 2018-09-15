@@ -7,10 +7,24 @@
 #include <stdarg.h>
 #include <assert.h>
 #include <signal.h>
+#include <unistd.h>
 
+// locks us into gcc, but I don't care and enables helpful macros
 #pragma once
 
-#define EXCP_ILL_OPCODE 1
+#define EXCP_ILL_INSTR 1
+#define EXCP_RESET 0
+#define EXCP_MISALIGNED_CNTL 2
+#define EXCP_DIV_ZERO 3
+
+enum exception_vec {
+	EXCP_RESET_VEC = 0x0,
+	EXCP_ILL_INSTR_VEC = 0x4,
+	EXCP_MISALIGNED_CNTL_VEC = 0x8,
+	EXCP_DIV_ZERO_VEC = 0xB,
+};
+
+#define SYSTEM_TRAP_VEC_SIZE 4
 
 // organize into enums
 #define INTERNAL_ERROR 2
@@ -22,6 +36,10 @@
 //rom is as big as the hex file
 
 #define PROC_FEAT_IE 0
+
+#define DEBUG 1
+#define dbprintf(format, ...) \
+	do { if (DEBUG) printf ("DBG: " format "\n", ## __VA_ARGS__); } while(0)
 
 
 typedef union {
@@ -89,11 +107,11 @@ typedef union {
 		uint16_t PC;
 		instr i;
 	};
+	uint16_t proc_ext_state;
 } proc;
 
 typedef struct {
 	proc p;
-	uint16_t proc_ext_state;
 } state;
 
 enum instruction_opcode {
@@ -119,6 +137,7 @@ enum instruction_opcode {
 	RET,
 	PS,
 	MOV,
+	BR,
 	RST,
 };
 
@@ -126,3 +145,4 @@ uint32_t fetch(uint16_t addr, uint32_t *hex_mem);
 void break_ill_opcode();
 void break_stop();
 
+void trap_service(proc *p, int exception_vector);

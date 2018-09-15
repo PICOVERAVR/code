@@ -13,10 +13,18 @@ ISA
 
 seperate external processor feature register
  15 14 13 12 11 10  9  8  7  6  5  4  3  2  1  0
-| x  x  x  x  x  x  x  x  x  x  x  x  x  x  r  i |
+| x  x  x  x  x  x  x  x  x  x  x  c  c  c  r  i |
 
 i = interrupt enable
 r = processor reset
+ccc = interrupt/trap cause
+
+traps
+	0x0: reset
+	0x4: illegal instruction
+	0x8: misaligned PC, SP, BP
+	0xB: intvec 0
+	...  intvec 7
 
 Three operand format for everything
 register-register architecture
@@ -30,7 +38,7 @@ control
 	//not specified whether this is a seperate bus or just extra pin
 	IO			r	       -> out	s
 				in	       -> r	s
-	PS			proc_state     -> r	
+	PS			proc_state     -> r	s
 	
 math
 	ADD s0, s1, d	s0 + s1 (signed 16b)   -> d	s
@@ -49,10 +57,10 @@ math
 	MULUB s0, s1, d 	s0 * s1 (unsigned 16b)  -> d		s
 	
 	//d0 = res, d1 = rem
-	DIV s0, s1, p, r	s0 / s1 (32bs)   -> {d0, d1} 	
-	DIVU s0, s1, p, r	s0 / s1 (32bu) -> {d0, d1}
-	DIVB s0, s1, p, r	s0 / s1 (16bs)   -> {d0, d1}
-	DIVUB s0, s1, p, r	s0 / s1 (16bu) -> {d0, d1}
+	DIV s0, s1, h, l	s0 / s1 (32bs)   -> {d0, d1} 		s
+	DIVU s0, s1, h, l	s0 / s1 (32bu) -> {d0, d1}		s
+	DIVB s0, s1, h, l	s0 / s1 (16bs)   -> {d0, d1}		s
+	DIVUB s0, s1, h, l	s0 / s1 (16bu) -> {d0, d1}		s
 	
 	SEX s			8b sign(s) -> 16b sign(d)	s
 	
@@ -81,11 +89,11 @@ moving
 	MOVB s, d	s (8b)		-> d		s
 	
 	//no LDB or STB, aligns stuff on 2-byte boundary
-	LD addr, r	mem[addr]	-> r 	
-	LD i, r		mem[i]		-> r
-	LD imm, r	imm		-> r
+	LD addr, r	mem[addr]	-> r 		s
+	LD i, r		mem[i]		-> r		s
+	LD imm, r	imm		-> r		s
 	
-	ST r, addr	r		-> addr
+	ST r, addr	r		-> addr		s
 	ST r, i		r		-> mem[i]
 	ST r, imm	r		-> mem[imm]
 	
@@ -99,6 +107,7 @@ branching
 	//r treated as 16bu
 	
 	Bcc s, d, r	(s op d)?	-> r		s
+	Bcc s, d, imm12 (s op d)?	-> imm12	s
 	
 	//no literal jumping like this
 	BE s, d, r	(s == d)?	-> r 		s
@@ -118,18 +127,13 @@ instruction encoding
 31 30 29 28 27 26 25 24 23 22 21 20 19 18 17 16 15 14 13 12 11 10 9 8 7 6 5 4 3 2 1 0
 |xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx| pm  |    op    |  -> HALT (A)
 |xxxxxxxxxxxxxxxx|                        imm                      | pm  |    op    |  -> BN imm (B)
-|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|      r      | pm  |    op    |  -> INC r (C)
+|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|      s      | pm  |    op    |  -> INC r (C)
 |xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|      s       |      d      | pm  |    op    |  -> MOV s, d (D)
 |x|                   imm                            |      r      | pm  |    op    |  -> LD imm, r (E)
 |xxxxxxxxxxxxxxxxxxxxxx|      s0      |      s1      |      d      | pm  |    op    |  -> ADD s0, s1, d (F)
 |                     imm             |      s       |      d      | pm  |    op    |  -> ADD imm16, s, d (F2)
 |xxxxxxx|      s0      |      s1      |      h       |      l      | pm  |    op    |  -> MUL s0, s1, h, L (G)
 
-possible formats to add
-
-// branch to literal, max jump distance +-4K (12b, not 16b literal!)
-// extra possible encoding, not sure if we need this
-|                 imm                 |      s0      |      s1     | pm  |    op    |  -> BNZ s0, s1, imm (X)
 
 possible instructions to add
 	IRET vs RET // would make a difference if we saved out registers!
@@ -158,4 +162,6 @@ interrupt architecture:
 stack:
 	starts wherever
 	grows down
-	
+
+
+

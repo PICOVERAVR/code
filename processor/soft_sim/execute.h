@@ -27,6 +27,7 @@ void instr_mov(proc *p);
 void instr_bn(proc *p);
 void instr_bs(proc *p);
 void instr_bcc(proc *p);
+void instr_br(proc *p);
 
 void instr_sex(proc *p);
 
@@ -44,8 +45,6 @@ enum COND_BRANCH_TYPES {
 	BRANCH_GE,
 	BRANCH_LT,
 	BRANCH_LE,
-	BRANCH_Z,
-	BRANCH_NZ,
 };
 
 
