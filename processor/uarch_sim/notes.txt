@@ -1,5 +1,10 @@
 1. Get software sim working! -- test out instructions we may want?
 2. Translate to execution units
+	
+	write this in SV, read book first!
+	
+	make sure the memory is external to the processor and writable
+	note: I have to have at least two uarch sims to translate into hardware!
 	how to execute in parallel:
 		have two linked lists of function pointers, traverse through and write
 		results to other linked list

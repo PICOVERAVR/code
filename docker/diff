@@ -1,0 +1,72 @@
+# Use an official ubuntu image as a parent
+FROM ubuntu:latest
+MAINTAINER Kyle Neil <kyle@johnneil.net>
+
+# Set the start directory to /root
+WORKDIR /root
+
+# Set default shell to be sure
+SHELL ["/bin/bash", "-c"]
+
+# Update package cache and install all the packages I want
+RUN apt-get -y update --yes
+
+RUN apt-get install --yes gcc g++ golang-go python3 # compilers/interpreters for languages I want
+RUN apt-get install --yes libglib2.0-dev # c data structures, cause rolling my own is stupid unless I want to
+RUN apt-get install --yes man strace valgrind vim gdb make git binutils # system/debugging tools
+RUN apt-get install --yes flex bison # gnu parse tools
+RUN apt-get install --yes autotools-dev autoconf # gnu packaging tools
+
+RUN apt-get install --yes pv # for performance reasons
+
+RUN apt-get update --yes
+RUN apt-get upgrade --yes
+RUN apt-get dist-upgrade --yes
+
+# get .bashrc read here, not applying for some reason...
+
+EXPOSE 80
+
+# build with: docker build -t base .
+# run with:
+
+
+# to clean "<none>:<none>" files: docker system prune
+
+
+# Use an official ubuntu image as a parent
+FROM ubuntu:latest
+MAINTAINER Kyle Neil <kyle@johnneil.net>
+
+# Set the start directory to /root
+WORKDIR /root
+
+# Set default shell to be sure
+SHELL ["/bin/bash", "-c"]
+
+# Update package cache and install all the packages I want
+RUN apt-get -y update --yes
+
+RUN apt-get install --yes gcc g++ golang-go python3 # compilers/interpreters for languages I want
+RUN apt-get install --yes libglib2.0-dev # c data structures, cause rolling my own is stupid unless I want to
+RUN apt-get install --yes man strace valgrind vim gdb make git binutils # system/debugging tools
+RUN apt-get install --yes flex bison # gnu parse tools
+RUN apt-get install --yes autotools-dev autoconf # gnu packaging tools
+
+RUN apt-get install --yes pv # for performance reasons
+
+RUN apt-get update --yes
+RUN apt-get upgrade --yes
+RUN apt-get dist-upgrade --yes
+
+# get .bashrc read here, not applying for some reason...
+
+EXPOSE 80
+
+# build with: docker build -t base .
+# run with:
+
+
+# to clean "<none>:<none>" files: docker system prune
+
+

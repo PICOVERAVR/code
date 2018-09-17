@@ -3,8 +3,10 @@
 export SHELL=/bin/bash
 export EDITOR=/usr/bin/vim
 
-export HISTCONTROL=ignoredups
+# include .filename in pathname expansion
+shopt -s dotglob
 
+export HISTCONTROL=ignoredups
 export DIR_STACK=""
 
 # options for color
