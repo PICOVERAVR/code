@@ -1,0 +1,1 @@
+This directory contains both the BSP package and the master .xdc file for the Cmod-A7-35t FPGA platform.

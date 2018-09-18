@@ -11,13 +11,21 @@ ISA
 	R29: BP
 	R0:  0x0 - hardwired
 
-seperate external processor feature register
+seperate external processor status register
  15 14 13 12 11 10  9  8  7  6  5  4  3  2  1  0
 | x  x  x  x  x  x  x  x  x  x  x  c  c  c  r  i |
 
 i = interrupt enable
 r = processor reset
 ccc = interrupt/trap cause
+
+seperate external processor feature register
+ 15 14 13 12 11 10  9  8  7  6  5  4  3  2  1  0
+| x  x  x  x  x  x  x  x  x  x  x  x  x  x  m  f |
+
+f = floating point support
+m = hardware MUL/DIV support
+
 
 traps
 	0x0: reset
