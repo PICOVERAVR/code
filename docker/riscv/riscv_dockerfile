@@ -17,6 +17,8 @@ RUN apt-get dist-upgrade --yes
 ADD riscv-toolchain-install.sh /root/riscv-toolchain-install.sh
 RUN /root/riscv-toolchain-install.sh
 
+ENV PATH="${PATH}:/root/install/bin"
+
 EXPOSE 80
 
 # build with: docker build -t base .

@@ -9,7 +9,7 @@ USER_FLAGS := $(vars)
 UNAME := $(shell uname -sm)
 
 debug: pre
-	@$(CC) $(SRC) $(DFLAGS) -o 'db.out'
+	@$(CC) $(SRC) $(DFLAGS) -Og -o 'db.out'
 	@echo "Debug build completed."
 
 fast: pre
