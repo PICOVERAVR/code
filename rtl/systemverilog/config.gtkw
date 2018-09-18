@@ -1,0 +1,25 @@
+[*]
+[*] GTKWave Analyzer v3.3.94 (w)1999-2018 BSI
+[*] Tue Sep 18 23:27:52 2018
+[*]
+[dumpfile] "/Users/kyleneil/code/main/rtl/systemverilog/dump.vcd"
+[dumpfile_mtime] "Tue Sep 18 23:22:42 2018"
+[dumpfile_size] 32934623
+[savefile] "/Users/kyleneil/code/main/rtl/systemverilog/config.gtkw"
+[timestart] 0
+[size] 1440 855
+[pos] -1 -1
+*-2.000000 2 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] test.
+[sst_width] 193
+[signals_width] 269
+[sst_expanded] 1
+[sst_vpaned_height] 402
+@22
+test.m.in_a[3:0]
+test.m.in_b[3:0]
+test.m.out[3:0]
+@29
+test.m.sysclk
+[pattern_trace] 1
+[pattern_trace] 0
