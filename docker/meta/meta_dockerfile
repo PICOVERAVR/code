@@ -1,13 +1,10 @@
 FROM kalilinux/kali-linux-docker
 MAINTAINER Kyle Neil <kyle@johnneil.net>
 
-# Set the start directory to /root
 WORKDIR /root
 
-# Set default shell to be sure
 SHELL ["/bin/bash", "-c"]
 
-# Update package cache and install all the packages I want
 RUN apt-get update --yes
 RUN apt-get install --yes metasploit-framework
 

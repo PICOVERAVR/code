@@ -1,10 +1,8 @@
 FROM ubuntu:latest
 MAINTAINER Kyle Neil <kyle@johnneil.net>
 
-# Set default shell to be sure
 SHELL ["/bin/bash", "-c"]
 
-# Update package cache and install all the packages I want
 RUN apt-get -y update --yes
 
 RUN apt-get install --yes gcc python3 
