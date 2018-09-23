@@ -2,12 +2,11 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.69])
-AC_INIT([fives], [0.1])
-AC_CONFIG_SRCDIR([proc.c])
+AC_INIT([FULL-PACKAGE-NAME], [VERSION], [BUG-REPORT-ADDRESS])
+AC_CONFIG_SRCDIR([setup.h])
 AC_CONFIG_HEADERS([config.h])
 
 # Checks for programs.
-AM_INIT_AUTOMAKE
 AC_PROG_CC
 
 # Checks for libraries.
@@ -28,10 +27,5 @@ AC_TYPE_UINT8_T
 AC_FUNC_MALLOC
 AC_CHECK_FUNCS([memset])
 
-AC_CONFIG_FILES([Makefile
-                 makefile])
-AC_PROG_CC_C99
+AC_CONFIG_FILES([Makefile])
 AC_OUTPUT
-
-echo -e "\n${PACKAGE_NAME} version ${PACKAGE_VERSION} installed " \
-	"in ${prefix}."

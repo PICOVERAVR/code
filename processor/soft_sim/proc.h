@@ -110,7 +110,8 @@ typedef union {
 	uint16_t proc_ext_state;
 } proc;
 
-typedef struct {
+typedef struct { // this is a useless declaration, but I'd have to change a bunch of stuff
+		 // to remove it and the compiler probably does it anyways
 	proc p;
 } state;
 

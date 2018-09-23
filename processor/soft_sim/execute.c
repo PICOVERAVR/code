@@ -11,7 +11,7 @@ static int imm_or_reg(proc *p) {
 	if ((p->i.pm >> 2) & 1) {
 		return p->i.f2_short_imm;
 	} else {
-		return p->regfile[p->i.c_s];
+		return REGISTER_SRC0;
 	}
 }
 
@@ -60,7 +60,7 @@ int instr_sub(proc *p) {
 int instr_mul(proc *p) {
 	uint32_t temp = p->regfile[p->i.g_s0] * p->regfile[p->i.g_s1];
 	
-	switch (p->i.pm) {
+	switch (p->i.pm >> 1) {
 		case 0:
 			p->regfile[p->i.g_h] = (temp >> 16) & 0xffff;
 			p->regfile[p->i.g_l] = temp & 0xffff;
@@ -85,13 +85,16 @@ int instr_div(proc *p) {
 	
 	if (p->regfile[p->i.g_s1] == 0) {
 		fprintf(stderr, "EXCP: Division by zero, PC 0x%x\n", p->PC);
+		
+		#ifdef HAVE_TRAP
 		trap_service(p, EXCP_DIV_ZERO_VEC);
+		#endif
 		return EXCP_DIV_ZERO;
 	}
 
 	div_t temp = div((int) p->regfile[p->i.g_s0], (int) p->regfile[p->i.g_s1]);
 	
-	switch (p->i.pm) {
+	switch (p->i.pm >> 1) {
 		case 0:
 			p->regfile[p->i.g_h] = temp.quot;
 			p->regfile[p->i.g_l] = temp.rem;

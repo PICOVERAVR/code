@@ -3,6 +3,8 @@
 #include "execute.h" // for individual instruction implementations
 #include "dispatch.h" // for individual instruction dispatch
 
+#define HAVE_TRAP 1 // tell execute.c that we can trap things
+
 static void proc_feat_set(state *s, int bitpos, int val) {
 	s->p.proc_ext_state |= val << bitpos;
 }
