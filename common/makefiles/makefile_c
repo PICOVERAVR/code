@@ -1,9 +1,9 @@
 CC = gcc
 STANDARD = -std=gnu11 # default anyways, not necessary
 CFLAGS = -Wall $(STANDARD)
-DFLAGS = $(CFLAGS) $(STANDARD) -g -pg # generate symbol information
+DFLAGS = $(CFLAGS) $(STANDARD) -g # generate symbol information
 
-SRC := $(filter-out test.c, $(wildcard *.c)) # grab anything with a .c ending
+SRC := $(filter-out $(exclude), $(wildcard *.c)) # grab anything with a .c ending
 
 USER_FLAGS := $(vars)
 UNAME := $(shell uname -sm)
@@ -11,6 +11,11 @@ UNAME := $(shell uname -sm)
 debug: pre
 	@$(CC) $(SRC) $(DFLAGS) -Og -o 'db.out'
 	@echo "Debug build completed."
+
+# small as in number of instructions executed, not total binary size
+small: pre
+	@$(CC) $(SRC) $(CFLAGS) -static -o 'small.out'
+	@echo "Small build completed."
 
 fast: pre
 	@$(CC) $(SRC) $(CFLAGS) -O3 -march=native -o 'prod.out' 
