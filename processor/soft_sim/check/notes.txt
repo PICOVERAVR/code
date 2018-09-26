@@ -1,1 +1,0 @@
-gcc -lchecl *.c ../execute.c
