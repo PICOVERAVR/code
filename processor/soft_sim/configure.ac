@@ -3,7 +3,7 @@
 
 AC_PREREQ([2.69])
 AC_INIT([fives], [0.1])
-AC_CONFIG_SRCDIR([config.h.in])
+AC_CONFIG_SRCDIR([src/])
 AC_CONFIG_HEADERS([config.h])
 
 # Checks for programs.
@@ -35,5 +35,5 @@ AC_CONFIG_FILES([Makefile
 AC_PROG_CC_C99
 AC_OUTPUT
 
-echo -e "\n${PACKAGE_NAME} version ${PACKAGE_VERSION} installed " \
+echo -e "\n${PACKAGE_NAME} version ${PACKAGE_VERSION} located " \
 	"in ${prefix}."

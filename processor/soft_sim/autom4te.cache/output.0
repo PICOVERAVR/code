@@ -582,7 +582,7 @@ PACKAGE_STRING='fives 0.1'
 PACKAGE_BUGREPORT=''
 PACKAGE_URL=''
 
-ac_unique_file="config.h.in"
+ac_unique_file="src/"
 # Factoring default headers for most tests.
 ac_includes_default="\
 #include <stdio.h>
@@ -6507,5 +6507,5 @@ $as_echo "$as_me: WARNING: unrecognized options: $ac_unrecognized_opts" >&2;}
 fi
 
 
-echo -e "\n${PACKAGE_NAME} version ${PACKAGE_VERSION} installed " \
+echo -e "\n${PACKAGE_NAME} version ${PACKAGE_VERSION} located " \
 	"in ${prefix}."
