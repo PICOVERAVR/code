@@ -24,7 +24,7 @@ int instr_add(proc *p) {
 			REGISTER_DEST = (int16_t) REGISTER_SRC1 + (int16_t) imm_or_reg(p);
 			break;
 		case 2: 
-			REGISTER_DEST = (temp > 0xFF) ? 0xFF - temp : temp;
+			REGISTER_DEST = (temp > 0xFF) ? 0 : 1;
 			break;
 		case 3: 
 			REGISTER_DEST = (int8_t) REGISTER_SRC1 + (int8_t) imm_or_reg(p);
@@ -326,8 +326,8 @@ void instr_ret(proc *p) {
 	p->PC = p->SP; // LD BP, PC
 }
 
-void instr_ps(proc *p) { // C type
-	p->regfile[p->i.c_s] = p->proc_ext_state;
+void instr_ps(state *s) { // C type
+	s->p.regfile[s->p.i.c_s] = s->p.proc_ext_state;
 }
 
 

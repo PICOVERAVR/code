@@ -3,6 +3,11 @@
 #include "execute.h"
 #include "dispatch.h" // used to test r0 writes, since individual functions don't
 			 // handle it
+
+#suite fives-check
+
+proc *p;
+
 enum registers {
 	R0,
 	R1,
@@ -26,10 +31,10 @@ void proc_set_vec(proc *p) {
 // lots of identical code here, should really clean this up
 // no isolation argument because check already does that
 
-#test add_1
-	proc *p = malloc(sizeof(proc));
-	proc_set_vec(p);
 
+#tcase add_instr
+
+#test add_1
 	p->i.f_d = R3;
 	
 	p->regfile[R1] = 44;
@@ -38,39 +43,40 @@ void proc_set_vec(proc *p) {
 	instr_add(p);
 	
 	ck_assert_int_eq(p->regfile[R3], 76);
-	
-	free(p);
 
 #test add_2
-	proc *p = malloc(sizeof(proc));
-	proc_set_vec(p);
-	
 	p->i.f_d = R3;
 	
 	instr_add(p);
 	
 	ck_assert_int_eq(p->regfile[R3], 3);
-	
-	free(p);
 
+#test add_b
+	p->i.f_pm = 0b010;
+	
+	p->regfile[R1] = 0x00FF;
+	p->regfile[R2] = 0x0001;
+	
+	instr_add(p);
+	ck_assert_int_eq(p->regfile[R3], 0);
+	
+#tcase dest_r0
+	
 #test add_dest_r0
-	state *s = malloc(sizeof(state));
-	proc_set_vec(&(s->p));
-	
-	s->p.i.f_d = R0;
-	s->p.i.f_opcode = ADD;
-
-	int err = disp(s, NULL); // not executing an instruction that needs RAM
-	
-	ck_assert_int_eq(s->p.regfile[R0], 0);
-	ck_assert_int_eq(err, 0);
-
-	free(s);
-
-#test mul_1
 	proc *p = malloc(sizeof(proc));
 	proc_set_vec(p);
 	
+	p->i.f_d = R0;
+	p->i.f_opcode = ADD;
+
+	int err = disp(p, NULL); // not executing an instruction that needs RAM
+	
+	ck_assert_int_eq(p->regfile[R0], 0);
+	ck_assert_int_eq(err, 0);
+
+#tcase instr_mul
+
+#test mul_1
 	p->i.g_s0 = R6;
 	p->i.g_s1 = R6;
 	
@@ -81,4 +87,6 @@ void proc_set_vec(proc *p) {
 	
 	ck_assert_int_eq(p->regfile[R3], 36);
 
-	free(p);
+#main-pre
+	p = malloc(sizeof(proc));
+	proc_set_vec(p);

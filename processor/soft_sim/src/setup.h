@@ -2,6 +2,6 @@
 
 #pragma once
 
-uint32_t *proc_setup(int argc, char **argv, state *s);
-void proc_teardown(uint32_t *hex_mem, state *s);
+uint32_t *proc_setup(int argc, char **argv, proc *p);
+void proc_teardown(uint32_t *hex_mem, proc *p);
 

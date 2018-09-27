@@ -1,89 +1,100 @@
 #include "dispatch.h"
 #include "execute.h"
 
-int disp(state *s, uint16_t *ram) {
-		// every op is broken out into a function in order for profiler to catch all
-		// instructions that get executed
-		// also looks better... kinda
-	switch (s->p.i.opcode) {
+static int check_arithmetic(proc *p) {
+	if (p->i.f_d == REGISTER_R0) {
+		dbprintf("Write to R0 detected.");
+		return -1; // not an error according to the isa, but return an error code to
+			   // abort executing anything
+	}
+}
+
+int disp(proc *p, uint16_t *ram) {
+	// every op is broken out into a function in order for profiler to catch all
+	// instructions that get executed
+	// also looks better... kinda
+	
+	switch (p->i.opcode) {
 		case ADD ... DIV:
 		case AND ... INV:
-			if (s->p.i.f_d == REGISTER_R0) {
-				dbprintf("Write to R0 detected.\n");
+			// not everything here is an error, but all will abort instruction execution
+			if (check_arithmetic(p)) {
+				dbprintf("Arithmetic encoding problem, aborting instruction execution.");
 				return 0;
 			}
+			break;
 	}
-		
-	switch (s->p.i.opcode) {
+	
+	switch (p->i.opcode) {
 		case NOP: break;
 		case RST: 
-			memset(s->p.regfile, 0, sizeof(s->p.regfile));
+			memset(p->regfile, 0, sizeof(p->regfile));
 			break;
 		case ADD:
-			instr_add(&(s->p)); //possible and a good idea to 
-					    //do more error checking here!
+			instr_add(p); 
 			break;
 		case SUB:
-			instr_sub(&(s->p));
+			instr_sub(p);
 			break;
 		case MUL:
-			instr_mul(&(s->p));
+			instr_mul(p);
 			break;
 		case DIV:
-			instr_div(&(s->p));
+			instr_div(p);
 			break;
 		case AND:
-			instr_and(&(s->p));
+			instr_and(p);
 			break;
 		case OR:
-			instr_or(&(s->p));
+			instr_or(p);
 			break;
 		case XOR:
-			instr_xor(&(s->p));
+			instr_xor(p);
 			break;
 		case NOT:
-			instr_not(&(s->p));
+			instr_not(p);
 			break;
 		case INV:
-			instr_inv(&(s->p));
+			instr_inv(p);
 			break;
 		case SEX:
-			instr_sex(&(s->p));
+			instr_sex(p);
 			break;
 		case LD:
-			instr_ld(&(s->p), ram);
+			instr_ld(p, ram);
 			break;
 		case ST:
-			instr_st(&(s->p), ram);
+			instr_st(p, ram);
 			break;
 		case BN:
-			instr_bn(&(s->p));
+			instr_bn(p);
 			break;
 		case BS:
-			instr_bs(&(s->p));
+			instr_bs(p);
 			break;
 		case BR:
-			instr_br(&(s->p));
+			instr_br(p);
 			break;
 		case MOV:
-			instr_mov(&(s->p));
+			instr_mov(p);
 			break;
 		case Bcc:
-			instr_bcc(&(s->p));
+			instr_bcc(p);
 			break;
 		case IO:
-			instr_io(&(s->p));
+			instr_io(p);
 			break;
 		case CALL:
-			instr_call(&(s->p));
+			instr_call(p);
 			break;
 		case RET:
-			instr_ret(&(s->p));
+			instr_ret(p);
 			break;
 		case PS:
-			instr_ps(s);
+			instr_ps(p);
+			break;
 		case STOP:
-			dbprintf("reached STOP instr, PC 0x%x", s->p.PC);
+			dbprintf("reached STOP instr, PC 0x%x", p->PC);
 			return SIM_STOP;
 		default:
 			printf("ERR: unknown opcode!\n");
