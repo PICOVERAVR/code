@@ -5,12 +5,21 @@
 #define REGISTER_SRC0 p->regfile[p->i.f_s0]
 #define REGISTER_SRC1 p->regfile[p->i.f_s1]
 
-static int imm_or_reg(proc *p) {
+
+#define REGISTER_SRC0_LOW p->byte_regfile[(2 * p->i.f_s0)]
+#define REGISTER_SRC1_LOW p->byte_regfile[(2 * p->i.f_s1)]
+#define REGISTER_DEST_LOW p->byte_regfile[(2 * p->i.f_d)]
+
+static uint16_t imm_or_reg(proc *p) {
 	if ((p->i.pm >> 1 >> 2) & 1) {
 		return p->i.f2_short_imm;
 	} else {
 		return REGISTER_SRC0;
 	}
+}
+
+static uint8_t imm_or_reg_byte(proc *p) {	
+	return imm_or_reg(p);
 }
 
 // F type instructions for arithmetic
@@ -24,10 +33,10 @@ int instr_add(proc *p) {
 			REGISTER_DEST = (int16_t) REGISTER_SRC1 + (int16_t) imm_or_reg(p);
 			break;
 		case 2: 
-			REGISTER_DEST = (temp > 0xFF) ? 0xFF - temp : temp;
+			REGISTER_DEST_LOW = REGISTER_SRC1_LOW + imm_or_reg_byte(p);
 			break;
 		case 3: 
-			REGISTER_DEST = (int8_t) REGISTER_SRC1 + (int8_t) imm_or_reg(p);
+			REGISTER_DEST_LOW = (int8_t) REGISTER_SRC1_LOW + (int8_t) imm_or_reg_byte(p);
 			break;
 		default:
 			return EXCP_ILL_INSTR;

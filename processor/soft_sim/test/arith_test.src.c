@@ -39,26 +39,16 @@ void proc_set_vec(proc *p) {
 // lots of identical code here, should really clean this up
 // no isolation argument because check already does that
 
+// lots of repetetive code here but honestly I'm tired of figuring out test case forking
+// not freeing memory here because I don't care
 
 
 START_TEST(add_1)
 {
-#line 38
-	p->i.f_d = R3;
+#line 40
+	proc *p = malloc(sizeof(proc));
+	proc_set_vec(p);
 	
-	p->regfile[R1] = 44;
-	p->regfile[R2] = 32;
-
-	instr_add(p);
-	
-	ck_assert_int_eq(p->regfile[R3], 76);
-
-}
-END_TEST
-
-START_TEST(add_2)
-{
-#line 48
 	p->i.f_d = R3;
 	
 	instr_add(p);
@@ -68,23 +58,44 @@ START_TEST(add_2)
 }
 END_TEST
 
-START_TEST(add_b)
+START_TEST(add_2)
 {
-#line 55
-	p->i.f_pm = 0b010;
+#line 50
+	proc *p = malloc(sizeof(proc));
+	proc_set_vec(p);
 	
-	p->regfile[R1] = 0x00FF;
-	p->regfile[R2] = 0x0001;
-	
+	p->regfile[R1] = 44;
+	p->regfile[R2] = 32;
+
 	instr_add(p);
-	ck_assert_int_eq(p->regfile[R3], 0);
+	
+	ck_assert_int_eq(p->regfile[R3], 76);
+	
+	free(p);
 	
 }
 END_TEST
+
+START_TEST(add_b)
+{
+#line 63
+	proc *p = malloc(sizeof(proc));
+	proc_set_vec(p);
 	
+	p->i.f_pm = 0b010;
+	
+	p->regfile[R1] = 0x00FF;
+	p->regfile[R2] = 0x0004;
+	
+	instr_add(p);
+	ck_assert_int_eq(p->regfile[R3], 3);
+	
+}
+END_TEST
+
 START_TEST(add_dest_r0)
 {
-#line 66
+#line 75
 	proc *p = malloc(sizeof(proc));
 	proc_set_vec(p);
 	
@@ -93,15 +104,49 @@ START_TEST(add_dest_r0)
 
 	int err = disp(p, NULL); // not executing an instruction that needs RAM
 	
-	ck_assert_int_eq(p->regfile[R0], 0);
-	ck_assert_int_eq(err, 0);
+	ck_assert_int_eq(p->regfile[R0], 0); // check for non-zero R0
+	ck_assert_int_eq(err, 0); // no error should be reported for R0 write
+
+}
+END_TEST
+
+START_TEST(add_check_byte)
+{
+#line 87
+	proc *p = malloc(sizeof(proc));
+	proc_set_vec(p);
+	
+	// check if the data in byte_regfile matches regfile
+	p->regfile[R1] = 0xAAFF;
+	
+	ck_assert_int_eq(p->byte_regfile[R1*2], 0xFF);
+	ck_assert_int_eq(p->byte_regfile[(R1*2)+1], 0xAA);
+	
+}
+END_TEST
+
+START_TEST(add_signed)
+{
+#line 97
+	proc *p = malloc(sizeof(proc));
+	proc_set_vec(p);
+	
+	p->regfile[R1] = -1;
+	p->regfile[R2] = 10;
+	
+	instr_add(p);
+	
+	ck_assert_int_eq(p->regfile[R3], 9);
 
 }
 END_TEST
 
 START_TEST(mul_1)
 {
-#line 80
+#line 110
+	proc *p = malloc(sizeof(proc));
+	proc_set_vec(p);
+	
 	p->i.g_s0 = R6;
 	p->i.g_s1 = R6;
 	
@@ -111,7 +156,6 @@ START_TEST(mul_1)
 	instr_mul(p);
 	
 	ck_assert_int_eq(p->regfile[R3], 36);
-
 }
 END_TEST
 
@@ -119,24 +163,19 @@ int main(void)
 {
     Suite *s1 = suite_create("fives-check");
     TCase *tc1_1 = tcase_create("add_instr");
-    TCase *tc1_2 = tcase_create("dest_r0");
-    TCase *tc1_3 = tcase_create("instr_mul");
+    TCase *tc1_2 = tcase_create("instr_mul");
     SRunner *sr = srunner_create(s1);
     int nf;
-
-    /* User-specified pre-run code */
-#line 91
-	p = malloc(sizeof(proc));
-	proc_set_vec(p);
 
     suite_add_tcase(s1, tc1_1);
     tcase_add_test(tc1_1, add_1);
     tcase_add_test(tc1_1, add_2);
     tcase_add_test(tc1_1, add_b);
+    tcase_add_test(tc1_1, add_dest_r0);
+    tcase_add_test(tc1_1, add_check_byte);
+    tcase_add_test(tc1_1, add_signed);
     suite_add_tcase(s1, tc1_2);
-    tcase_add_test(tc1_2, add_dest_r0);
-    suite_add_tcase(s1, tc1_3);
-    tcase_add_test(tc1_3, mul_1);
+    tcase_add_test(tc1_2, mul_1);
 
     srunner_run_all(sr, CK_ENV);
     nf = srunner_ntests_failed(sr);

@@ -100,7 +100,12 @@ typedef union {
 
 typedef union {
 	struct {
-		uint16_t regfile[32];
+		union {
+			uint16_t regfile[32];
+			uint8_t byte_regfile[64];
+			// L [      R3    ] H L [      R4    ] ... 
+			// L [  h  ][  l  ] H L [  h  ][  l  ] ... 
+		};
 		instr raw_i;
 	};
 	struct {

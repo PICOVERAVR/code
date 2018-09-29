@@ -71,9 +71,7 @@ int main(int argc, char **argv) {
 	for(;;) {
 		
 		perf_counter++;
-		if (p->PC % 4 != 0) {
-		// below is actually correct, but I wrote my test program wrong and I want it to pass
-		//if (p->PC % 4 != 0 || p->SP % 4 != 0 || p->BP % 4 != 0) {
+		if (p->PC % 4 != 0 || p->SP % 4 != 0 || p->BP % 4 != 0) {
 			fprintf(stderr, "EXCP: Misaligned cntl!\n");
 			p->PC = EXCP_MISALIGNED_CNTL_VEC;
 		}

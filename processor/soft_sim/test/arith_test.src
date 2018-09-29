@@ -31,11 +31,24 @@ void proc_set_vec(proc *p) {
 // lots of identical code here, should really clean this up
 // no isolation argument because check already does that
 
+// lots of repetetive code here but honestly I'm tired of figuring out test case forking
+// not freeing memory here because I don't care
 
 #tcase add_instr
 
 #test add_1
+	proc *p = malloc(sizeof(proc));
+	proc_set_vec(p);
+	
 	p->i.f_d = R3;
+	
+	instr_add(p);
+	
+	ck_assert_int_eq(p->regfile[R3], 3);
+
+#test add_2
+	proc *p = malloc(sizeof(proc));
+	proc_set_vec(p);
 	
 	p->regfile[R1] = 44;
 	p->regfile[R2] = 32;
@@ -43,24 +56,20 @@ void proc_set_vec(proc *p) {
 	instr_add(p);
 	
 	ck_assert_int_eq(p->regfile[R3], 76);
-
-#test add_2
-	p->i.f_d = R3;
 	
-	instr_add(p);
+	free(p);
 	
-	ck_assert_int_eq(p->regfile[R3], 3);
-
 #test add_b
+	proc *p = malloc(sizeof(proc));
+	proc_set_vec(p);
+	
 	p->i.f_pm = 0b010;
 	
 	p->regfile[R1] = 0x00FF;
-	p->regfile[R2] = 0x0001;
+	p->regfile[R2] = 0x0004;
 	
 	instr_add(p);
-	ck_assert_int_eq(p->regfile[R3], 0);
-	
-#tcase dest_r0
+	ck_assert_int_eq(p->regfile[R3], 3);
 	
 #test add_dest_r0
 	proc *p = malloc(sizeof(proc));
@@ -71,12 +80,36 @@ void proc_set_vec(proc *p) {
 
 	int err = disp(p, NULL); // not executing an instruction that needs RAM
 	
-	ck_assert_int_eq(p->regfile[R0], 0);
-	ck_assert_int_eq(err, 0);
+	ck_assert_int_eq(p->regfile[R0], 0); // check for non-zero R0
+	ck_assert_int_eq(err, 0); // no error should be reported for R0 write
+
+#test add_check_byte
+	proc *p = malloc(sizeof(proc));
+	proc_set_vec(p);
+	
+	// check if the data in byte_regfile matches regfile
+	p->regfile[R1] = 0xAAFF;
+	
+	ck_assert_int_eq(p->byte_regfile[R1*2], 0xFF);
+	ck_assert_int_eq(p->byte_regfile[(R1*2)+1], 0xAA);
+	
+#test add_signed
+	proc *p = malloc(sizeof(proc));
+	proc_set_vec(p);
+	
+	p->regfile[R1] = -1;
+	p->regfile[R2] = 10;
+	
+	instr_add(p);
+	
+	ck_assert_int_eq(p->regfile[R3], 9);
 
 #tcase instr_mul
 
 #test mul_1
+	proc *p = malloc(sizeof(proc));
+	proc_set_vec(p);
+	
 	p->i.g_s0 = R6;
 	p->i.g_s1 = R6;
 	
@@ -86,7 +119,3 @@ void proc_set_vec(proc *p) {
 	instr_mul(p);
 	
 	ck_assert_int_eq(p->regfile[R3], 36);
-
-#main-pre
-	p = malloc(sizeof(proc));
-	proc_set_vec(p);
