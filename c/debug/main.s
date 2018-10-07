@@ -1,3 +1,4 @@
+// gcc main.s -nostdlib -no-pie -o main.out
 .global _start
 
 	.text
