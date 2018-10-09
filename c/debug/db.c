@@ -1,24 +1,19 @@
-#include "db.h"
-
-void step(pid_t child) {
-	if (ptrace(PTRACE_SINGLESTEP, child, 0, 0)) {
-		perror("ptrace");
-		exit(2);
-	}
-}
 
 void print_info(pid_t child, struct user_regs_struct *regs) {
 	printf("Program information:\n");
 	
-	printf("RIP: 0x%llx\n", regs->rip);
+	printf("RIP: %#llx\n", regs->rip);
+	printf("RSP: %#llx\n", regs->rsp);
 }
 
 void run_debugger(pid_t child) {
 	int wait_status;
-	long long int data; // instruction to store while using breakpoints
-	long long int addr; 
+	long long int data = 0; // instruction to store while using breakpoints
+	long long int addr = 0; 
 	
 	bool running = false;
+	long long int bp_list[NUM_BREAKPOINTS] = {0};
+	int bp_free = 0;
 	
 	struct user_regs_struct regs;
 	
@@ -37,26 +32,32 @@ void run_debugger(pid_t child) {
 			char temp = get_input();
 			switch (temp) {
 				case 's':
-					step(child);
+					ptrace(PTRACE_SINGLESTEP, child, 0, 0);
 					running = true;
 					break;
-				case 'c': 
+				case 'c':
+					ptrace(PTRACE_GETREGS, child, 0, &regs);
+					for (int i = 0; i < NUM_BREAKPOINTS; i++) {
+						if (bp_list[i] == regs.rip-1) {
+							printf("Resuming from breakpoint %d\n", i);
+							ptrace(PTRACE_POKETEXT, child, addr, data);
+							regs.rip -= 1;
+							ptrace(PTRACE_SETREGS, child, 0, &regs);
+							ptrace(PTRACE_CONT, child, 0, 0);
+						}
+					}
 					ptrace(PTRACE_CONT, child, 0, 0);
 					running = true;
 					break; 
 				case 'b': 
+					// NOTE: there's a bug here where if you set multiple breakpoints 
+					// the instruction data gets overwritten and probably segfaults.
 					addr = get_mem_break();
 					data = ptrace(PTRACE_PEEKTEXT, child, (void*) addr, 0);
 					long long int mod_data = (data & 0xFFFFFF00) | 0xCC;
 					ptrace(PTRACE_POKETEXT, child, (void*) addr, (void*) mod_data);
-					printf("Set breakpoint at %llx\n", addr);
-					break;
-				case 'r': // this sould be integrated into continue!
-					ptrace(PTRACE_POKETEXT, child, addr, data);
-					regs.rip -= 1;
-					ptrace(PTRACE_SETREGS, child, 0, &regs);
-					ptrace(PTRACE_CONT, child, 0, 0);
-					running = true;
+					printf("Set breakpoint %d at %llx\n", bp_free, addr);
+					bp_list[bp_free++] = addr;
 					break;
 				case 'i':
 					// update registers
@@ -67,7 +68,7 @@ void run_debugger(pid_t child) {
 					kill(child, SIGKILL);
 					exit(0);
 				default: 
-					printf("Unknown command %c (%d)\n", temp, (int)temp);
+					printf("Unknown command %c\n", temp);
 			}
 		}
 			
@@ -79,7 +80,7 @@ void run_debugger(pid_t child) {
 
 void run_target(const char *program_name) {
 	
-	printf("Starting program %s\n", program_name);
+	printf("Starting program %s.\n", program_name);
 	
 	// asks the kernel if the parent can trace it
 	if (ptrace(PTRACE_TRACEME, 0, 0, 0) < 0) {
@@ -91,9 +92,6 @@ void run_target(const char *program_name) {
 	execl(program_name, program_name, NULL);
 }
 
-
-// take in a program name and fork
-// child runs the program, parent uses ptrace to examine state
 int main(int argc, char **argv) {
 	
 	pid_t child;
@@ -113,6 +111,5 @@ int main(int argc, char **argv) {
 		perror("Fork");
 		exit(3);
 	}
-	
 	
 }
