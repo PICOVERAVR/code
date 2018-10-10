@@ -1,3 +1,4 @@
+#include "db.h"
 
 void print_info(pid_t child, struct user_regs_struct *regs) {
 	printf("Program information:\n");

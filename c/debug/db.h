@@ -11,5 +11,7 @@
 #include <signal.h>
 #include <stdbool.h>
 
+#define NUM_BREAKPOINTS 32
+
 char get_input();
 int get_mem_break();
