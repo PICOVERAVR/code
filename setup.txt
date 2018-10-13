@@ -2,4 +2,6 @@ To interface:
 	set bashrc properly
 	enable color
 	point .gitconfig to inside repo
-	(git config --local include.path ../.gitconfig) within project
+		(git config --local include.path ../.gitconfig) within project
+	for setting up specific branches:
+		git checkout --track origin/branch
