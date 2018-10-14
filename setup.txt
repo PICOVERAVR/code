@@ -1,5 +1,9 @@
-To interface:
-	set bashrc properly
-	enable color
-	point .gitconfig to inside repo
+On new dev box:
+	set bashrc location
+	
+	clone https://www.github.com/PICOVERAVR/code
+	manually point .gitconfig to inside repo
+		"git config --local include.path ../.gitconfig" in main folder
+	checkout and track individual branches
+		git checkout --track origin/branch
 	
