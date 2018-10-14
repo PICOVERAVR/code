@@ -5,7 +5,8 @@ INT_0: BN int
 
 .org 0x100
 org:
-	LD 0xffff, BP
+	// has to be aligned to ?-byte boundary
+	LD 0xfff0, BP
 	MOV BP, SP
 	
 	LD 100, R1
@@ -18,8 +19,8 @@ loop:
 	SUBU 1, R1, R1
 	BNE R1, R0, R4
 	
-.int 0x140	// not implemented
-int:
+.isr 0x140	// not implemented
+isr:
 	IO R1, 0xbeef
 	RET
 	
