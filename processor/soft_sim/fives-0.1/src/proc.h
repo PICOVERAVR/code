@@ -39,7 +39,7 @@ enum exception_vec {
 #define PROC_FEAT_IE 0
 
 // edit macro below if you want specific debug info
-#define DEBUG 0
+#define DEBUG 1
 // see above
 #define dbprintf(format, ...) \
 	do { if (DEBUG) printf ("DBG: " format "\n", ## __VA_ARGS__); } while(0)
@@ -100,7 +100,12 @@ typedef union {
 
 typedef union {
 	struct {
-		uint16_t regfile[32];
+		union {
+			uint16_t regfile[32];
+			uint8_t byte_regfile[64];
+			// L [      R3    ] H L [      R4    ] ... 
+			// L [  h  ][  l  ] H L [  h  ][  l  ] ... 
+		};
 		instr raw_i;
 	};
 	struct {

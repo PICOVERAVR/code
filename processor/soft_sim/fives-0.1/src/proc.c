@@ -5,27 +5,27 @@
 
 #define HAVE_TRAP 1 // tell execute.c that we can trap things
 
-static void proc_feat_set(state *s, int bitpos, int val) {
-	s->p.proc_ext_state |= val << bitpos;
+static void proc_feat_set(proc *p, int bitpos, int val) {
+	p->proc_ext_state |= val << bitpos;
 }
 
-static uint16_t proc_feat_get(state *s, int bitpos) {
-	return (s->p.proc_ext_state >> bitpos);
+static uint16_t proc_feat_get(proc *p, int bitpos) {
+	return (p->proc_ext_state >> bitpos);
 }
 
 void trap_service(proc *p, int trap_vector) {
-	// p->proc_ext_state = trap_vector / 4; NOT SHIFTED PROPERLY
-	p->BP = p->PC; // save PC, keep SP
-	p->BP -= 4;
+	// p->roc_ext_state = trap_vector / 4; NOT SHIFTED PROPERLY
+	p->SP = p->PC; // save PC, keep SP
+	p->SP -= 4;
 	p->PC = trap_vector; // jump to trap
 }
 
 volatile sig_atomic_t interrupt_requested = 0;
 
-static void interrupt_handle(state *s) {
+static void interrupt_handle(proc *p) {
 	
 	unsigned int interrupt_level;
-	dbprintf("caught interrupt, PC 0x%x", s->p.PC);
+	dbprintf("caught interrupt, PC 0x%x", p->PC);
 	printf("3bu ilevel: ");
 	scanf("%d", &interrupt_level);
 	
@@ -33,9 +33,9 @@ static void interrupt_handle(state *s) {
 		printf("WARN: invalid interrupt level!\n");
 	}
 	
-	s->p.BP = s->p.PC; // save PC and jump
-	s->p.BP -= 4;
-	s->p.PC = (4 * interrupt_level) + SYSTEM_TRAP_VEC_SIZE; // jump to interrupt vector, skip trap table
+	p->BP = p->PC; // save PC and jump
+	p->BP -= 4;
+	p->PC = (4 * interrupt_level) + SYSTEM_TRAP_VEC_SIZE; // jump to interrupt vector, skip trap table
 }
 
 void signal_handler(int signum) {
@@ -43,7 +43,7 @@ void signal_handler(int signum) {
 }
 
 int main(int argc, char **argv) {
-	state *s = malloc(sizeof(state));
+	proc *p = malloc(sizeof(proc));
 	
 	uint64_t perf_counter = 0;
 
@@ -52,15 +52,15 @@ int main(int argc, char **argv) {
 		dbprintf("RST encountered, resetting processor\n");
 	}
 
-	uint32_t *hex_mem = proc_setup(argc, argv, s); // this clears processor state!
+	uint32_t *hex_mem = proc_setup(argc, argv, p); // this clears processor state!
 	if (hex_mem == NULL) {
 		fprintf(stderr, "ERR: setup error.\n");
-		free(s);
+		free(p);
 		exit(NO_HEX_ERROR);
 	}
 	
 	// disable interrupts until we want them
-	proc_feat_set(s, PROC_FEAT_IE, 0);
+	proc_feat_set(p, PROC_FEAT_IE, 0);
 	
 	interrupt_requested = false;
 	signal(SIGQUIT, signal_handler);
@@ -71,34 +71,32 @@ int main(int argc, char **argv) {
 	for(;;) {
 		
 		perf_counter++;
-		if (s->p.PC % 4 != 0) {
-		// below is actually correct, but I wrote my test program wrong and I want it to pass
-		//if (s->p.PC % 4 != 0 || s->p.SP % 4 != 0 || s->p.BP % 4 != 0) {
+		if (p->PC % 4 != 0 || p->SP % 4 != 0 || p->BP % 4 != 0) {
 			fprintf(stderr, "EXCP: Misaligned cntl!\n");
-			s->p.PC = EXCP_MISALIGNED_CNTL_VEC;
+			p->PC = EXCP_MISALIGNED_CNTL_VEC;
 		}
 		
-		if (interrupt_requested && proc_feat_get(s, PROC_FEAT_IE)) {
-			interrupt_handle(s);
+		if (interrupt_requested && proc_feat_get(p, PROC_FEAT_IE)) {
+			interrupt_handle(p);
 			interrupt_requested = false; // clear interrupt flag
 		} else {
-			s->p.i.raw_instr = hex_mem[s->p.PC / sizeof(uint32_t)];
-			dbprintf("fetched instruction 0x%x, PC 0x%x", s->p.i.raw_instr, s->p.PC);
+			p->i.raw_instr = hex_mem[p->PC / sizeof(uint32_t)];
+			dbprintf("fetched instruction 0x%x, PC 0x%x", p->i.raw_instr, p->PC);
 			
-			s->p.PC += 4;
+			p->PC += 4;
 		}
 		
-		int err = disp(s, ram);
+		int err = disp(p, ram);
 		if (err == EXCP_ILL_INSTR) {
-			fprintf(stderr, "EXCP: Illegal instruction 0x%x!\n", s->p.i.raw_instr);
-			s->p.PC = EXCP_ILL_INSTR_VEC;
+			fprintf(stderr, "EXCP: Illegal instruction 0x%x!\n", p->i.raw_instr);
+			p->PC = EXCP_ILL_INSTR_VEC;
 		} else if (err == SIM_STOP) {
 			break;
 		}
 		
 	}
 	
-	free(s);
+	free(p);
 	free(ram);
 	
 	fprintf(stderr, "ERR: reached end of sim\n");

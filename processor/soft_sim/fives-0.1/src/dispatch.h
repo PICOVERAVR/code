@@ -1,4 +1,4 @@
 #include "proc.h"
 
-int disp(state *s, uint16_t *ram);
+int disp(proc *p, uint16_t *ram);
 

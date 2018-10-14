@@ -1,6 +1,6 @@
 #include "proc.h"
 
-uint32_t *proc_setup(int argc, char **argv, state *s) {
+uint32_t *proc_setup(int argc, char **argv, proc *p) {
 	if (argc < 2) {
 		fprintf(stderr, "ERR: no hex file provided!\n");
 		return NULL;
@@ -22,6 +22,6 @@ uint32_t *proc_setup(int argc, char **argv, state *s) {
 	
 	hex_mem[hex_size-1] = 0; // make the file NULL-terminated, for ease of mind
 
-	memset(s, 0, sizeof(state)); // clear proc state
+	memset(p, 0, sizeof(proc)); // clear proc state
 	return hex_mem;
 }
