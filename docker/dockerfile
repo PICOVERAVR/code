@@ -6,27 +6,25 @@ SHELL ["/bin/bash", "-c"]
 
 ENV TERM xterm
 
-RUN apt-get -y update --yes
-
-RUN apt-get install --yes bash \
-			  gcc \
-			  g++ \
-			  golang-go \
-			  python3 \
-			  libglib2.0-dev \
-			  man \
-			  strace \
-			  valgrind \
-			  vim \
-			  gdb \
-			  make \
-			  git \
-			  binutils \
-			  flex \
-			  bison \
-			  autotools-dev \
-			  autoconf \
-			  pv
+RUN apt-get update && apt-get install -y \
+	bash \
+	gcc \
+	g++ \
+	golang-go \
+	python3 \
+	libglib2.0-dev \
+	strace \
+	valgrind \
+	vim \
+	gdb \
+	make \
+	git \
+	binutils \
+	flex \
+	bison \
+	autotools-dev \
+	autoconf \
+&& rm -rf /var/lib/apt/lists/*
 
 EXPOSE 80
 

@@ -3,6 +3,14 @@
 
 	.text
 _start:
+	
+	push %rbp
+	mov %rsp, %rbp
+	
+	// testing VEX prefixes and stuff in here
+	// for no reason
+	mov $0xFF, %r15
+	
 	// write
 	mov $0x1, %rax
 	mov $0x1, %rdi

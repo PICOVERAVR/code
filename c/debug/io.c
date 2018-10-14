@@ -1,4 +1,4 @@
-#include <stdio.h>
+#include "db.h"
 
 char get_input() {
 	char in;
@@ -13,7 +13,7 @@ char get_input() {
 
 int get_mem_break() {
 	long long int addr;
-	printf("Address (hex)? ");
+	printf("addr: ");
 	int err = scanf(" %llx", &addr);
 	if (err < 0) {
 		perror("scanf");
