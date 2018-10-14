@@ -13,6 +13,7 @@
 #include <stdbool.h>
 
 #define NUM_BREAKPOINTS 32
+#define TRAP_CODE 0xCC
 
 char get_input();
 int get_mem_break();

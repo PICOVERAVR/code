@@ -23,6 +23,7 @@ void run_debugger(pid_t child, const char *child_name) {
 	
 	printf("Debugger started.\n");
 	
+	ptrace(PTRACE_SETOPTIONS, child, 0, PTRACE_O_TRACESYSGOOD);
 	// wait until something happens
 	wait(&wait_status);
 	
@@ -38,6 +39,7 @@ void run_debugger(pid_t child, const char *child_name) {
 			char temp = get_input();
 			switch (temp) {
 				case 'd':
+					// security vuln here: if program is named '<program>; <cmd>', cmd will be executed
 					snprintf(system_str, sizeof(system_str), "objdump -d %s", child_name);
 					int err = system(system_str);
 					if (err) printf("ERR: cannot dump executable.\n");
@@ -64,7 +66,7 @@ void run_debugger(pid_t child, const char *child_name) {
 					addr = get_mem_break();
 					data = ptrace(PTRACE_PEEKTEXT, child, (void*) addr, 0);
 					// patch the instruction at the breakpoint with a 'int 3' opcode: 0xCC
-					uint64_t mod_data = (data & 0xFFFFFF00) | 0xCC;
+					uint64_t mod_data = (data & 0xFFFFFF00) | TRAP_CODE;
 					ptrace(PTRACE_POKETEXT, child, (void*) addr, (void*) mod_data);
 					printf("Set breakpoint %d at %lx\n", bp_free, addr);
 					bp_list[bp_free] = addr;
@@ -73,9 +75,9 @@ void run_debugger(pid_t child, const char *child_name) {
 				case 'i':
 					print_info(child, &regs);
 					break;
-				case 'x': 
-					if (kill(child, SIGKILL)< 0) {
-						perror("sigkill");
+				case 'x':
+					if (kill(child, SIGKILL) < 0) {
+						perror("kill");
 					}
 					exit(0);
 				case 'h':
@@ -89,21 +91,24 @@ void run_debugger(pid_t child, const char *child_name) {
 		// wait for child to stop again
 		wait(&wait_status);
 	}
-	printf("Child exited with status %d\n",WEXITSTATUS(wait_status));
+	printf("Child exited with status %d\n", WEXITSTATUS(wait_status));
 }
 
 void run_target(const char *program_name) {
 	
-	printf("Starting program %s.\n", program_name);
-	
 	// asks the kernel if the parent can trace it
 	if (ptrace(PTRACE_TRACEME, 0, 0, 0) < 0) {
 		perror("trace");
-		exit(2);
+		exit(1);
 	}
 	
 	// exec needs a NULL sentinel at the end
-	execl(program_name, program_name, NULL);
+	if (execl(program_name, program_name, NULL) < 0) {
+		perror("exec");
+		exit(-1);
+	}
+	
+	printf("Starting program %s.\n", program_name);
 }
 
 int main(int argc, char **argv) {
@@ -122,6 +127,6 @@ int main(int argc, char **argv) {
 		run_debugger(child, argv[1]);
 	} else {
 		perror("fork");
-		exit(3);
+		exit(1);
 	}
 }

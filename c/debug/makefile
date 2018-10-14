@@ -10,8 +10,9 @@ debug: pre
 	@echo "Debug build completed."
 
 small: pre
-	@$(CC) $(SRC) $(DFLAGS) -s -Os -o 'small.out'
-	@echo "Small build completed, size" $(shell du -b small.out | head -c 6) "bytes."
+	@$(CC) $(SRC) $(DFLAGS) -s -Os -Wl,--gc-sections -o 'small.out'
+	@strip --strip-all --remove-section=.comment --remove-section=.note small.out
+	@echo "Small build completed."
 
 pre:
 	@echo "Building on $(UNAME), user params: $(USER_FLAGS)"
