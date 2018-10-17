@@ -1,0 +1,95 @@
+23:31:06 **** Build of project microblaze_src_bsp ****
+make -k all 
+"Running Make include in microblaze_0/libsrc/bram_v4_2/src"
+make -C microblaze_0/libsrc/bram_v4_2/src -s include  "SHELL=CMD" "COMPILER=mb-gcc" "ARCHIVER=mb-ar" "COMPILER_FLAGS=  -O2 -c -mcpu=v10.0 -mlittle-endian -mxl-soft-mul" "EXTRA_COMPILER_FLAGS=-ffunction-sections -fdata-sections -Wall -Wextra"
+"Running Make include in microblaze_0/libsrc/cpu_v2_7/src"
+make -C microblaze_0/libsrc/cpu_v2_7/src -s include  "SHELL=CMD" "COMPILER=mb-gcc" "ARCHIVER=mb-ar" "COMPILER_FLAGS=  -O2 -c -mcpu=v10.0 -mlittle-endian -mxl-soft-mul" "EXTRA_COMPILER_FLAGS=-ffunction-sections -fdata-sections -Wall -Wextra"
+"Running Make include in microblaze_0/libsrc/gpio_v4_3/src"
+make -C microblaze_0/libsrc/gpio_v4_3/src -s include  "SHELL=CMD" "COMPILER=mb-gcc" "ARCHIVER=mb-ar" "COMPILER_FLAGS=  -O2 -c -mcpu=v10.0 -mlittle-endian -mxl-soft-mul" "EXTRA_COMPILER_FLAGS=-ffunction-sections -fdata-sections -Wall -Wextra"
+"Running Make include in microblaze_0/libsrc/standalone_v6_7/src"
+make -C microblaze_0/libsrc/standalone_v6_7/src -s include  "SHELL=CMD" "COMPILER=mb-gcc" "ARCHIVER=mb-ar" "COMPILER_FLAGS=  -O2 -c -mcpu=v10.0 -mlittle-endian -mxl-soft-mul" "EXTRA_COMPILER_FLAGS=-ffunction-sections -fdata-sections -Wall -Wextra"
+"Running Make libs in microblaze_0/libsrc/bram_v4_2/src"
+make -C microblaze_0/libsrc/bram_v4_2/src -s libs  "SHELL=CMD" "COMPILER=mb-gcc" "ARCHIVER=mb-ar" "COMPILER_FLAGS=  -O2 -c -mcpu=v10.0 -mlittle-endian -mxl-soft-mul" "EXTRA_COMPILER_FLAGS=-ffunction-sections -fdata-sections -Wall -Wextra"
+"Compiling bram"
+mb-ar: creating ../../../lib/libxil.a
+"Running Make libs in microblaze_0/libsrc/cpu_v2_7/src"
+make -C microblaze_0/libsrc/cpu_v2_7/src -s libs  "SHELL=CMD" "COMPILER=mb-gcc" "ARCHIVER=mb-ar" "COMPILER_FLAGS=  -O2 -c -mcpu=v10.0 -mlittle-endian -mxl-soft-mul" "EXTRA_COMPILER_FLAGS=-ffunction-sections -fdata-sections -Wall -Wextra"
+"Compiling cpu"
+"Running Make libs in microblaze_0/libsrc/gpio_v4_3/src"
+make -C microblaze_0/libsrc/gpio_v4_3/src -s libs  "SHELL=CMD" "COMPILER=mb-gcc" "ARCHIVER=mb-ar" "COMPILER_FLAGS=  -O2 -c -mcpu=v10.0 -mlittle-endian -mxl-soft-mul" "EXTRA_COMPILER_FLAGS=-ffunction-sections -fdata-sections -Wall -Wextra"
+"Compiling gpio"
+"Running Make libs in microblaze_0/libsrc/standalone_v6_7/src"
+make -C microblaze_0/libsrc/standalone_v6_7/src -s libs  "SHELL=CMD" "COMPILER=mb-gcc" "ARCHIVER=mb-ar" "COMPILER_FLAGS=  -O2 -c -mcpu=v10.0 -mlittle-endian -mxl-soft-mul" "EXTRA_COMPILER_FLAGS=-ffunction-sections -fdata-sections -Wall -Wextra"
+"Compiling standalone";
+inbyte.c: In function 'inbyte':
+inbyte.c:11:1: warning: control reaches end of non-void function [-Wreturn-type]
+ }
+ ^
+microblaze_sleep.c:74:9: note: #pragma message: For the sleep routines, assembly instructions are used
+ #pragma message ("For the sleep routines, assembly instructions are used")
+         ^~~~~~~
+outbyte.c: In function 'outbyte':
+outbyte.c:11:19: warning: unused parameter 'c' [-Wunused-parameter]
+ void outbyte(char c) {
+                   ^
+'Finished building libraries'
+
+**** Build of configuration Debug for project microblaze_src ****
+
+Nothing to build for project microblaze_src
+23:31:47 **** Auto Build of configuration Debug for project microblaze_src ****
+make all 
+'Building file: ../src/main.c'
+'Invoking: MicroBlaze gcc compiler'
+mb-gcc -Wall -O0 -g3 -c -fmessage-length=0 -MT"src/main.o" -I../../microblaze_src_bsp/microblaze_0/include -mlittle-endian -mcpu=v10.0 -mxl-soft-mul -Wl,--no-relax -ffunction-sections -fdata-sections -MMD -MP -MF"src/main.d" -MT"src/main.o" -o "src/main.o" "../src/main.c"
+'Finished building: ../src/main.c'
+' '
+'Building target: microblaze_src.elf'
+'Invoking: MicroBlaze gcc linker'
+mb-gcc -Wl,-T -Wl,../src/lscript.ld -L../../microblaze_src_bsp/microblaze_0/lib -mlittle-endian -mcpu=v10.0 -mxl-soft-mul -Wl,--no-relax -Wl,--gc-sections -o "microblaze_src.elf"  ./src/main.o   -Wl,--start-group,-lxil,-lgcc,-lc,--end-group
+c:/xilinx/sdk/2018.2/gnu/microblaze/nt/bin/../lib/gcc/microblaze-xilinx-elf/7.2.0/../../../../microblaze-xilinx-elf/lib/le/crtinit.o: In function `_crtinit':
+(.text+0x78): undefined reference to `main'
+collect2.exe: error: ld returned 1 exit status
+make: *** [microblaze_src.elf] Error 1
+23:37:30 **** Auto Build of configuration Debug for project microblaze_src ****
+make all 
+'Building file: ../src/main.c'
+'Invoking: MicroBlaze gcc compiler'
+mb-gcc -Wall -O0 -g3 -c -fmessage-length=0 -MT"src/main.o" -I../../microblaze_src_bsp/microblaze_0/include -mlittle-endian -mcpu=v10.0 -mxl-soft-mul -Wl,--no-relax -ffunction-sections -fdata-sections -MMD -MP -MF"src/main.d" -MT"src/main.o" -o "src/main.o" "../src/main.c"
+'Finished building: ../src/main.c'
+' '
+'Building target: microblaze_src.elf'
+'Invoking: MicroBlaze gcc linker'
+mb-gcc -Wl,-T -Wl,../src/lscript.ld -L../../microblaze_src_bsp/microblaze_0/lib -mlittle-endian -mcpu=v10.0 -mxl-soft-mul -Wl,--no-relax -Wl,--gc-sections -o "microblaze_src.elf"  ./src/main.o   -Wl,--start-group,-lxil,-lgcc,-lc,--end-group
+'Finished building target: microblaze_src.elf'
+' '
+'Invoking: MicroBlaze Print Size'
+mb-size microblaze_src.elf  |tee "microblaze_src.elf.size"
+   text	   data	    bss	    dec	    hex	filename
+   2868	    288	   3116	   6272	   1880	microblaze_src.elf
+'Finished building: microblaze_src.elf.size'
+' '
+23:38:21 **** Auto Build of configuration Debug for project microblaze_src ****
+make all 
+'Building file: ../src/main.c'
+'Invoking: MicroBlaze gcc compiler'
+mb-gcc -Wall -O0 -g3 -c -fmessage-length=0 -MT"src/main.o" -I../../microblaze_src_bsp/microblaze_0/include -mlittle-endian -mcpu=v10.0 -mxl-soft-mul -Wl,--no-relax -ffunction-sections -fdata-sections -MMD -MP -MF"src/main.d" -MT"src/main.o" -o "src/main.o" "../src/main.c"
+'Finished building: ../src/main.c'
+' '
+'Building target: microblaze_src.elf'
+'Invoking: MicroBlaze gcc linker'
+mb-gcc -Wl,-T -Wl,../src/lscript.ld -L../../microblaze_src_bsp/microblaze_0/lib -mlittle-endian -mcpu=v10.0 -mxl-soft-mul -Wl,--no-relax -Wl,--gc-sections -o "microblaze_src.elf"  ./src/main.o   -Wl,--start-group,-lxil,-lgcc,-lc,--end-group
+'Finished building target: microblaze_src.elf'
+' '
+'Invoking: MicroBlaze Print Size'
+mb-size microblaze_src.elf  |tee "microblaze_src.elf.size"
+   text	   data	    bss	    dec	    hex	filename
+   2868	    288	   3116	   6272	   1880	microblaze_src.elf
+'Finished building: microblaze_src.elf.size'
+' '
+23:38:22 **** Auto Build of configuration Debug for project microblaze_src ****
+make all 
+make: Nothing to be done for `all'.
+23:41:20 **** Incremental Build of configuration Debug for project microblaze_src ****
+make all 
+make: Nothing to be done for `all'.
