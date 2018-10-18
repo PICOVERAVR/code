@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+
+<plant_list>
+<plant>
+	<name>Plant 123</name>
+	<sname>Plantai 123us</sname>
+	<traits>
+		<cones>+</cones>
+		<native_ca>+</native_ca>
+	</traits>
+</plant>
+
+<plant>
+	<name>Plant 456</name>
+	<sname>Plantai 456</sname>
+	<traits>
+		<cones>-</cones>
+		<native_ca>+</native_ca>
+	</traits>
+</plant>
+
+<plant>
+	<name>Plant 789</name>
+	<sname>Plantai 789</sname>
+	<traits>
+		<native_ca>+</native_ca>
+		<native_other>+</native_other>
+	</traits>
+</plant>
+
+<plant>
+	<name>test</name>
+	<sname>test</sname>
+	<traits>
+		<native_ca>-</native_ca>
+		<native_other>-</native_other>
+	</traits>
+</plant>
+</plant_list>

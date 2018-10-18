@@ -1,0 +1,3 @@
+given a list of plants and parameters about them, generate a tree thing in bio
+
+
