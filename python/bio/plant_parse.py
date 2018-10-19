@@ -27,7 +27,7 @@ if __name__ == "__main__":
 			temp_list.append(j.text)
 		print('Params for ' + list_names[i] + ': ')
 		for i in temp_list:
-			print('\t' + i + ': ' + 'Grab data from XML sheet again and put here')
+			print('\t' + i + ': ' + i + root.find('.//'))
 		print()
 	
 

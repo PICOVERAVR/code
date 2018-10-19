@@ -1,3 +1,7 @@
 given a list of plants and parameters about them, generate a tree thing in bio
 
+TODO:
+	1. Use JSON instead of XML
+	2. Use lib to import JSON into Python Dictionary and process from there
+	3. Make sure output format is flexible as well
 
