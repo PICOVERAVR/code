@@ -1,4 +1,0 @@
-NumberHits:0
-Timestamp: Sat Oct 20 04:37:33 UTC 2018
-VLNV: xilinx.com:ip:axi_intc:4.1
-SynthRuntime: 38
