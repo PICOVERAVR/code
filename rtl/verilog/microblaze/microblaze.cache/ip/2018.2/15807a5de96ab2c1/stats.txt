@@ -1,4 +1,0 @@
-NumberHits:0
-Timestamp: Wed Oct 17 06:24:08 UTC 2018
-VLNV: xilinx.com:ip:proc_sys_reset:5.0
-SynthRuntime: 45

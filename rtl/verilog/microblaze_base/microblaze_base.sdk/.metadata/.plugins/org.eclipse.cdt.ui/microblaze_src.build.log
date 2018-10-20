@@ -1,0 +1,28 @@
+21:59:07 **** Auto Build of configuration Debug for project microblaze_src ****
+make all 
+'Building file: ../src/main.c'
+'Invoking: MicroBlaze gcc compiler'
+mb-gcc -Wall -O0 -g3 -c -fmessage-length=0 -MT"src/main.o" -I../../microblaze_src_bsp/microblaze_0/include -mlittle-endian -mxl-barrel-shift -mcpu=v10.0 -mno-xl-soft-mul -Wl,--no-relax -ffunction-sections -fdata-sections -MMD -MP -MF"src/main.d" -MT"src/main.o" -o "src/main.o" "../src/main.c"
+../src/main.c: In function 'main':
+../src/main.c:8:6: warning: variable 'btn' set but not used [-Wunused-but-set-variable]
+  u32 btn, led;
+      ^~~
+../src/main.c:18:3: warning: 'led' is used uninitialized in this function [-Wuninitialized]
+   XGpio_DiscreteWrite(&gpio, 2, led);
+   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+'Finished building: ../src/main.c'
+' '
+'Building target: microblaze_src.elf'
+'Invoking: MicroBlaze gcc linker'
+mb-gcc -Wl,-T -Wl,../src/lscript.ld -L../../microblaze_src_bsp/microblaze_0/lib -mlittle-endian -mxl-barrel-shift -mcpu=v10.0 -mno-xl-soft-mul -Wl,--no-relax -Wl,--gc-sections -o "microblaze_src.elf"  ./src/main.o   -Wl,--start-group,-lxil,-lgcc,-lc,--end-group
+'Finished building target: microblaze_src.elf'
+' '
+'Invoking: MicroBlaze Print Size'
+mb-size microblaze_src.elf  |tee "microblaze_src.elf.size"
+   text	   data	    bss	    dec	    hex	filename
+   6620	    340	   3120	  10080	   2760	microblaze_src.elf
+'Finished building: microblaze_src.elf.size'
+' '
+
+21:59:07 Build Finished (took 762ms)
+
