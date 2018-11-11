@@ -1,0 +1,27 @@
+CC = gcc
+STANDARD = -std=gnu11 # default anyways, not necessary
+CFLAGS = -Wall $(STANDARD)
+DFLAGS = $(CFLAGS) $(STANDARD) -g -pg # generate symbol information
+
+SRC := $(filter-out test.c, $(wildcard *.c)) # grab anything with a .c ending
+
+USER_FLAGS := $(vars)
+UNAME := $(shell uname -sm)
+
+debug: pre
+	@$(CC) $(SRC) $(DFLAGS) -Og -o 'db.out'
+	@echo "Debug build completed."
+
+fast: pre
+	@$(CC) $(SRC) $(CFLAGS) -O3 -march=native -o 'prod.out' 
+	@echo "Optimized build completed."
+
+pre:
+	@echo "Building on $(UNAME), user params: $(USER_FLAGS)"
+
+clean:
+	@rm -f *.out
+	@rm -f *.s *.o
+	
+	@rm -rf *.out.dSYM # get rid of debug info, macOS specific
+	@rm -f *.gch
