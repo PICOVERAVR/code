@@ -1,7 +1,7 @@
 #include "header.h"
 
 void test(int *p) {
-	*p = 42;;
+	*p = 42;
 }
 
 
