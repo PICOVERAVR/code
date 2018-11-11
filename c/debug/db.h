@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdint.h>
+#include <stdarg.h>
 
 #include <sys/types.h>
 #include <sys/ptrace.h>
@@ -17,3 +18,5 @@
 
 char get_input();
 int get_mem_break();
+
+extern const char *help_text;

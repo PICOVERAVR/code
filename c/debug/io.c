@@ -13,7 +13,6 @@ char get_input() {
 
 int get_mem_break() {
 	long long int addr;
-	printf("addr: ");
 	int err = scanf(" %llx", &addr);
 	if (err < 0) {
 		perror("scanf");
