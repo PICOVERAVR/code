@@ -1,6 +1,14 @@
 #include "db.h"
 
-const char *help_text = "Help menu:\nd: disassemble the current program\ns: single-step the current program\nc: continue from breakpoint\n b: set a breakpoint\ni: info about PC and SP\nx: kill child and quit\nh: this help menu\n\n";
+const char *help_text = "Help menu: \
+    command (short name) <parameters>: description \
+    dump (d): disassemble the current executable. \
+    step (s): advance one instruction \
+    continue (c): resume execution of program \
+    break (b) <hex addr>: stop exeuction at addr \
+    quit (q): kill child and quit the program \
+    help (h): display this help menu \
+";
 
 void print_info(pid_t child, struct user_regs_struct *regs) {
 	printf("Program information:\n");
@@ -55,7 +63,7 @@ void run_debugger(pid_t child, const char *child_name) {
 	
 	char system_str[512];
 	
-	printf("Debugger started. Enter 'h' for help.\n");
+	printf("Debugger started. Enter 'help' for help.\n");
 	
 	ptrace(PTRACE_SETOPTIONS, child, 0, PTRACE_O_TRACESYSGOOD);
 	// wait until something happens
@@ -70,25 +78,25 @@ void run_debugger(pid_t child, const char *child_name) {
 		// update registers on debug side
 		
 		while (!running) {
-			char temp = get_input();
+			int temp = get_input();
 			switch (temp) {
-				case 'd':
+				case DUMP_REGS:
 					// security vuln here: if program is named '<program>; <cmd>', cmd will be executed
 					snprintf(system_str, sizeof(system_str), "objdump -d %s", child_name);
 					int err = system(system_str);
 					if (err) printf("ERR: cannot dump executable.\n");
 					break;
-				case 's':
+				case SINGLE_STEP:
 					check_clear_bp(child, bp_list, bp_data, &bp_free);
 					ptrace(PTRACE_SINGLESTEP, child, 0, 0);
 					running = true;
 					break;
-				case 'c':
+				case B_CONTINUE:
 					check_clear_bp(child, bp_list, bp_data, &bp_free);
 					ptrace(PTRACE_CONT, child, 0, 0);
 					running = true;
 					break; 
-				case 'b': 
+				case B_BREAK: 
 					addr = get_mem_break();
 					data = ptrace(PTRACE_PEEKTEXT, child, (void*) addr, 0);
 					// patch the instruction at the breakpoint with a 'int 3' opcode: 0xCC
@@ -99,20 +107,20 @@ void run_debugger(pid_t child, const char *child_name) {
 					bp_data[bp_free] = data;
 					bp_free++;
 					break;
-				case 'i':
+				case PROG_INFO:
 					print_info(child, &regs);
 					break;
-				case 'x':
+				case KILL_QUIT:
 					if (kill(child, SIGKILL) < 0) {
 						perror("kill");
 					}
 					free_all(2, bp_list, bp_data);
 					exit(0);
-				case 'h':
+				case HELP:
 					printf("%s", help_text);
 					break;
 				default: 
-					printf("Unknown command %c\n", temp);
+					printf("Unknown command!\n");
 					break;
 			}
 		}

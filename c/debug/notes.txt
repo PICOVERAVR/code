@@ -1,2 +1,8 @@
-3. doesn't work for a regular helloworld.c - breakpoints never met?
-4. should move beyond just letters
+1. doesn't work for a regular helloworld.c
+	dynamic linking shuffles everything around
+2. set watchpoints
+3. print all breakpoints
+4. stuff
+
+666. Use libdwarf!
+
