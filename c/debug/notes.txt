@@ -1,8 +1,8 @@
 1. doesn't work for a regular helloworld.c
-	dynamic linking shuffles everything around
+	no support for PIC executables, recompile with -no-pie flag
 2. set watchpoints
-3. print all breakpoints
-4. stuff
+3. disable breakpoints
 
-666. Use libdwarf!
-
+4. Use libdwarf!
+	got it to work, but code relies on compiler generating dwarf2
+	apparently still decently popular...

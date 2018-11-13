@@ -1,3 +1,6 @@
+// gcc dwarf.c -ldwarf -lelf -lz -o dwarf.out
+// LD_LIBRARY_PATH=/usr/local/lib ./a.out testing/comp.out
+// compile comp.out with -gdwarf-2
 #include <stdio.h>
 #include <stdarg.h>
 #include <stdlib.h>

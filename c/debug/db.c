@@ -7,7 +7,8 @@ const char *help_text = "Help menu: \
     continue (c): resume execution of program \
     break (b) <hex addr>: stop exeuction at addr \
     quit (q): kill child and quit the program \
-    help (h): display this help menu \
+    list (l): list all breakpoints \
+	help (h): display this help menu \
 ";
 
 void print_info(pid_t child, struct user_regs_struct *regs) {
@@ -16,21 +17,6 @@ void print_info(pid_t child, struct user_regs_struct *regs) {
 	printf("RIP: %#llx\n", regs->rip);
 	printf("RBP: %#llx\n", regs->rbp);
 	printf("RSP: %#llx\n", regs->rsp);
-}
-
-void check_clear_bp(pid_t child, uint64_t *list, uint64_t *data, int *next_free) {
-	struct user_regs_struct temp_regs;
-
-	ptrace(PTRACE_GETREGS, child, 0, &temp_regs);
-	for (int i = 0; i <= *next_free; i++) {
-		if (list[i] == temp_regs.rip-1) {
-			printf("Resuming from breakpoint %d\n", i);
-			ptrace(PTRACE_POKETEXT, child, list[i], data[i]);
-			temp_regs.rip--;
-			ptrace(PTRACE_SETREGS, child, 0, &temp_regs);
-			(*next_free)--;
-		}
-	}
 }
 
 void free_all(int numfree, void *arg1, ...) {
@@ -116,6 +102,9 @@ void run_debugger(pid_t child, const char *child_name) {
 					}
 					free_all(2, bp_list, bp_data);
 					exit(0);
+				case LIST_BP:
+					print_breakpoints(bp_list);
+					break;
 				case HELP:
 					printf("%s", help_text);
 					break;
