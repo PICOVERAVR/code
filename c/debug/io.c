@@ -14,7 +14,8 @@ const cmd_string list_cmd [END_CMD] = {
 	{PROG_INFO,   "info", "i"},
 	{KILL_QUIT,   "quit", "q"},
 	{HELP,        "help", "h"},
-	{LIST_BP,	  "list", "l"}
+	{LIST_BP,	  "list", "l"},
+	{WATCHP, 	  "watch", "w"},
 };
 
 void print_breakpoints(uint64_t *break_list) {

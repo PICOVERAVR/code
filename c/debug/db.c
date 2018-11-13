@@ -105,6 +105,12 @@ void run_debugger(pid_t child, const char *child_name) {
 				case LIST_BP:
 					print_breakpoints(bp_list);
 					break;
+				case WATCHP:
+					//addr = get_mem_break();
+					//data = ptrace(PTRACE_PEEKTEXT, child, (void*) addr, 0);
+					printf("Not implemented yet!\n");
+					// same as breakpoints, but stop if value is changed
+					break;
 				case HELP:
 					printf("%s", help_text);
 					break;

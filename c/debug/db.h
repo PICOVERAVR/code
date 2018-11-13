@@ -27,7 +27,8 @@ enum {
     KILL_QUIT,
  	HELP,
 	LIST_BP,
-    END_CMD // sentinel value
+    WATCHP,
+	END_CMD // sentinel value
  };
 
 int get_input();
