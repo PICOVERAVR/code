@@ -9,11 +9,12 @@ typedef enum include {
 
 struct task_buf {
     void (*func)(void *);
-    int tid;
+	int tid;
     int priority;
     struct task_buf *next;
     void *args;
 };
+
 //do not optimize this
 typedef struct task_buf task_buf;
 

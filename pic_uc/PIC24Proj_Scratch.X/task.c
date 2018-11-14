@@ -2,11 +2,11 @@
 
 //TODO:
     //add priority scheduling - figure out how to avoid resource starvation!
-    //forcing everything through a void* is really annoying... is there a better way to do this?
-    //add a monitor task that indicates an error
+    //or priority inversion - have the task only be executed every <priority> ticks
     //have a way to kill tasks and have their memory freed properly
-    //have the user modify the parameter the task gets
+    //	wrap malloc in a function that tracks memory accesses and frees them all when the function gets killed
     //have an interrupt task that gets called and sets global interrupt bits, then returns
+	//	have a special task that returns stuff? idk
 
 static jmp_buf task_main; //processor state of master task to come back to
 task_buf *task_bufbot; //pointer to null task (first task)
@@ -48,6 +48,18 @@ int get_system_tick(void) {
         return -1;
     }
     return *((int*) timer->args);
+}
+
+//modify the arg of a task
+//WARNING: not tested!!
+int set_task_arg(int tid, void *arg) {
+	task_buf *modify = task_find(tid);
+	if (modify == NULL) {
+		printf("ERROR: task not found!\n");
+		return -1;
+	}
+	modify->args = arg;
+	return 0;
 }
 
 //find a task by tid, returns NULL if not found
@@ -92,7 +104,6 @@ task_buf *user_task_add(void (*task_func)(void *), void *args) {
 
 //remove a task from the pool
 //note: this does not free any resources allocated by the task
-//no way to do this yet...
 void task_del(task_buf *buf, task_buf *prev) {
     prev->next = buf->next;
     free(buf);
