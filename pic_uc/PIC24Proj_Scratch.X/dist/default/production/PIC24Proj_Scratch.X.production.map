@@ -511,7 +511,7 @@ __FOSCSEL
 
 __FGS             0x0557fa          0x2
  *(__FGS.sec*)
- __FGS.sec        0x0557fa          0x2 /CW/_FGS ƒ¨Ôƒ¨__FGS.sec
+ __FGS.sec        0x0557fa          0x2 /CW/_FGS ƒÔƒ__FGS.sec
                   0x0557fa                  __FGS.sec
 
 __FUID0
@@ -529,23 +529,23 @@ __FUID3
 .comment
  *(.comment)
 
-.debug_info       0x000000       0xe4e3
+.debug_info       0x000000       0xe46b
  *(.debug_info)
- .debug_info      0x000000       0x179f build/default/production/mcc_generated_files/mcc.o
- .debug_info      0x00179f        0x166 build/default/production/mcc_generated_files/interrupt_manager.o
- .debug_info      0x001905        0x58a build/default/production/mcc_generated_files/traps.o
- .debug_info      0x001e8f        0xaf0 build/default/production/mcc_generated_files/pin_manager.o
- .debug_info      0x00297f        0x622 build/default/production/mcc_generated_files/tmr2.o
- .debug_info      0x002fa1        0x74a build/default/production/mcc_generated_files/uart1.o
- .debug_info      0x0036eb        0x91f build/default/production/mcc_generated_files/spi2.o
- .debug_info      0x00400a        0xfc0 build/default/production/mcc_generated_files/adc1.o
- .debug_info      0x004fca       0x102b build/default/production/main.o
- .debug_info      0x005ff5       0x1371 build/default/production/core.o
- .debug_info      0x007366       0x1ae1 build/default/production/i2c.o
- .debug_info      0x008e47       0x1707 build/default/production/tft.o
- .debug_info      0x00a54e       0x1450 build/default/production/task.o
- .debug_info      0x00b99e       0x1308 build/default/production/fat.o
- .debug_info      0x00cca6       0x183d build/default/production/sd.o
+ .debug_info      0x000000       0x1797 build/default/production/mcc_generated_files/mcc.o
+ .debug_info      0x001797        0x15e build/default/production/mcc_generated_files/interrupt_manager.o
+ .debug_info      0x0018f5        0x582 build/default/production/mcc_generated_files/traps.o
+ .debug_info      0x001e77        0xae8 build/default/production/mcc_generated_files/pin_manager.o
+ .debug_info      0x00295f        0x61a build/default/production/mcc_generated_files/tmr2.o
+ .debug_info      0x002f79        0x742 build/default/production/mcc_generated_files/uart1.o
+ .debug_info      0x0036bb        0x917 build/default/production/mcc_generated_files/spi2.o
+ .debug_info      0x003fd2        0xfb8 build/default/production/mcc_generated_files/adc1.o
+ .debug_info      0x004f8a       0x1023 build/default/production/main.o
+ .debug_info      0x005fad       0x1369 build/default/production/core.o
+ .debug_info      0x007316       0x1ad9 build/default/production/i2c.o
+ .debug_info      0x008def       0x16ff build/default/production/tft.o
+ .debug_info      0x00a4ee       0x1448 build/default/production/task.o
+ .debug_info      0x00b936       0x1300 build/default/production/fat.o
+ .debug_info      0x00cc36       0x1835 build/default/production/sd.o
  *(.gnu.linkonce.wi.*)
 
 .debug_abbrev     0x000000       0x13b8
@@ -1548,7 +1548,7 @@ LOAD /Applications/microchip/xc16/v1.35/bin/bin/../../lib/libm-elf.a
 LOAD /Applications/microchip/xc16/v1.35/bin/bin/../../lib/libc-elf.a
 END GROUP
 OUTPUT(dist/default/production/PIC24Proj_Scratch.X.production.elf elf32-pic30)
-LOAD /CW/_FGS ƒ¨Ôƒ¨__FGS.sec
+LOAD /CW/_FGS ƒÔƒ__FGS.sec
 LOAD jump_table
 LOAD default_isr
 LOAD heap

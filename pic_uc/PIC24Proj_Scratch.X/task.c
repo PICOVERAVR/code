@@ -1,17 +1,16 @@
 #include "task.h"
 
-
 //TODO:
     //add priority scheduling - figure out how to avoid resource starvation!
     //forcing everything through a void* is really annoying... is there a better way to do this?
     //add a monitor task that indicates an error
-
+    //have a way to kill tasks and have their memory freed properly
+    //have the user modify the parameter the task gets
+    //have an interrupt task that gets called and sets global interrupt bits, then returns
 
 static jmp_buf task_main; //processor state of master task to come back to
-task_buf *task_bufbot; //pointer to bottom of queue
-task_buf *task_buftop; //pointer to top of queue
-//the difference between the two above pointers is pretty minimal
-//since the buffer is circular
+task_buf *task_bufbot; //pointer to null task (first task)
+task_buf *task_buftop; //pointer to top of task queue
 
 //this has to be volatile since tasks do not return, instead they yield
 static volatile int *num_tasks;
@@ -23,14 +22,12 @@ static void task_null(void *args) {
     task_yield(0);
 }
 
-//bump the tick counter
-//check against random magic number!
+//timer task that bumps a hidden timer object
+//and checks against a random magic number!
 static void task_timer(void *timer_arg) {
-    //printf("in timer task...\n");
     int *p = (int*) timer_arg;
     (*p > 0xFF00) ? *p = 0 : (*p)++;
     task_yield(0);
-    
 }
 
 //allocate resources for the system tick counter
@@ -39,7 +36,7 @@ static void task_timer_init(void) {
     task_add(task_timer, 0, (void *)p);
 }
 
-//if the task is a system task, assume it is issued with a fixed tid
+//if the task is a system task, assume it is issued with a fixed tid (task id)
 //task_null - 0
 //task_timer - 1
 
@@ -53,7 +50,7 @@ int get_system_tick(void) {
     return *((int*) timer->args);
 }
 
-//find a task by pid, returns NULL if not found
+//find a task by tid, returns NULL if not found
 task_buf *task_find(int target) {
     task_buf *n = task_buftop;
     int start = n->tid;
@@ -94,6 +91,8 @@ task_buf *user_task_add(void (*task_func)(void *), void *args) {
 }
 
 //remove a task from the pool
+//note: this does not free any resources allocated by the task
+//no way to do this yet...
 void task_del(task_buf *buf, task_buf *prev) {
     prev->next = buf->next;
     free(buf);
@@ -105,6 +104,8 @@ static void task_switch(void) {
 }
 
 //called by user when task is done
+//preemptive is kinda pointless since all hardware is visible
+//to every task
 void task_yield(int exit) {
     longjmp(task_main, exit);
 }
@@ -112,6 +113,9 @@ void task_yield(int exit) {
 //no support for adding multiple extensions yet
 static int task_noncrit_init(include incl) {
     switch (incl) {
+        // maybe something like 
+        // <mask out relevant init bit>
+        // loop until zero
         case TASK_MONITOR: break;
         case TASK_TIMER:
             task_timer_init();
@@ -122,7 +126,8 @@ static int task_noncrit_init(include incl) {
     return 0;
 }
 
-//this function sets up tasks to be executed but does not execute them!
+//this function sets up a task to be executed, but does not execute it!
+//call task_start() when you want to start a task.
 int task_init(include incl) {
     num_tasks = calloc(1, sizeof(int));
     
@@ -137,11 +142,11 @@ int task_init(include incl) {
         return -2;
     }
     //the null task has to be created seperately from everything else
-    //as there are no tasks to build off of
+    //as there are no previous tasks to build off of
     task_null_buf->func = task_null;
     task_null_buf->next = task_null_buf;
     task_null_buf->priority = 0;
-    task_null_buf->tid = (*num_tasks)++;;
+    task_null_buf->tid = (*num_tasks)++;
     task_null_buf->args = NULL;
     task_buftop = task_null_buf;
     task_bufbot = task_null_buf;
