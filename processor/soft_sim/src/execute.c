@@ -5,7 +5,6 @@
 #define REGISTER_SRC0 p->regfile[p->i.f_s0]
 #define REGISTER_SRC1 p->regfile[p->i.f_s1]
 
-
 #define REGISTER_SRC0_LOW p->byte_regfile[(2 * p->i.f_s0)]
 #define REGISTER_SRC1_LOW p->byte_regfile[(2 * p->i.f_s1)]
 #define REGISTER_DEST_LOW p->byte_regfile[(2 * p->i.f_d)]
@@ -130,13 +129,13 @@ int instr_and(proc *p) {
 			REGISTER_DEST = REGISTER_SRC1 & imm_or_reg(p);
 			break;;
 		case 1: 
-			REGISTER_DEST = (int16_t) REGISTER_SRC1 & (int16_t) imm_or_reg(p);
+			//REGISTER_DEST = (int16_t) REGISTER_SRC1 & (int16_t) imm_or_reg(p);
 			break;
 		case 2: 
 			REGISTER_DEST = (uint8_t) REGISTER_SRC1 & (uint8_t) imm_or_reg(p);
 			break;
 		case 3: 
-			REGISTER_DEST = (int8_t) REGISTER_SRC1 & (int8_t) imm_or_reg(p);
+			//REGISTER_DEST = (int8_t) REGISTER_SRC1 & (int8_t) imm_or_reg(p);
 			break;
 		default:
 			return EXCP_ILL_INSTR;
@@ -150,13 +149,13 @@ int instr_or(proc *p) {
 			REGISTER_DEST = REGISTER_SRC1 | imm_or_reg(p);
 			break;;
 		case 1: 
-			REGISTER_DEST = (int16_t) REGISTER_SRC1 | (int16_t) imm_or_reg(p);
+			//REGISTER_DEST = (int16_t) REGISTER_SRC1 | (int16_t) imm_or_reg(p);
 			break;
 		case 2: 
 			REGISTER_DEST = (uint8_t) REGISTER_SRC1 | (uint8_t) imm_or_reg(p);
 			break;
 		case 3: 
-			REGISTER_DEST = (int8_t) REGISTER_SRC1 | (int8_t) imm_or_reg(p);
+			//REGISTER_DEST = (int8_t) REGISTER_SRC1 | (int8_t) imm_or_reg(p);
 			break;
 		default:
 			return EXCP_ILL_INSTR;
@@ -170,13 +169,13 @@ int instr_xor(proc *p) {
 			REGISTER_DEST = REGISTER_SRC1 ^ imm_or_reg(p);
 			break;;
 		case 1: 
-			REGISTER_DEST = (int16_t) REGISTER_SRC1 ^ (int16_t) imm_or_reg(p);
+			//REGISTER_DEST = (int16_t) REGISTER_SRC1 ^ (int16_t) imm_or_reg(p);
 			break;
 		case 2: 
 			REGISTER_DEST = (uint8_t) REGISTER_SRC1 ^ (uint8_t) imm_or_reg(p);
 			break;
 		case 3: 
-			REGISTER_DEST = (int8_t) REGISTER_SRC1 ^ (int8_t) imm_or_reg(p);
+			//REGISTER_DEST = (int8_t) REGISTER_SRC1 ^ (int8_t) imm_or_reg(p);
 			break;
 		default:
 			return EXCP_ILL_INSTR;
@@ -191,13 +190,13 @@ int instr_not(proc *p) {
 			REGISTER_DEST = ~REGISTER_SRC1;
 			break;
 		case 1: 
-			REGISTER_DEST = (int16_t) ~REGISTER_SRC1;
+			//REGISTER_DEST = (int16_t) ~REGISTER_SRC1;
 			break;
 		case 2: 
 			REGISTER_DEST = (uint8_t) ~REGISTER_SRC1;
 			break;
 		case 3: 
-			REGISTER_DEST = (int8_t) ~REGISTER_SRC1;
+			//REGISTER_DEST = (int8_t) ~REGISTER_SRC1;
 			break;
 		default:
 			return EXCP_ILL_INSTR;
@@ -212,13 +211,13 @@ int instr_inv(proc *p) {
 			REGISTER_DEST = !REGISTER_SRC1;
 			break;
 		case 1: 
-			REGISTER_DEST = (int16_t) !REGISTER_SRC1;
+			//REGISTER_DEST = (int16_t) !REGISTER_SRC1;
 			break;
 		case 2: 
 			REGISTER_DEST = (uint8_t) !REGISTER_SRC1;
 			break;
 		case 3: 
-			REGISTER_DEST = (int8_t) !REGISTER_SRC1;
+			//REGISTER_DEST = (int8_t) !REGISTER_SRC1;
 			break;
 		default:
 			return EXCP_ILL_INSTR;
@@ -308,15 +307,14 @@ void instr_bcc(proc *p) { // F type
 	}
 }
 
-void instr_cmpcc(proc *p) {
-	// test stuff, not sure of output format
-}
-
 void instr_io(proc *p) { // E type
 	if (p->i.e_pm) { // input op
 		int temp;
 		printf("16bu io input at address %d: ", p->i.e_imm);
-		scanf("%d", &temp);
+		int err = scanf("%d", &temp);
+		if (err) {
+			perror("scanf");
+		}
 		p->regfile[p->i.e_s] = (uint16_t) temp;
 	} else { // output op
 		printf("16bu io output %d at address %d\n", p->regfile[p->i.e_s], p->i.e_imm);

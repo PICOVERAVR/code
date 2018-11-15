@@ -26,7 +26,6 @@ seperate external processor feature register
 f = floating point support
 m = hardware MUL/DIV support
 
-
 traps
 	0x0: reset
 	0x4: illegal instruction
@@ -66,32 +65,34 @@ math
 	
 	//d0 = res, d1 = rem
 	DIV s0, s1, h, l	s0 / s1 (32bs)   -> {d0, d1} 		s
-	DIVU s0, s1, h, l	s0 / s1 (32bu) -> {d0, d1}		s
+	DIVU s0, s1, h, l	s0 / s1 (32bu) -> {d0, d1}			s
 	DIVB s0, s1, h, l	s0 / s1 (16bs)   -> {d0, d1}		s
-	DIVUB s0, s1, h, l	s0 / s1 (16bu) -> {d0, d1}		s
+	DIVUB s0, s1, h, l	s0 / s1 (16bu) -> {d0, d1}			s
 	
-	SEX s			8b sign(s) -> 16b sign(d)	s
+	SEX s			8b sign(s) -> 16b sign(d)	
 	
 	// inc and dec functionality provided by ADD r, 1, r
-	
-	AND s0, s1, d	s0 & s1 (signed 16b)   -> d	s
+	// don't need signed bitwise ops
+
 	ANDU s0, s1, d	s0 & s1 (unsigned 16b) -> d	s
-	ANDB s0, s1, d  s0 & s1 (signed 8b)    -> d	s
 	ANDUB s0, s1, d s0 & s1 (unsigned 8b)  -> d	s
 	
-	OR s0, s1, d	s0 | s1 (signed 16b)   -> d	s
 	ORU s0, s1, d	s0 | s1 (unsigned 16b) -> d	s
-	ORB s0, s1, d   s0 | s1 (signed 8b)    -> d	s
 	ORUB s0, s1, d  s0 | s1 (unsigned 8b)  -> d	s
 
-	XOR s0, s1, d	s0 ^ s1 (signed 16b)   -> d	s
 	XORU s0, s1, d	s0 ^ s1 (unsigned 16b) -> d	s
-	XORB s0, s1, d  s0 ^ s1 (signed 8b)    -> d	s
 	XORUB s0, s1, d s0 ^ s1 (unsigned 8b)  -> d	s
 
-	NOT s		~s		       -> d	s
+	NOT s		~s		       		   -> d	s
 	INV s		twos_comp(s)	       -> d	s
 	
+	// totally forgot shifting left and right
+	ASR s0, s1, d s0 >> s1 (signed 16b) -> d
+	LSR s0, s1, d s0 >> s1 (unsigned 16b) -> d
+	LSL s0, s1, d s0 << s1 (unsigned 16b) -> d
+	ROL s0, s1, d s0 << s1 (rotated) -> d
+	ROR s0, s1, d s0 >> s1 (rotated) -> d
+
 moving
 	MOV s, d	s (16b)		-> d		s
 	MOVB s, d	s (8b)		-> d		s
@@ -99,14 +100,14 @@ moving
 	//no LDB or STB, aligns stuff on 2-byte boundary
 	LD addr, r	mem[addr]	-> r 		s
 	LD i, r		mem[i]		-> r		s
-	LD imm, r	imm		-> r		s
+	LD imm, r	imm		-> r			s
 	
-	ST r, addr	r		-> addr		s
+	ST r, addr	r		-> addr			s
 	ST r, i		r		-> mem[i]
 	ST r, imm	r		-> mem[imm]
 	
 branching
-	BN lit		lit		-> pc		s
+	BN lit		lit		-> pc			s
 	
 	BS r, add	s0 + s1		-> pc		s
 	//branch to r = BS r, R0
@@ -170,6 +171,4 @@ interrupt architecture:
 stack:
 	starts wherever
 	grows down
-
-
 

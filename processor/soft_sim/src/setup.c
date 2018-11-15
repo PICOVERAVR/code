@@ -17,7 +17,11 @@ uint32_t *proc_setup(int argc, char **argv, proc *p) {
 	rewind(hex);
 	
 	uint32_t *hex_mem = malloc(hex_size+1);
-	fread(hex_mem, sizeof(uint32_t), hex_size, hex);
+	int err = fread(hex_mem, sizeof(uint32_t), hex_size, hex);
+	if (err * sizeof(uint32_t) != hex_size) {
+		perror("fread");
+		return NULL;
+	}
 	fclose(hex);
 	
 	hex_mem[hex_size-1] = 0; // make the file NULL-terminated, for ease of mind

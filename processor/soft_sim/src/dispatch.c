@@ -7,6 +7,7 @@ static int check_arithmetic(proc *p) {
 		return -1; // not an error according to the isa, but return an error code to
 			   // abort executing anything
 	}
+	return 0;
 }
 
 int disp(proc *p, uint16_t *ram) {

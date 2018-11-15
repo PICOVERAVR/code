@@ -27,8 +27,11 @@ static void interrupt_handle(proc *p) {
 	unsigned int interrupt_level;
 	dbprintf("caught interrupt, PC 0x%x", p->PC);
 	printf("3bu ilevel: ");
-	scanf("%d", &interrupt_level);
-	
+	int err = scanf("%d", &interrupt_level);
+	if (err < 0) {
+		perror("scanf");
+	}
+
 	if (interrupt_level > 7) {
 		printf("WARN: invalid interrupt level!\n");
 	}
