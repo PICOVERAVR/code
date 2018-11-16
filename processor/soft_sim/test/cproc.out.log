@@ -1,5 +1,5 @@
 Running suite(s): fives-check
 DBG: Write to R0 detected.
 DBG: Arithmetic encoding problem, aborting instruction execution.
-100%: Checks: 7, Failures: 0, Errors: 0
+100%: Checks: 9, Failures: 0, Errors: 0
 PASS cproc.out (exit status: 0)

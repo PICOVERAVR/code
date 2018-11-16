@@ -24,6 +24,7 @@ void instr_st(proc *p, uint16_t *ram);
 
 void instr_mov(proc *p);
 
+void instr_ldu(proc *p);
 void instr_bn(proc *p);
 void instr_bs(proc *p);
 void instr_bcc(proc *p);
@@ -39,12 +40,11 @@ void instr_ret(proc *p);
 void instr_ps(proc *p);
 
 enum COND_BRANCH_TYPES {
-	BRANCH_EQ,
-	BRANCH_NE,
-	BRANCH_GT,
-	BRANCH_GE,
-	BRANCH_LT,
-	BRANCH_LE,
+	BRANCH_EQ, // 0
+	BRANCH_NE, // 1
+	BRANCH_GT, // 2
+	BRANCH_GE, // 3
+	BRANCH_LT, // 4
+	BRANCH_LE, // 5
 };
-
 

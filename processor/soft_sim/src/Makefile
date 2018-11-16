@@ -233,10 +233,10 @@ OBJEXT = o
 PACKAGE = fives
 PACKAGE_BUGREPORT = 
 PACKAGE_NAME = fives
-PACKAGE_STRING = fives 0.1
+PACKAGE_STRING = fives 0.2
 PACKAGE_TARNAME = fives
 PACKAGE_URL = 
-PACKAGE_VERSION = 0.1
+PACKAGE_VERSION = 0.2
 PATH_SEPARATOR = :
 PKG_CONFIG = /usr/bin/pkg-config
 PKG_CONFIG_LIBDIR = 
@@ -244,7 +244,7 @@ PKG_CONFIG_PATH =
 SET_MAKE = 
 SHELL = /bin/bash
 STRIP = 
-VERSION = 0.1
+VERSION = 0.2
 abs_builddir = /root/main/processor/soft_sim/src
 abs_srcdir = /root/main/processor/soft_sim/src
 abs_top_builddir = /root/main/processor/soft_sim
@@ -293,10 +293,10 @@ include_HEADERS = dispatch.h execute.h proc.h setup.h
 proc_CFLAGS = -I$(top_srcdir)/include # include headers without changing everything to be #include "../stuff/include"
 
 # include debugging info for now
-AM_CFLAGS = -g -Wall i-Wextra -Og
+AM_CFLAGS = -g -Wall -Wextra -Og
 
 # include doc for how to use processor and test programs for software simulator
-noinst_DIST = isa.txt notes.txt software.txt test_programs
+noinst_DIST = test_programs assist test
 all: all-am
 
 .SUFFIXES:

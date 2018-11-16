@@ -36,7 +36,7 @@ void proc_set_vec(proc *p) {
 
 #tcase add_instr
 
-#test add_1
+#test add_basic1
 	proc *p = malloc(sizeof(proc));
 	proc_set_vec(p);
 	
@@ -46,7 +46,7 @@ void proc_set_vec(proc *p) {
 	
 	ck_assert_int_eq(p->regfile[R3], 3);
 
-#test add_2
+#test add_basic2
 	proc *p = malloc(sizeof(proc));
 	proc_set_vec(p);
 	
@@ -59,18 +59,39 @@ void proc_set_vec(proc *p) {
 	
 	free(p);
 	
-#test add_b
+#test add_byte
 	proc *p = malloc(sizeof(proc));
 	proc_set_vec(p);
-	
-	p->i.f_pm = 0b010;
 	
 	p->regfile[R1] = 0x00FF;
 	p->regfile[R2] = 0x0004;
 	
 	instr_add(p);
 	ck_assert_int_eq(p->regfile[R3], 3);
+
+#test add_immediate
+	proc *p = malloc(sizeof(proc));
+	proc_set_vec(p);
+
+	p->i.f_pm = 0b100;
+	p->i.f2_s = R1;
+	p->i.f2_short_imm = 20;
+
+	instr_add(p);
+	ck_assert_int_eq(p->regfile[R3], 21);
+
+#test add_word
+	proc *p = malloc(sizeof(proc));
+	proc_set_vec(p);
+
+	p->i.f_pm = 0b010;
+	p->regfile[R1] = 0xFFA0;
+	p->regfile[R2] = 45;
+
+	instr_add(p);
 	
+	ck_assert_int_eq(p->regfile[R3], 0xFFCD);
+
 #test add_dest_r0
 	proc *p = malloc(sizeof(proc));
 	proc_set_vec(p);
@@ -78,7 +99,8 @@ void proc_set_vec(proc *p) {
 	p->i.f_d = R0;
 	p->i.f_opcode = ADD;
 
-	int err = disp(p, NULL); // not executing an instruction that needs RAM
+	int err = disp(p, NULL); // not executing an instruction that needs RAM,
+							 // so no RAM is provided
 	
 	ck_assert_int_eq(p->regfile[R0], 0); // check for non-zero R0
 	ck_assert_int_eq(err, 0); // no error should be reported for R0 write
@@ -92,7 +114,7 @@ void proc_set_vec(proc *p) {
 	
 	ck_assert_int_eq(p->byte_regfile[R1*2], 0xFF);
 	ck_assert_int_eq(p->byte_regfile[(R1*2)+1], 0xAA);
-	
+
 #test add_signed
 	proc *p = malloc(sizeof(proc));
 	proc_set_vec(p);
@@ -104,9 +126,9 @@ void proc_set_vec(proc *p) {
 	
 	ck_assert_int_eq(p->regfile[R3], 9);
 
-#tcase instr_mul
+#tcase mul_instr
 
-#test mul_1
+#test mul_basic1
 	proc *p = malloc(sizeof(proc));
 	proc_set_vec(p);
 	

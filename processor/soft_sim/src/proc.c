@@ -102,6 +102,6 @@ int main(int argc, char **argv) {
 	free(p);
 	free(ram);
 	
-	fprintf(stderr, "ERR: reached end of sim\n");
+	fprintf(stderr, "INFO: reached end of sim\n");
 	return INTERNAL_ERROR;
 }

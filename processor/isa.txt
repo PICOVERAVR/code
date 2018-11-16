@@ -1,12 +1,13 @@
-ISA
+Fives ISA
 =======
 
 16 bit RISC processor
+little-endian
 
 //give a reason as to how this is different than RISC-V.
 
-32 16-bit registers (R0 - R31)
-	R31: PC - hardwired
+31 16-bit registers (R0 - R30)
+	R31: 32-bit PC - hardwired
 	R30: SP
 	R29: BP
 	R0:  0x0 - hardwired
@@ -31,7 +32,7 @@ traps
 	0x4: illegal instruction
 	0x8: misaligned PC, SP, BP
 	0xB: intvec 0
-	...  intvec 7
+	...  intvec 15
 
 Three operand format for everything
 register-register architecture
@@ -43,9 +44,11 @@ no status register, just compare and branch
 control
 	HALT			stop the processor	s
 	//not specified whether this is a seperate bus or just extra pin
-	IO			r	       -> out	s
-				in	       -> r	s
-	PS			proc_state     -> r	s
+	
+	IO r, port	r -> port	s
+	IO port, r  port -> r	s
+	
+	PS			proc_state     -> r
 	
 math
 	ADD s0, s1, d	s0 + s1 (signed 16b)   -> d	s
@@ -74,14 +77,14 @@ math
 	// inc and dec functionality provided by ADD r, 1, r
 	// don't need signed bitwise ops
 
-	ANDU s0, s1, d	s0 & s1 (unsigned 16b) -> d	s
-	ANDUB s0, s1, d s0 & s1 (unsigned 8b)  -> d	s
+	AND s0, s1, d	s0 & s1 (unsigned 16b) -> d	s
+	ANDB s0, s1, d s0 & s1 (unsigned 8b)  -> d	s
 	
-	ORU s0, s1, d	s0 | s1 (unsigned 16b) -> d	s
-	ORUB s0, s1, d  s0 | s1 (unsigned 8b)  -> d	s
+	OR s0, s1, d	s0 | s1 (unsigned 16b) -> d	s
+	ORB s0, s1, d  s0 | s1 (unsigned 8b)  -> d	s
 
-	XORU s0, s1, d	s0 ^ s1 (unsigned 16b) -> d	s
-	XORUB s0, s1, d s0 ^ s1 (unsigned 8b)  -> d	s
+	XOR s0, s1, d	s0 ^ s1 (unsigned 16b) -> d	s
+	XORB s0, s1, d s0 ^ s1 (unsigned 8b)  -> d	s
 
 	NOT s		~s		       		   -> d	s
 	INV s		twos_comp(s)	       -> d	s
@@ -101,8 +104,9 @@ moving
 	LD addr, r	mem[addr]	-> r 		s
 	LD i, r		mem[i]		-> r		s
 	LD imm, r	imm		-> r			s
-	
-	ST r, addr	r		-> addr			s
+	LDU r		r -> PCH				s
+
+	ST r, addr	r		-> addr			
 	ST r, i		r		-> mem[i]
 	ST r, imm	r		-> mem[imm]
 	
@@ -132,7 +136,7 @@ branching
 	BNZ s, r	(s != 0)?	-> r		s
 
 instruction encoding
-
+			   o0			  o1			 o2				o3
 31 30 29 28 27 26 25 24 23 22 21 20 19 18 17 16 15 14 13 12 11 10 9 8 7 6 5 4 3 2 1 0
 |xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx| pm  |    op    |  -> HALT (A)
 |xxxxxxxxxxxxxxxx|                        imm                      | pm  |    op    |  -> BN imm (B)
@@ -150,12 +154,12 @@ possible instructions to add
 opcode encoding
 	all 0 opcode is illegal (STOP pseudo-i in this sim)
 	 9 8 7 6 5 4 3 2 1 0
-	  |x x h|  NOP(1)  | h = 1 for halt
+	  |x x h|  NOP(1)  | h = 1 for halt -- is this is a thing I implemented?
 	  |i b s|  ADD(x)  | b = 1 for word, s = 1 for signed, i = 1 for 12bu imm, 0 for reg
 	  |x b x|  MOV(x)  | b = 1 for word
-	  |x x m|  LD(x)   | m = 1 for mem, 0 for imm
+	  |x b m|  LD(x)   | b = 1 for word, m = 1 for mem, m = 0 for imm
 	  |x x x|  ST(x)   | 
-	  |x x x|  BN(x)   |
+	  |x x x|  BN(x)   | 
 	  |x x r|  BR(x)   | r = 1 for +r //has to be seperate from BN due to differing encoding
 	  |c c c|  Bcc(x)  | c = condition code
 	  |x x i|  IO(x)   | i = 1 for input

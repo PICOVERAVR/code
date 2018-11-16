@@ -59,7 +59,7 @@ typedef union {
 		unsigned int f_s1     : 5;
 		unsigned int f_s0     : 5;
 	};
-	struct {
+	struct { // F2 type instruction
 		unsigned int f2_opcode : 6;
 		unsigned int f2_pm     : 3;
 		unsigned int f2_d      : 5;
@@ -98,52 +98,61 @@ typedef union {
 	};
 } instr;
 
-typedef union {
-	struct {
-		union {
-			uint16_t regfile[32];
-			uint8_t byte_regfile[64];
-			// L [      R3    ] H L [      R4    ] ... 
-			// L [  h  ][  l  ] H L [  h  ][  l  ] ... 
+typedef struct {
+	union {
+		struct {
+			union {
+				uint16_t regfile[33];
+				uint8_t byte_regfile[66];
+				// L [      R3    ] H L [      R4    ] ... 
+				// L [  h  ][  l  ] H L [  h  ][  l  ] ... 
+			};
+			instr raw_i;
 		};
-		instr raw_i;
-	};
-	struct {
-		const uint16_t R0;
-		uint16_t user_regfile[28];
-		uint16_t BP;
-		uint16_t SP;
-		uint16_t PC;
-		instr i;
+		struct {
+			const uint16_t R0;
+			uint16_t user_regfile[28];
+			uint16_t BP;
+			uint16_t SP;
+			union {
+				uint32_t PC;
+				struct {
+					uint16_t PCL;
+					uint16_t PCH;
+				};
+			};
+			instr i;
+		};
 	};
 	uint16_t proc_ext_state;
 } proc;
 
 enum instruction_opcode {
-	STOP,
-	NOP,
-	ADD,
-	SUB,
-	MUL,
-	DIV,
-	SEX,
-	BN,
-	BS,
-	Bcc,
-	LD,
-	ST,
-	IO,
-	AND,
-	OR,
-	XOR,
-	NOT,
-	INV,
-	CALL,
-	RET,
-	PS,
-	MOV,
-	BR,
-	RST,
+	STOP, // 0
+	NOP,  // 1
+	ADD,  // 2
+	SUB,  // 3
+	MUL,  // 4
+	DIV,  // 5
+	SEX,  // 6
+	BN,   // 7
+	BS,   // 8
+	Bcc,  // 9 EQ:0, NE:1, GT:2, GE:3, LT:4, LE:5
+	LD,   // A
+	ST,   // B
+	IO,   // C
+	AND,  // D
+	OR,   // E
+	XOR,  // F
+	NOT,  // 10
+	INV,  // 11
+	CALL, // 12
+	RET,  // 13
+	PS,   // 14
+	MOV,  // 15
+	BR,   // 16
+	RST,  // 17
+	LDU,  // 18
 };
 
 uint32_t fetch(uint16_t addr, uint32_t *hex_mem);

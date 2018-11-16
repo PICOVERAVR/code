@@ -43,7 +43,7 @@ void proc_set_vec(proc *p) {
 // not freeing memory here because I don't care
 
 
-START_TEST(add_1)
+START_TEST(add_basic1)
 {
 #line 40
 	proc *p = malloc(sizeof(proc));
@@ -58,7 +58,7 @@ START_TEST(add_1)
 }
 END_TEST
 
-START_TEST(add_2)
+START_TEST(add_basic2)
 {
 #line 50
 	proc *p = malloc(sizeof(proc));
@@ -76,33 +76,65 @@ START_TEST(add_2)
 }
 END_TEST
 
-START_TEST(add_b)
+START_TEST(add_byte)
 {
 #line 63
 	proc *p = malloc(sizeof(proc));
 	proc_set_vec(p);
-	
-	p->i.f_pm = 0b010;
 	
 	p->regfile[R1] = 0x00FF;
 	p->regfile[R2] = 0x0004;
 	
 	instr_add(p);
 	ck_assert_int_eq(p->regfile[R3], 3);
+
+}
+END_TEST
+
+START_TEST(add_immediate)
+{
+#line 73
+	proc *p = malloc(sizeof(proc));
+	proc_set_vec(p);
+
+	p->i.f_pm = 0b100;
+	p->i.f2_s = R1;
+	p->i.f2_short_imm = 20;
+
+	instr_add(p);
+	ck_assert_int_eq(p->regfile[R3], 21);
+
+}
+END_TEST
+
+START_TEST(add_word)
+{
+#line 84
+	proc *p = malloc(sizeof(proc));
+	proc_set_vec(p);
+
+	p->i.f_pm = 0b010;
+	p->regfile[R1] = 0xFFA0;
+	p->regfile[R2] = 45;
+
+	instr_add(p);
 	
+	ck_assert_int_eq(p->regfile[R3], 0xFFCD);
+
 }
 END_TEST
 
 START_TEST(add_dest_r0)
 {
-#line 75
+#line 96
 	proc *p = malloc(sizeof(proc));
 	proc_set_vec(p);
 	
 	p->i.f_d = R0;
 	p->i.f_opcode = ADD;
 
-	int err = disp(p, NULL); // not executing an instruction that needs RAM
+	int err = disp(p, NULL); // not executing an instruction that needs RAM,
+							 // so no RAM is provided
 	
 	ck_assert_int_eq(p->regfile[R0], 0); // check for non-zero R0
 	ck_assert_int_eq(err, 0); // no error should be reported for R0 write
@@ -112,7 +144,7 @@ END_TEST
 
 START_TEST(add_check_byte)
 {
-#line 87
+#line 109
 	proc *p = malloc(sizeof(proc));
 	proc_set_vec(p);
 	
@@ -121,13 +153,13 @@ START_TEST(add_check_byte)
 	
 	ck_assert_int_eq(p->byte_regfile[R1*2], 0xFF);
 	ck_assert_int_eq(p->byte_regfile[(R1*2)+1], 0xAA);
-	
+
 }
 END_TEST
 
 START_TEST(add_signed)
 {
-#line 97
+#line 119
 	proc *p = malloc(sizeof(proc));
 	proc_set_vec(p);
 	
@@ -141,9 +173,9 @@ START_TEST(add_signed)
 }
 END_TEST
 
-START_TEST(mul_1)
+START_TEST(mul_basic1)
 {
-#line 110
+#line 132
 	proc *p = malloc(sizeof(proc));
 	proc_set_vec(p);
 	
@@ -163,19 +195,21 @@ int main(void)
 {
     Suite *s1 = suite_create("fives-check");
     TCase *tc1_1 = tcase_create("add_instr");
-    TCase *tc1_2 = tcase_create("instr_mul");
+    TCase *tc1_2 = tcase_create("mul_instr");
     SRunner *sr = srunner_create(s1);
     int nf;
 
     suite_add_tcase(s1, tc1_1);
-    tcase_add_test(tc1_1, add_1);
-    tcase_add_test(tc1_1, add_2);
-    tcase_add_test(tc1_1, add_b);
+    tcase_add_test(tc1_1, add_basic1);
+    tcase_add_test(tc1_1, add_basic2);
+    tcase_add_test(tc1_1, add_byte);
+    tcase_add_test(tc1_1, add_immediate);
+    tcase_add_test(tc1_1, add_word);
     tcase_add_test(tc1_1, add_dest_r0);
     tcase_add_test(tc1_1, add_check_byte);
     tcase_add_test(tc1_1, add_signed);
     suite_add_tcase(s1, tc1_2);
-    tcase_add_test(tc1_2, mul_1);
+    tcase_add_test(tc1_2, mul_basic1);
 
     srunner_run_all(sr, CK_ENV);
     nf = srunner_ntests_failed(sr);

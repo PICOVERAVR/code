@@ -5,7 +5,7 @@ static int check_arithmetic(proc *p) {
 	if (p->i.f_d == REGISTER_R0) {
 		dbprintf("Write to R0 detected.");
 		return -1; // not an error according to the isa, but return an error code to
-			   // abort executing anything
+			   // don't execute anything
 	}
 	return 0;
 }
@@ -97,6 +97,9 @@ int disp(proc *p, uint16_t *ram) {
 		case STOP:
 			dbprintf("reached STOP instr, PC 0x%x", p->PC);
 			return SIM_STOP;
+		case LDU:
+			instr_ldu(p);
+			break;
 		default:
 			printf("ERR: unknown opcode!\n");
 			return EXCP_ILL_INSTR;
