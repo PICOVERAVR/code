@@ -29,6 +29,9 @@ notes:
 to check:
 	more error checking, using perror!
 	not sure if arithmetic encoding error in jmp_add is actually an error or not.
+	shift instructions
+	
+	rewrite the dispatch section.  Not clean and not the best way to do it.  Makes other stuff harder.
 
 bugs:
 	if an instruction returns an illegal opcode, it gets ignored

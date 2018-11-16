@@ -18,7 +18,7 @@ uint32_t *proc_setup(int argc, char **argv, proc *p) {
 	
 	uint32_t *hex_mem = malloc(hex_size+1);
 	int err = fread(hex_mem, sizeof(uint32_t), hex_size, hex);
-	if (err * sizeof(uint32_t) != hex_size) {
+	if (err != hex_size / 4) {
 		perror("fread");
 		return NULL;
 	}
