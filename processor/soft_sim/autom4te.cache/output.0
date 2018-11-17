@@ -2351,6 +2351,11 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 ac_config_headers="$ac_config_headers config.h"
 
 
+# turn on all warnings
+# should be checking for -Og support in compiler
+
+# : ${CFLAGS="-g -Wall -Wextra -Og"}
+
 # Checks for programs.
 am__api_version='1.15'
 
@@ -4790,6 +4795,8 @@ _ACEOF
 ;;
   esac
 
+
+AC_CHECK_COMPILE_FLAG(-Wall)
 
 # Checks for library functions.
 for ac_header in stdlib.h

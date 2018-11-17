@@ -1,4 +1,4 @@
-proc-proc.o: proc.c /usr/include/stdc-predef.h proc.h \
+proc-core.o: core.c /usr/include/stdc-predef.h core.h proc.h \
  /usr/include/stdio.h \
  /usr/include/x86_64-linux-gnu/bits/libc-header-start.h \
  /usr/include/features.h /usr/include/x86_64-linux-gnu/sys/cdefs.h \
@@ -83,10 +83,11 @@ proc-proc.o: proc.c /usr/include/stdc-predef.h proc.h \
  /usr/include/x86_64-linux-gnu/bits/confname.h \
  /usr/include/x86_64-linux-gnu/bits/getopt_posix.h \
  /usr/include/x86_64-linux-gnu/bits/getopt_core.h \
- /usr/include/x86_64-linux-gnu/bits/unistd.h setup.h execute.h dispatch.h \
- core.h
+ /usr/include/x86_64-linux-gnu/bits/unistd.h
 
 /usr/include/stdc-predef.h:
+
+core.h:
 
 proc.h:
 
@@ -277,11 +278,3 @@ proc.h:
 /usr/include/x86_64-linux-gnu/bits/getopt_core.h:
 
 /usr/include/x86_64-linux-gnu/bits/unistd.h:
-
-setup.h:
-
-execute.h:
-
-dispatch.h:
-
-core.h:

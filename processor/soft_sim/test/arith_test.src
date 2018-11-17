@@ -34,6 +34,27 @@ void proc_set_vec(proc *p) {
 // lots of repetetive code here but honestly I'm tired of figuring out test case forking
 // not freeing memory here because I don't care
 
+#tcase cntl
+
+#test nop
+	proc *p = calloc(1, sizeof(proc)); // important to make sure no stray bytes are different
+    proc_set_vec(p);
+
+	proc *p2 = malloc(sizeof(proc));
+    proc_set_vec(p2);
+	
+	int code = instr_nop(p2);
+
+	ck_assert_int_eq(code, RET_OK);
+	ck_assert_int_eq(memcmp(p2, p, sizeof(p)), 0); // make sure it did nothing
+
+#test stop
+	proc *p = malloc(sizeof(proc));
+    proc_set_vec(p);	
+	
+	int code = instr_stop(p);
+	ck_assert_int_eq(code, RET_STOP);
+
 #tcase add_instr
 
 #test add_basic1
@@ -64,10 +85,10 @@ void proc_set_vec(proc *p) {
 	proc_set_vec(p);
 	
 	p->regfile[R1] = 0x00FF;
-	p->regfile[R2] = 0x0004;
+	p->regfile[R2] = 0x00A4;
 	
 	instr_add(p);
-	ck_assert_int_eq(p->regfile[R3], 3);
+	ck_assert_int_eq(p->regfile[R3], 0xA3);
 
 #test add_immediate
 	proc *p = malloc(sizeof(proc));

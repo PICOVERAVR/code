@@ -25,6 +25,12 @@ AC_TYPE_UINT32_T
 AC_TYPE_UINT64_T
 AC_TYPE_UINT8_T
 
+# check for relevant compiler flags and add them if supported
+AX_CHECK_COMPILE_FLAG([-g], [CFLAGS="$CFLAGS -g"], , [-Werror])
+AX_CHECK_COMPILE_FLAG([-Wall], [CFLAGS="$CFLAGS -Wall"], , [-Werror])
+AX_CHECK_COMPILE_FLAG([-Wextra], [CFLAGS="$CFLAGS -Wextra"], , [-Werror])
+AX_CHECK_COMPILE_FLAG([-Og], [CFLAGS="$CFLAGS -Og"], , [-Werror])
+
 # Checks for library functions.
 AC_FUNC_MALLOC
 AC_CHECK_FUNCS([memset])

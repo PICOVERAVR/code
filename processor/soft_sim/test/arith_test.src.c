@@ -43,9 +43,38 @@ void proc_set_vec(proc *p) {
 // not freeing memory here because I don't care
 
 
-START_TEST(add_basic1)
+START_TEST(nop)
 {
 #line 40
+	proc *p = calloc(1, sizeof(proc)); // important to make sure no stray bytes are different
+    proc_set_vec(p);
+
+	proc *p2 = malloc(sizeof(proc));
+    proc_set_vec(p2);
+	
+	int code = instr_nop(p2);
+
+	ck_assert_int_eq(code, RET_OK);
+	ck_assert_int_eq(memcmp(p2, p, sizeof(p)), 0); // make sure it did nothing
+
+}
+END_TEST
+
+START_TEST(stop)
+{
+#line 52
+	proc *p = malloc(sizeof(proc));
+    proc_set_vec(p);	
+	
+	int code = instr_stop(p);
+	ck_assert_int_eq(code, RET_STOP);
+
+}
+END_TEST
+
+START_TEST(add_basic1)
+{
+#line 61
 	proc *p = malloc(sizeof(proc));
 	proc_set_vec(p);
 	
@@ -60,7 +89,7 @@ END_TEST
 
 START_TEST(add_basic2)
 {
-#line 50
+#line 71
 	proc *p = malloc(sizeof(proc));
 	proc_set_vec(p);
 	
@@ -78,22 +107,22 @@ END_TEST
 
 START_TEST(add_byte)
 {
-#line 63
+#line 84
 	proc *p = malloc(sizeof(proc));
 	proc_set_vec(p);
 	
 	p->regfile[R1] = 0x00FF;
-	p->regfile[R2] = 0x0004;
+	p->regfile[R2] = 0x00A4;
 	
 	instr_add(p);
-	ck_assert_int_eq(p->regfile[R3], 3);
+	ck_assert_int_eq(p->regfile[R3], 0xA3);
 
 }
 END_TEST
 
 START_TEST(add_immediate)
 {
-#line 73
+#line 94
 	proc *p = malloc(sizeof(proc));
 	proc_set_vec(p);
 
@@ -109,7 +138,7 @@ END_TEST
 
 START_TEST(add_word)
 {
-#line 84
+#line 105
 	proc *p = malloc(sizeof(proc));
 	proc_set_vec(p);
 
@@ -126,7 +155,7 @@ END_TEST
 
 START_TEST(add_dest_r0)
 {
-#line 96
+#line 117
 	proc *p = malloc(sizeof(proc));
 	proc_set_vec(p);
 	
@@ -144,7 +173,7 @@ END_TEST
 
 START_TEST(add_check_byte)
 {
-#line 109
+#line 130
 	proc *p = malloc(sizeof(proc));
 	proc_set_vec(p);
 	
@@ -159,7 +188,7 @@ END_TEST
 
 START_TEST(add_signed)
 {
-#line 119
+#line 140
 	proc *p = malloc(sizeof(proc));
 	proc_set_vec(p);
 	
@@ -175,7 +204,7 @@ END_TEST
 
 START_TEST(mul_basic1)
 {
-#line 132
+#line 153
 	proc *p = malloc(sizeof(proc));
 	proc_set_vec(p);
 	
@@ -194,22 +223,26 @@ END_TEST
 int main(void)
 {
     Suite *s1 = suite_create("fives-check");
-    TCase *tc1_1 = tcase_create("add_instr");
-    TCase *tc1_2 = tcase_create("mul_instr");
+    TCase *tc1_1 = tcase_create("cntl");
+    TCase *tc1_2 = tcase_create("add_instr");
+    TCase *tc1_3 = tcase_create("mul_instr");
     SRunner *sr = srunner_create(s1);
     int nf;
 
     suite_add_tcase(s1, tc1_1);
-    tcase_add_test(tc1_1, add_basic1);
-    tcase_add_test(tc1_1, add_basic2);
-    tcase_add_test(tc1_1, add_byte);
-    tcase_add_test(tc1_1, add_immediate);
-    tcase_add_test(tc1_1, add_word);
-    tcase_add_test(tc1_1, add_dest_r0);
-    tcase_add_test(tc1_1, add_check_byte);
-    tcase_add_test(tc1_1, add_signed);
+    tcase_add_test(tc1_1, nop);
+    tcase_add_test(tc1_1, stop);
     suite_add_tcase(s1, tc1_2);
-    tcase_add_test(tc1_2, mul_basic1);
+    tcase_add_test(tc1_2, add_basic1);
+    tcase_add_test(tc1_2, add_basic2);
+    tcase_add_test(tc1_2, add_byte);
+    tcase_add_test(tc1_2, add_immediate);
+    tcase_add_test(tc1_2, add_word);
+    tcase_add_test(tc1_2, add_dest_r0);
+    tcase_add_test(tc1_2, add_check_byte);
+    tcase_add_test(tc1_2, add_signed);
+    suite_add_tcase(s1, tc1_3);
+    tcase_add_test(tc1_3, mul_basic1);
 
     srunner_run_all(sr, CK_ENV);
     nf = srunner_ntests_failed(sr);

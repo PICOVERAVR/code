@@ -24,8 +24,6 @@ uint32_t *proc_setup(int argc, char **argv, proc *p) {
 	}
 	fclose(hex);
 	
-	hex_mem[hex_size-1] = 0; // make the file NULL-terminated, for ease of mind
-
 	memset(p, 0, sizeof(proc)); // clear proc state
 	return hex_mem;
 }

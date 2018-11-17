@@ -4791,6 +4791,148 @@ _ACEOF
   esac
 
 
+# check for relevant compiler flags and add them if supported
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether C compiler accepts -g" >&5
+$as_echo_n "checking whether C compiler accepts -g... " >&6; }
+if ${ax_cv_check_cflags__Werror__g+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+
+  ax_check_save_flags=$CFLAGS
+  CFLAGS="$CFLAGS -Werror -g"
+  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+int
+main ()
+{
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_compile "$LINENO"; then :
+  ax_cv_check_cflags__Werror__g=yes
+else
+  ax_cv_check_cflags__Werror__g=no
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+  CFLAGS=$ax_check_save_flags
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ax_cv_check_cflags__Werror__g" >&5
+$as_echo "$ax_cv_check_cflags__Werror__g" >&6; }
+if test "x$ax_cv_check_cflags__Werror__g" = xyes; then :
+  CFLAGS="$CFLAGS -g"
+else
+  :
+fi
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether C compiler accepts -Wall" >&5
+$as_echo_n "checking whether C compiler accepts -Wall... " >&6; }
+if ${ax_cv_check_cflags__Werror__Wall+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+
+  ax_check_save_flags=$CFLAGS
+  CFLAGS="$CFLAGS -Werror -Wall"
+  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+int
+main ()
+{
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_compile "$LINENO"; then :
+  ax_cv_check_cflags__Werror__Wall=yes
+else
+  ax_cv_check_cflags__Werror__Wall=no
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+  CFLAGS=$ax_check_save_flags
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ax_cv_check_cflags__Werror__Wall" >&5
+$as_echo "$ax_cv_check_cflags__Werror__Wall" >&6; }
+if test "x$ax_cv_check_cflags__Werror__Wall" = xyes; then :
+  CFLAGS="$CFLAGS -Wall"
+else
+  :
+fi
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether C compiler accepts -Wextra" >&5
+$as_echo_n "checking whether C compiler accepts -Wextra... " >&6; }
+if ${ax_cv_check_cflags__Werror__Wextra+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+
+  ax_check_save_flags=$CFLAGS
+  CFLAGS="$CFLAGS -Werror -Wextra"
+  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+int
+main ()
+{
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_compile "$LINENO"; then :
+  ax_cv_check_cflags__Werror__Wextra=yes
+else
+  ax_cv_check_cflags__Werror__Wextra=no
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+  CFLAGS=$ax_check_save_flags
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ax_cv_check_cflags__Werror__Wextra" >&5
+$as_echo "$ax_cv_check_cflags__Werror__Wextra" >&6; }
+if test "x$ax_cv_check_cflags__Werror__Wextra" = xyes; then :
+  CFLAGS="$CFLAGS -Wextra"
+else
+  :
+fi
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether C compiler accepts -Og" >&5
+$as_echo_n "checking whether C compiler accepts -Og... " >&6; }
+if ${ax_cv_check_cflags__Werror__Og+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+
+  ax_check_save_flags=$CFLAGS
+  CFLAGS="$CFLAGS -Werror -Og"
+  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+int
+main ()
+{
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_compile "$LINENO"; then :
+  ax_cv_check_cflags__Werror__Og=yes
+else
+  ax_cv_check_cflags__Werror__Og=no
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+  CFLAGS=$ax_check_save_flags
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ax_cv_check_cflags__Werror__Og" >&5
+$as_echo "$ax_cv_check_cflags__Werror__Og" >&6; }
+if test "x$ax_cv_check_cflags__Werror__Og" = xyes; then :
+  CFLAGS="$CFLAGS -Og"
+else
+  :
+fi
+
+
 # Checks for library functions.
 for ac_header in stdlib.h
 do :

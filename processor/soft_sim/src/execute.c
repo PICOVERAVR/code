@@ -18,7 +18,24 @@ static uint16_t imm_or_reg(proc *p) {
 }
 
 static uint8_t imm_or_reg_byte(proc *p) {	
+	p->regfile[0] = p->regfile[0]; // to shut up compiler warnings
 	return imm_or_reg(p);
+}
+
+int instr_stop(proc *p) {
+	dbprintf("reached STOP instr, PC 0x%x", p->PC);
+	p->regfile[0] = p->regfile[0];
+	return RET_STOP;
+}
+
+int instr_nop(proc *p) {
+	p->regfile[0] = p->regfile[0];
+	return RET_OK;
+}
+
+int instr_rst(proc *p) {
+	memset(p->regfile, 0, sizeof(p->regfile));
+	return RET_OK;
 }
 
 // F type instructions for arithmetic
@@ -39,7 +56,7 @@ int instr_add(proc *p) {
 		default:
 			return EXCP_ILL_INSTR;
 	}
-	return 0;
+	return RET_OK;
 }
 
 int instr_sub(proc *p) {
@@ -59,7 +76,7 @@ int instr_sub(proc *p) {
 		default:
 			return EXCP_ILL_INSTR;
 	}
-	return 0;
+	return RET_OK;
 }
 
 int instr_mul(proc *p) {
@@ -86,7 +103,7 @@ int instr_mul(proc *p) {
 		default:
 			return EXCP_ILL_INSTR;
 	}
-	return 0;
+	return RET_OK;
 }
 
 int instr_div(proc *p) {
@@ -97,7 +114,7 @@ int instr_div(proc *p) {
 		#ifdef HAVE_TRAP
 		trap_service(p, EXCP_DIV_ZERO_VEC);
 		#endif
-		return EXCP_DIV_ZERO;
+		return RET_DIV_ZERO;
 	}
 
 	div_t temp = div((int) p->regfile[p->i.g_s0], (int) p->regfile[p->i.g_s1]);
@@ -129,7 +146,7 @@ int instr_div(proc *p) {
 		default:
 			return EXCP_ILL_INSTR;
 	}
-	return 0;
+	return RET_OK;
 }
 
 int instr_and(proc *p) {
@@ -143,7 +160,7 @@ int instr_and(proc *p) {
 		default:
 			return EXCP_ILL_INSTR;
 	}
-	return 0;
+	return RET_OK;
 }
 
 int instr_or(proc *p) {
@@ -157,7 +174,7 @@ int instr_or(proc *p) {
 		default:
 			return EXCP_ILL_INSTR;
 	}
-	return 0;
+	return RET_OK;
 }
 
 int instr_xor(proc *p) {
@@ -171,7 +188,7 @@ int instr_xor(proc *p) {
 		default:
 			return EXCP_ILL_INSTR;
 	}
-	return 0;
+	return RET_OK;
 	
 }
 
@@ -186,7 +203,7 @@ int instr_not(proc *p) {
 		default:
 			return EXCP_ILL_INSTR;
 	}
-	return 0;
+	return RET_OK;
 
 }
 
@@ -201,63 +218,71 @@ int instr_inv(proc *p) {
 		default:
 			return EXCP_ILL_INSTR;
 	}
-	return 0;
+	return RET_OK;
 }
 
-void instr_ld(proc *p, uint16_t *ram) {
+int instr_ld(proc *p, uint16_t *ram) {
 	uint16_t temp;
 
-	if (p->i.pm & 1 == 1) {
+	if ((p->i.pm & 1) == 1) {
 		temp = ram[p->regfile[p->i.e_imm]];
 	} else {
 		temp = p->i.e_imm;
 	}
 
-	if ((p->i.pm >> 1) & 1 == 1) {
+	if (((p->i.pm >> 1) & 1) == 1) {
 		p->regfile[p->i.e_s] = temp;
 	} else {
 		p->regfile[p->i.e_s] = (uint8_t) temp;
 	}
+	return RET_OK;
 }
 
-void instr_mov(proc *p) {
+int instr_mov(proc *p) {
 	
-	if ((p->i.pm >> 1) & 1 == 1) {
+	if (((p->i.pm >> 1) & 1) == 1) {
 		REGISTER_DEST = REGISTER_SRC1;
 	} else {
 		REGISTER_DEST = (uint8_t) REGISTER_SRC1;
 	}
+	return RET_OK;
 }
 
-void instr_st(proc *p, uint16_t *ram) {
+int instr_st(proc *p, uint16_t *ram) {
 	fprintf(stderr, "ST is not fully implemented.\n");
 	ram[REGISTER_DEST] = REGISTER_SRC1;
+	return RET_OK;
 }
 
-void instr_ldu(proc *p) {
+int instr_ldu(proc *p) {
 	p->PCH = REGISTER_SRC1;
+	return RET_OK;
 }
 
-void instr_bs(proc *p) {
+int instr_bs(proc *p) {
 	p->PCL = REGISTER_SRC1 + REGISTER_DEST;
+	return RET_OK;
 }
 
-void instr_bn(proc *p) {
+int instr_bn(proc *p) {
 	p->PCL = p->i.b_imm;
+	return RET_OK;
 }
 
-void instr_br(proc *p) {
+int instr_br(proc *p) {
 	p->PCL = p->PCL + REGISTER_DEST;
+	return RET_OK;
 }
 
-void instr_sex(proc *p) {
+int instr_sex(proc *p) {
 	// don't really need to know how to do this at any level, verilog 
 	// handles this?
 	// s assumed to be 8bs
 	p->regfile[p->i.c_s] = (int16_t) p->regfile[p->i.c_s];
+	return RET_OK;
 }
 
-void instr_bcc(proc *p) { // F type
+int instr_bcc(proc *p) { // F type
 	switch (p->i.pm) {
 		case BRANCH_EQ: 
 			if (REGISTER_SRC1 == REGISTER_SRC0) { 
@@ -289,9 +314,10 @@ void instr_bcc(proc *p) { // F type
 			} break;
 			break;
 	}
+	return RET_OK;
 }
 
-void instr_io(proc *p) { // E type
+int instr_io(proc *p) { // E type
 	if (p->i.e_pm) { // input op
 		int temp;
 		printf("16bu io input at address %d: ", p->i.e_imm);
@@ -303,22 +329,26 @@ void instr_io(proc *p) { // E type
 	} else { // output op
 		printf("16bu io output %d at address %d\n", p->regfile[p->i.e_s], p->i.e_imm);
 	}
+	return RET_OK;
 }
 
 
-void instr_call(proc *p) {
+int instr_call(proc *p) {
 	p->BP = p->PC; // ST PC, BP
 	p->BP -= 4; // SUB 4, BP, BP
 	p->PC = p->i.b_imm; // BN imm16
+	return RET_OK;
 }
 
-void instr_ret(proc *p) {
+int instr_ret(proc *p) {
 	p->BP += 4; // ADD 4, BP, BP
 	p->PC = p->SP; // LD BP, PC
+	return RET_OK;
 }
 
-void instr_ps(proc *p) { // C type
+int instr_ps(proc *p) { // C type
 	p->regfile[p->i.c_s] = p->proc_ext_state;
+	return RET_OK;
 }
 
 

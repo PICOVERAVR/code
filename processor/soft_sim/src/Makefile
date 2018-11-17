@@ -102,7 +102,7 @@ CONFIG_CLEAN_VPATH_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)" "$(DESTDIR)$(includedir)"
 PROGRAMS = $(bin_PROGRAMS)
 am_proc_OBJECTS = proc-dispatch.$(OBJEXT) proc-execute.$(OBJEXT) \
-	proc-proc.$(OBJEXT) proc-setup.$(OBJEXT)
+	proc-proc.$(OBJEXT) proc-setup.$(OBJEXT) proc-core.$(OBJEXT)
 proc_OBJECTS = $(am_proc_OBJECTS)
 proc_LDADD = $(LDADD)
 proc_LINK = $(CCLD) $(proc_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) \
@@ -204,7 +204,7 @@ AUTOMAKE = ${SHELL} /root/main/processor/soft_sim/missing automake-1.15
 AWK = mawk
 CC = gcc
 CCDEPMODE = depmode=gcc3
-CFLAGS = -g -O2
+CFLAGS = -g -O2 -g -Wall -Wextra -Og
 CHECK_CFLAGS = -pthread
 CHECK_LIBS = -lcheck_pic -pthread -lrt -lm -lsubunit
 CPP = gcc -E
@@ -288,12 +288,9 @@ target_alias =
 top_build_prefix = ../
 top_builddir = ..
 top_srcdir = ..
-proc_SOURCES = dispatch.c execute.c proc.c setup.c
-include_HEADERS = dispatch.h execute.h proc.h setup.h
+proc_SOURCES = dispatch.c execute.c proc.c setup.c core.c
+include_HEADERS = dispatch.h execute.h proc.h setup.h core.h
 proc_CFLAGS = -I$(top_srcdir)/include # include headers without changing everything to be #include "../stuff/include"
-
-# include debugging info for now
-AM_CFLAGS = -g -Wall -Wextra -Og
 
 # include doc for how to use processor and test programs for software simulator
 noinst_DIST = test_programs assist test
@@ -383,6 +380,7 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+include ./$(DEPDIR)/proc-core.Po
 include ./$(DEPDIR)/proc-dispatch.Po
 include ./$(DEPDIR)/proc-execute.Po
 include ./$(DEPDIR)/proc-proc.Po
@@ -459,6 +457,20 @@ proc-setup.obj: setup.c
 #	$(AM_V_CC)source='setup.c' object='proc-setup.obj' libtool=no \
 #	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
 #	$(AM_V_CC_no)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(proc_CFLAGS) $(CFLAGS) -c -o proc-setup.obj `if test -f 'setup.c'; then $(CYGPATH_W) 'setup.c'; else $(CYGPATH_W) '$(srcdir)/setup.c'; fi`
+
+proc-core.o: core.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(proc_CFLAGS) $(CFLAGS) -MT proc-core.o -MD -MP -MF $(DEPDIR)/proc-core.Tpo -c -o proc-core.o `test -f 'core.c' || echo '$(srcdir)/'`core.c
+	$(AM_V_at)$(am__mv) $(DEPDIR)/proc-core.Tpo $(DEPDIR)/proc-core.Po
+#	$(AM_V_CC)source='core.c' object='proc-core.o' libtool=no \
+#	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
+#	$(AM_V_CC_no)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(proc_CFLAGS) $(CFLAGS) -c -o proc-core.o `test -f 'core.c' || echo '$(srcdir)/'`core.c
+
+proc-core.obj: core.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(proc_CFLAGS) $(CFLAGS) -MT proc-core.obj -MD -MP -MF $(DEPDIR)/proc-core.Tpo -c -o proc-core.obj `if test -f 'core.c'; then $(CYGPATH_W) 'core.c'; else $(CYGPATH_W) '$(srcdir)/core.c'; fi`
+	$(AM_V_at)$(am__mv) $(DEPDIR)/proc-core.Tpo $(DEPDIR)/proc-core.Po
+#	$(AM_V_CC)source='core.c' object='proc-core.obj' libtool=no \
+#	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
+#	$(AM_V_CC_no)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(proc_CFLAGS) $(CFLAGS) -c -o proc-core.obj `if test -f 'core.c'; then $(CYGPATH_W) 'core.c'; else $(CYGPATH_W) '$(srcdir)/core.c'; fi`
 install-includeHEADERS: $(include_HEADERS)
 	@$(NORMAL_INSTALL)
 	@list='$(include_HEADERS)'; test -n "$(includedir)" || list=; \

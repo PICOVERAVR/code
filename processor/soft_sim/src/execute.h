@@ -1,5 +1,12 @@
 #include "proc.h"
 
+enum RET_COND {
+	RET_OK,
+	RET_ERR,
+	RET_DIV_ZERO,
+	RET_STOP,
+};
+
 #pragma once
 
 // we don't need to pass the entire processor state to the function here,
@@ -19,25 +26,29 @@ int instr_inv(proc *p);
 int instr_mul(proc *p);
 int instr_div(proc *p);
 
-void instr_ld(proc *p, uint16_t *ram);
-void instr_st(proc *p, uint16_t *ram);
+int instr_ld(proc *p, uint16_t *ram);
+int instr_st(proc *p, uint16_t *ram);
 
-void instr_mov(proc *p);
+int instr_mov(proc *p);
 
-void instr_ldu(proc *p);
-void instr_bn(proc *p);
-void instr_bs(proc *p);
-void instr_bcc(proc *p);
-void instr_br(proc *p);
+int instr_ldu(proc *p);
+int instr_bn(proc *p);
+int instr_bs(proc *p);
+int instr_bcc(proc *p);
+int instr_br(proc *p);
 
-void instr_sex(proc *p);
+int instr_sex(proc *p);
 
-void instr_io(proc *p);
+int instr_io(proc *p);
 
-void instr_call(proc *p);
-void instr_ret(proc *p);
+int instr_call(proc *p);
+int instr_ret(proc *p);
 
-void instr_ps(proc *p);
+int instr_ps(proc *p);
+
+int instr_stop(proc *p);
+int instr_nop(proc *p);
+int instr_rst(proc *p);
 
 enum COND_BRANCH_TYPES {
 	BRANCH_EQ, // 0

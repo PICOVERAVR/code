@@ -16,7 +16,6 @@
 #define EXCP_ILL_INSTR 1
 #define EXCP_RESET 0
 #define EXCP_MISALIGNED_CNTL 2
-#define EXCP_DIV_ZERO 3
 
 enum exception_vec {
 	EXCP_RESET_VEC = 0x0,
@@ -30,8 +29,6 @@ enum exception_vec {
 // organize into enums
 #define INTERNAL_ERROR 2
 #define NO_HEX_ERROR 3
-
-#define SIM_STOP 4
 
 #define PROC_RAM 2048
 //rom is as big as the hex file

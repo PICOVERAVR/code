@@ -2,6 +2,7 @@
 #include "setup.h" // for system setup and initialization
 #include "execute.h" // for individual instruction implementations
 #include "dispatch.h" // for individual instruction dispatch
+#include "core.h" // for misc assist functions
 
 #define HAVE_TRAP 1 // tell execute.c that we can trap things
 
@@ -13,37 +14,7 @@ static uint16_t proc_feat_get(proc *p, int bitpos) {
 	return (p->proc_ext_state >> bitpos);
 }
 
-void trap_service(proc *p, int trap_vector) {
-	// p->roc_ext_state = trap_vector / 4; NOT SHIFTED PROPERLY
-	p->SP = p->PC; // save PC, keep SP
-	p->SP -= 4;
-	p->PC = trap_vector; // jump to trap
-}
-
 volatile sig_atomic_t interrupt_requested = 0;
-
-static void interrupt_handle(proc *p) {
-	
-	unsigned int interrupt_level;
-	dbprintf("caught interrupt, PC 0x%x", p->PC);
-	printf("3bu ilevel: ");
-	int err = scanf("%d", &interrupt_level);
-	if (err < 0) {
-		perror("scanf");
-	}
-
-	if (interrupt_level > 7) {
-		printf("WARN: invalid interrupt level!\n");
-	}
-	
-	p->BP = p->PC; // save PC and jump
-	p->BP -= 4;
-	p->PC = (4 * interrupt_level) + SYSTEM_TRAP_VEC_SIZE; // jump to interrupt vector, skip trap table
-}
-
-void signal_handler(int signum) {
-	interrupt_requested = 1;
-}
 
 int main(int argc, char **argv) {
 	proc *p = malloc(sizeof(proc));
@@ -62,7 +33,7 @@ int main(int argc, char **argv) {
 		exit(NO_HEX_ERROR);
 	}
 	
-	// disable interrupts until we want them
+	// disable interrupts by default
 	proc_feat_set(p, PROC_FEAT_IE, 0);
 	
 	interrupt_requested = false;
@@ -93,7 +64,7 @@ int main(int argc, char **argv) {
 		if (err == EXCP_ILL_INSTR) {
 			fprintf(stderr, "EXCP: Illegal instruction 0x%x!\n", p->i.raw_instr);
 			p->PC = EXCP_ILL_INSTR_VEC;
-		} else if (err == SIM_STOP) {
+		} else if (err == RET_STOP) {
 			break;
 		}
 		
