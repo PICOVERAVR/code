@@ -152,10 +152,10 @@ int instr_div(proc *p) {
 int instr_and(proc *p) {
 	switch ((p->i.pm >> 1) & 1) {
 		case 0: 
-			REGISTER_DEST = REGISTER_SRC1 & imm_or_reg(p);
+			REGISTER_DEST_LOW = REGISTER_SRC1_LOW & imm_or_reg_byte(p);
 			break;
 		case 1: 
-			REGISTER_DEST_LOW = (int8_t) REGISTER_SRC1_LOW & (int8_t) imm_or_reg_byte(p);
+			REGISTER_DEST = REGISTER_SRC1 & imm_or_reg(p);
 			break;
 		default:
 			return EXCP_ILL_INSTR;
@@ -166,10 +166,10 @@ int instr_and(proc *p) {
 int instr_or(proc *p) {
 	switch ((p->i.pm >> 1) & 1) {
 		case 0: 
-			REGISTER_DEST = REGISTER_SRC1 | imm_or_reg(p);
+			REGISTER_DEST_LOW = REGISTER_SRC1_LOW | imm_or_reg_byte(p);
 			break;
 		case 1: 
-			REGISTER_DEST_LOW = (int8_t) REGISTER_SRC1_LOW | (int8_t) imm_or_reg_byte(p);
+			REGISTER_DEST = REGISTER_SRC1 | imm_or_reg(p);
 			break;
 		default:
 			return EXCP_ILL_INSTR;
@@ -179,11 +179,11 @@ int instr_or(proc *p) {
 
 int instr_xor(proc *p) {
 	switch ((p->i.pm >> 1) & 1) {
-		case 0: 
-			REGISTER_DEST = REGISTER_SRC1 ^ imm_or_reg(p);
+		case 0:
+			REGISTER_DEST_LOW = REGISTER_SRC1_LOW ^ imm_or_reg_byte(p);
 			break;
 		case 1: 
-			REGISTER_DEST_LOW = (int8_t) REGISTER_SRC1_LOW ^ (int8_t) imm_or_reg_byte(p);
+			REGISTER_DEST = REGISTER_SRC1 ^ imm_or_reg(p);
 			break;
 		default:
 			return EXCP_ILL_INSTR;
@@ -195,10 +195,10 @@ int instr_xor(proc *p) {
 int instr_not(proc *p) {
 	switch ((p->i.pm >> 1) & 1) {
 		case 0: 
-			REGISTER_DEST = ~REGISTER_SRC1;
+			REGISTER_DEST_LOW = ~REGISTER_SRC1_LOW;
 			break;
 		case 1: 
-			REGISTER_DEST = (uint8_t) ~REGISTER_SRC1_LOW;
+			REGISTER_DEST = ~REGISTER_SRC1;
 			break;
 		default:
 			return EXCP_ILL_INSTR;
@@ -210,15 +210,83 @@ int instr_not(proc *p) {
 int instr_inv(proc *p) {
 	switch ((p->i.pm >> 1) & 1) {
 		case 0: 
-			REGISTER_DEST = !REGISTER_SRC1;
+			REGISTER_DEST_LOW = REGISTER_SRC1_LOW * (uint8_t) -1;
 			break;
 		case 1: 
-			REGISTER_DEST = (int8_t) REGISTER_SRC1_LOW * (int8_t) -1;
+			REGISTER_DEST = !REGISTER_SRC1;
 			break;
 		default:
 			return EXCP_ILL_INSTR;
 	}
 	return RET_OK;
+}
+
+// shifting: when unsigned, do a logical shift
+// when signed, do an arithmetic shift
+// but right shift is technically implementation dependant!
+
+// NOT TESTED
+int instr_lsh(proc *p) {
+    switch (p->i.pm & 0b11) {
+        case 0:
+            REGISTER_DEST_LOW = REGISTER_SRC1_LOW >> imm_or_reg_byte(p);
+            break;
+        case 1:
+            REGISTER_DEST_LOW = REGISTER_SRC1_LOW << imm_or_reg_byte(p);
+            break;
+        case 2:
+            REGISTER_DEST = REGISTER_SRC1 >> imm_or_reg(p);
+            break;
+        case 3:
+            REGISTER_DEST = REGISTER_SRC1 << imm_or_reg(p);
+            break;
+        default:
+            return EXCP_ILL_INSTR;
+    }	
+	return RET_OK;
+}
+
+// NOT TESTED
+int instr_ash(proc *p) {
+    switch (p->i.pm & 0b11) {
+        case 0: // not sure if we need to keep the cast for the right term
+            REGISTER_DEST_LOW = (int8_t) REGISTER_SRC1_LOW >> (int8_t) imm_or_reg_byte(p);
+            break;
+        case 1:
+            REGISTER_DEST_LOW = (int8_t) REGISTER_SRC1_LOW << (int8_t) imm_or_reg_byte(p);
+            break;
+        case 2:
+            REGISTER_DEST = (int16_t) REGISTER_SRC1 >> (int16_t) imm_or_reg(p);
+            break;
+        case 3:
+            REGISTER_DEST = (int16_t) REGISTER_SRC1 << (int16_t) imm_or_reg(p);
+            break;
+        default:
+            return EXCP_ILL_INSTR;
+    }   
+	return RET_OK;
+}
+
+// NOT FINISHED
+// might require more than a single instruction
+int instr_rot(proc *p) {
+    switch (p->i.pm & 0b11) {
+        case 0:
+            REGISTER_DEST_LOW = REGISTER_SRC1_LOW >> imm_or_reg_byte(p);
+            break;
+        case 1:
+            REGISTER_DEST_LOW = REGISTER_SRC1_LOW << imm_or_reg_byte(p);
+            break;
+        case 2:
+            REGISTER_DEST = REGISTER_SRC1 >> imm_or_reg(p);
+            break;
+        case 3:
+            REGISTER_DEST = REGISTER_SRC1 << imm_or_reg(p);
+            break;
+        default:
+            return EXCP_ILL_INSTR;
+    }   
+    return RET_OK;	
 }
 
 int instr_ld(proc *p, uint16_t *ram) {
@@ -254,8 +322,13 @@ int instr_st(proc *p, uint16_t *ram) {
 	return RET_OK;
 }
 
-int instr_ldu(proc *p) {
+int instr_stu(proc *p) {
 	p->PCH = REGISTER_SRC1;
+	return RET_OK;
+}
+
+int instr_ldu(proc *p) {
+	REGISTER_SRC1 = p->PCH;
 	return RET_OK;
 }
 
@@ -350,5 +423,4 @@ int instr_ps(proc *p) { // C type
 	p->regfile[p->i.c_s] = p->proc_ext_state;
 	return RET_OK;
 }
-
 

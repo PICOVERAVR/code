@@ -31,6 +31,10 @@ int instr_st(proc *p, uint16_t *ram);
 
 int instr_mov(proc *p);
 
+int instr_lsh(proc *p);
+int instr_ash(proc *p);
+int instr_rot(proc *p);
+
 int instr_ldu(proc *p);
 int instr_bn(proc *p);
 int instr_bs(proc *p);

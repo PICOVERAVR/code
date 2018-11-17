@@ -157,6 +157,7 @@ opcode encoding
 	 9 8 7 6 5 4 3 2 1 0
 	  |x x h|  NOP(1)  | h = 1 for halt -- is this is a thing I implemented?
 	  |i b s|  ADD(x)  | b = 1 for word, s = 1 for signed, i = 1 for 12bu imm, 0 for reg
+	  |i b d|  LSH(x)  | b = 1 for word, i = 1 for 12bu imm, d = 1 for left
 	  |x b x|  MOV(x)  | b = 1 for word
 	  |x b m|  LD(x)   | b = 1 for word, m = 1 for mem, m = 0 for imm
 	  |x x x|  ST(x)   | 
