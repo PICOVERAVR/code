@@ -150,6 +150,7 @@ enum instruction_opcode {
 	BR,   // 16
 	RST,  // 17
 	LDU,  // 18
+	STU,  // 19
 };
 
 uint32_t fetch(uint16_t addr, uint32_t *hex_mem);

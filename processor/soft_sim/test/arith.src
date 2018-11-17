@@ -1,32 +1,6 @@
-#include <stdio.h>
-#include "proc.h"
-#include "execute.h"
-#include "dispatch.h" // used to test r0 writes, since individual functions don't
-			 // handle it
+#include "test.h"
 
-#suite fives-check
-
-proc *p;
-
-enum registers {
-	R0,
-	R1,
-	R2,
-	R3,
-	R4,
-	R5,
-	R6,
-};
-
-void proc_set_vec(proc *p) {
-	for (int i = 0; i < 32; i++) {
-		p->regfile[i] = i;
-	}
-	
-	p->i.f_s0 = R1;
-	p->i.f_s1 = R2;
-	p->i.f_d = R3;
-}
+	#suite arith-check
 
 // lots of identical code here, should really clean this up
 // no isolation argument because check already does that
@@ -34,28 +8,7 @@ void proc_set_vec(proc *p) {
 // lots of repetetive code here but honestly I'm tired of figuring out test case forking
 // not freeing memory here because I don't care
 
-#tcase cntl
-
-#test nop
-	proc *p = calloc(1, sizeof(proc)); // important to make sure no stray bytes are different
-    proc_set_vec(p);
-
-	proc *p2 = malloc(sizeof(proc));
-    proc_set_vec(p2);
-	
-	int code = instr_nop(p2);
-
-	ck_assert_int_eq(code, RET_OK);
-	ck_assert_int_eq(memcmp(p2, p, sizeof(p)), 0); // make sure it did nothing
-
-#test stop
-	proc *p = malloc(sizeof(proc));
-    proc_set_vec(p);	
-	
-	int code = instr_stop(p);
-	ck_assert_int_eq(code, RET_STOP);
-
-#tcase add_instr
+	#tcase add_instr
 
 #test add_basic1
 	proc *p = malloc(sizeof(proc));
@@ -147,7 +100,7 @@ void proc_set_vec(proc *p) {
 	
 	ck_assert_int_eq(p->regfile[R3], 9);
 
-#tcase mul_instr
+	#tcase mul_instr
 
 #test mul_basic1
 	proc *p = malloc(sizeof(proc));
@@ -162,3 +115,19 @@ void proc_set_vec(proc *p) {
 	instr_mul(p);
 	
 	ck_assert_int_eq(p->regfile[R3], 36);
+	ck_assert_int_eq(p->regfile[R4], 4);
+
+	#tcase shift_instr
+
+#test ash_basic1
+	proc *p = malloc(sizeof(proc));
+	proc_set_vec(p);
+	
+	p->regfile[R2] = 0xAAFF;
+	p->i.f_pm = 0b010; // word shift, right, using reg
+	
+	instr_lsh(p);
+	
+	ck_assert_int_eq(p->regfile[R3], 0x557F);
+
+

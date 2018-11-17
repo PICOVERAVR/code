@@ -1,0 +1,5 @@
+Running suite(s): arith-check
+DBG: Write to R0 detected.
+DBG: Arithmetic check failed, aborting instruction execution.
+100%: Checks: 10, Failures: 0, Errors: 0
+PASS arith.src.c.out (exit status: 0)

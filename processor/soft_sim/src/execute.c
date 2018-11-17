@@ -227,7 +227,7 @@ int instr_inv(proc *p) {
 
 // NOT TESTED
 int instr_lsh(proc *p) {
-    switch (p->i.pm & 0b11) {
+	switch (p->i.pm & 0b11) {
         case 0:
             REGISTER_DEST_LOW = REGISTER_SRC1_LOW >> imm_or_reg_byte(p);
             break;
@@ -235,8 +235,8 @@ int instr_lsh(proc *p) {
             REGISTER_DEST_LOW = REGISTER_SRC1_LOW << imm_or_reg_byte(p);
             break;
         case 2:
-            REGISTER_DEST = REGISTER_SRC1 >> imm_or_reg(p);
-            break;
+			REGISTER_DEST = REGISTER_SRC1 >> imm_or_reg(p);
+			break;
         case 3:
             REGISTER_DEST = REGISTER_SRC1 << imm_or_reg(p);
             break;
@@ -323,12 +323,12 @@ int instr_st(proc *p, uint16_t *ram) {
 }
 
 int instr_stu(proc *p) {
-	p->PCH = REGISTER_SRC1;
+	p->PCH = REGISTER_DEST;
 	return RET_OK;
 }
 
 int instr_ldu(proc *p) {
-	REGISTER_SRC1 = p->PCH;
+	REGISTER_DEST = p->PCH;
 	return RET_OK;
 }
 

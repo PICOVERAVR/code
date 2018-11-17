@@ -414,7 +414,7 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-TESTS = cproc.out 
+TESTS = arith.src.c.out branch.src.c.out cntl.src.c.out
 all: all-am
 
 .SUFFIXES:
@@ -596,9 +596,23 @@ recheck: all
 	        am__force_recheck=am--force-recheck \
 	        TEST_LOGS="$$log_list"; \
 	exit $$?
-cproc.out.log: cproc.out
-	@p='cproc.out'; \
-	b='cproc.out'; \
+arith.src.c.out.log: arith.src.c.out
+	@p='arith.src.c.out'; \
+	b='arith.src.c.out'; \
+	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
+	--log-file $$b.log --trs-file $$b.trs \
+	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
+	"$$tst" $(AM_TESTS_FD_REDIRECT)
+branch.src.c.out.log: branch.src.c.out
+	@p='branch.src.c.out'; \
+	b='branch.src.c.out'; \
+	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
+	--log-file $$b.log --trs-file $$b.trs \
+	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
+	"$$tst" $(AM_TESTS_FD_REDIRECT)
+cntl.src.c.out.log: cntl.src.c.out
+	@p='cntl.src.c.out'; \
+	b='cntl.src.c.out'; \
 	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
 	--log-file $$b.log --trs-file $$b.trs \
 	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \

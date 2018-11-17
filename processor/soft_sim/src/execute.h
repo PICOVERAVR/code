@@ -36,6 +36,8 @@ int instr_ash(proc *p);
 int instr_rot(proc *p);
 
 int instr_ldu(proc *p);
+int instr_stu(proc *p);
+
 int instr_bn(proc *p);
 int instr_bs(proc *p);
 int instr_bcc(proc *p);

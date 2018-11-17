@@ -29,7 +29,7 @@ void interrupt_handle(proc *p) {
 }
 
 void signal_handler(int signum) {
-    dbprintf("signal caught: %d\n", signum);
+    dbprintf("signal caught: %d", signum);
     interrupt_requested = 1;
 }
 
