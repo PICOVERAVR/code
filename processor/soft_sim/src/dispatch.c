@@ -37,7 +37,8 @@ instr_type instr_list[] = {
     
 	{.opcode=RST, .fp=instr_rst, .check_level=CHECK_NONE},
 	
-	{.opcode=LDU, .fp=instr_ldu, .check_level=CHECK_NONE}, // should be stu, add ldu
+	{.opcode=LDU, .fp=instr_ldu, .check_level=CHECK_ARITH},
+	{.opcode=STU, .fp=instr_stu, .check_level=CHECK_NONE},
 };
 
 static int check_arithmetic(proc *p) {

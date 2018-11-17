@@ -1,6 +1,26 @@
 start off un-pipelined
 
 modules:
+	min CPI and no pipelining
+	slow clock is ok
+	
+	steps:
+	------
+	
+	enable ifetch
+	fetch instruction, decode - one step
+		wait
+	disable ifetch
+	if mem ops required, read mem data
+		wait
+	execute
+	if mem ops required, write mem data
+		wait
+	goto top
+
+	round robin style of execution
+
+pipelined modules:
 	ifetch
 	idecode
 	execute
@@ -11,5 +31,4 @@ modules:
 	common rst + enable signal
 	
 	add memory interface, hazard detection
-	
 	

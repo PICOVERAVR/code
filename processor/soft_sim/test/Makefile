@@ -321,29 +321,29 @@ TEST_LOG_COMPILE = $(TEST_LOG_COMPILER) $(AM_TEST_LOG_FLAGS) \
 	$(TEST_LOG_FLAGS)
 am__DIST_COMMON = $(srcdir)/Makefile.in $(top_srcdir)/test-driver
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
-ACLOCAL = ${SHELL} /root/main/processor/soft_sim/missing aclocal-1.15
+ACLOCAL = ${SHELL} /Users/kyleneil/code/main/processor/soft_sim/missing aclocal-1.15
 AMTAR = $${TAR-tar}
 AM_DEFAULT_VERBOSITY = 1
-AUTOCONF = ${SHELL} /root/main/processor/soft_sim/missing autoconf
-AUTOHEADER = ${SHELL} /root/main/processor/soft_sim/missing autoheader
-AUTOMAKE = ${SHELL} /root/main/processor/soft_sim/missing automake-1.15
-AWK = mawk
+AUTOCONF = ${SHELL} /Users/kyleneil/code/main/processor/soft_sim/missing autoconf
+AUTOHEADER = ${SHELL} /Users/kyleneil/code/main/processor/soft_sim/missing autoheader
+AUTOMAKE = ${SHELL} /Users/kyleneil/code/main/processor/soft_sim/missing automake-1.15
+AWK = awk
 CC = gcc
 CCDEPMODE = depmode=gcc3
-CFLAGS = -g -O2 -g -Wall -Wextra -Og
-CHECK_CFLAGS = -pthread
-CHECK_LIBS = -lcheck_pic -pthread -lrt -lm -lsubunit
+CFLAGS = -g -Wall -Wextra -Og
+CHECK_CFLAGS = -D_THREAD_SAFE -I/usr/local/Cellar/check/0.12.0/include
+CHECK_LIBS = -L/usr/local/Cellar/check/0.12.0/lib -lcheck
 CPP = gcc -E
 CPPFLAGS = 
 CYGPATH_W = echo
 DEFS = -DHAVE_CONFIG_H
 DEPDIR = .deps
-ECHO_C = 
-ECHO_N = -n
+ECHO_C = \c
+ECHO_N = 
 ECHO_T = 
-EGREP = /bin/grep -E
+EGREP = /usr/bin/grep -E
 EXEEXT = 
-GREP = /bin/grep
+GREP = /usr/bin/grep
 INSTALL = /usr/bin/install -c
 INSTALL_DATA = ${INSTALL} -m 644
 INSTALL_PROGRAM = ${INSTALL}
@@ -353,8 +353,8 @@ LDFLAGS =
 LIBOBJS = 
 LIBS = 
 LTLIBOBJS = 
-MAKEINFO = ${SHELL} /root/main/processor/soft_sim/missing makeinfo
-MKDIR_P = /bin/mkdir -p
+MAKEINFO = ${SHELL} /Users/kyleneil/code/main/processor/soft_sim/missing makeinfo
+MKDIR_P = .././install-sh -c -d
 OBJEXT = o
 PACKAGE = fives
 PACKAGE_BUGREPORT = 
@@ -364,17 +364,17 @@ PACKAGE_TARNAME = fives
 PACKAGE_URL = 
 PACKAGE_VERSION = 0.2
 PATH_SEPARATOR = :
-PKG_CONFIG = /usr/bin/pkg-config
+PKG_CONFIG = /usr/local/bin/pkg-config
 PKG_CONFIG_LIBDIR = 
 PKG_CONFIG_PATH = 
 SET_MAKE = 
-SHELL = /bin/bash
+SHELL = /bin/sh
 STRIP = 
 VERSION = 0.2
-abs_builddir = /root/main/processor/soft_sim/test
-abs_srcdir = /root/main/processor/soft_sim/test
-abs_top_builddir = /root/main/processor/soft_sim
-abs_top_srcdir = /root/main/processor/soft_sim
+abs_builddir = /Users/kyleneil/code/main/processor/soft_sim/test
+abs_srcdir = /Users/kyleneil/code/main/processor/soft_sim/test
+abs_top_builddir = /Users/kyleneil/code/main/processor/soft_sim
+abs_top_srcdir = /Users/kyleneil/code/main/processor/soft_sim
 ac_ct_CC = gcc
 am__include = include
 am__leading_dot = .
@@ -393,7 +393,7 @@ host_alias =
 htmldir = ${docdir}
 includedir = ${prefix}/include
 infodir = ${datarootdir}/info
-install_sh = ${SHELL} /root/main/processor/soft_sim/install-sh
+install_sh = ${SHELL} /Users/kyleneil/code/main/processor/soft_sim/install-sh
 libdir = ${exec_prefix}/lib
 libexecdir = ${exec_prefix}/libexec
 localedir = ${datarootdir}/locale
@@ -414,7 +414,7 @@ target_alias =
 top_build_prefix = ../
 top_builddir = ..
 top_srcdir = ..
-TESTS = cproc.out 
+TESTS = arith.src.c.out branch.src.c.out cntl.src.c.out
 all: all-am
 
 .SUFFIXES:
@@ -596,9 +596,23 @@ recheck: all
 	        am__force_recheck=am--force-recheck \
 	        TEST_LOGS="$$log_list"; \
 	exit $$?
-cproc.out.log: cproc.out
-	@p='cproc.out'; \
-	b='cproc.out'; \
+arith.src.c.out.log: arith.src.c.out
+	@p='arith.src.c.out'; \
+	b='arith.src.c.out'; \
+	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
+	--log-file $$b.log --trs-file $$b.trs \
+	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
+	"$$tst" $(AM_TESTS_FD_REDIRECT)
+branch.src.c.out.log: branch.src.c.out
+	@p='branch.src.c.out'; \
+	b='branch.src.c.out'; \
+	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
+	--log-file $$b.log --trs-file $$b.trs \
+	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
+	"$$tst" $(AM_TESTS_FD_REDIRECT)
+cntl.src.c.out.log: cntl.src.c.out
+	@p='cntl.src.c.out'; \
+	b='cntl.src.c.out'; \
 	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
 	--log-file $$b.log --trs-file $$b.trs \
 	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \

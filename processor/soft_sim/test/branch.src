@@ -1,0 +1,17 @@
+#include "test.h"
+
+    #suite branch-check
+
+    #tcase branch
+
+#test unconditional_branch_32b
+    proc *p = malloc(sizeof(proc));
+    proc_set_vec(p);
+
+    p->regfile[R3] = 0xAAFF;
+    instr_stu(p);
+
+    p->i.b_imm = 0x1111;
+    instr_bn(p);
+
+    ck_assert_int_eq(p->PC, 0xAAFF1111);

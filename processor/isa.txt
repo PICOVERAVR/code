@@ -105,7 +105,8 @@ moving
 	LD addr, r	mem[addr]	-> r 		s
 	LD i, r		mem[i]		-> r		s
 	LD imm, r	imm		-> r			s
-	LDU r		r -> PCH				s
+	STU r		r -> PCH				s
+	LDU r		PCH -> r				s
 
 	ST r, addr	r		-> addr			
 	ST r, i		r		-> mem[i]
