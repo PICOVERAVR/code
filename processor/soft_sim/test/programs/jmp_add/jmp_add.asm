@@ -13,8 +13,14 @@ org:
 	LD 0x200, R2 // addr to finish
 
 loop:
-	ADD 1, R1, R1 // R1 = R1 + 1
-	BNE R1, R3, R4
+	ADD 1, R1, R1
+	BNE R1, R3, R4 
+	
+	IO R1, 0x1 // should be 100
+	IO R2, 0x2 // should be 0x200
+	IO R3, 0x3 // should be 100
+	IO R4, 0x4 // should be addr of loop
+
 	STOP
 
 ----------------
@@ -33,4 +39,10 @@ loop:
 loop:
 0x8243 0800 - ADD 1, R1, R1
 0x49c8 0800 - BNE R1, R3, R4
+
+0x0c42 0000 - IO R1, 0x1
+0x0c84 0000 - IO R2, 0x2
+0x0cc6 0000 - IO R3, 0x3
+0x0c08 0100 - IO R4, 0x4
+
 0x0000 0000 - STOP

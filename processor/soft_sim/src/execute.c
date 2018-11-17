@@ -320,14 +320,14 @@ int instr_bcc(proc *p) { // F type
 int instr_io(proc *p) { // E type
 	if (p->i.e_pm) { // input op
 		int temp;
-		printf("16bu io input at address %d: ", p->i.e_imm);
-		int err = scanf("%d", &temp);
+		printf("16bu io input at address %#x (hex): ", p->i.e_imm);
+		int err = scanf("%x", &temp);
 		if (err) {
 			perror("scanf");
 		}
 		p->regfile[p->i.e_s] = (uint16_t) temp;
 	} else { // output op
-		printf("16bu io output %d at address %d\n", p->regfile[p->i.e_s], p->i.e_imm);
+		printf("16bu io output %#x at address %#x\n", p->regfile[p->i.e_s], p->i.e_imm);
 	}
 	return RET_OK;
 }

@@ -42,6 +42,7 @@ no status register, just compare and branch
 "s" indicates implemented in soft_sim
 
 control
+	NOP
 	STOP			stop the processor	s
 	//not specified whether this is a seperate bus or just extra pin
 	
