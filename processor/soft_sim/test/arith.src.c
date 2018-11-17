@@ -53,7 +53,7 @@ END_TEST
 START_TEST(add_byte)
 {
 #line 37
-	proc *p = malloc(sizeof(proc));
+	proc *p = calloc(1, sizeof(proc));
 	proc_set_vec(p);
 	
 	p->regfile[R1] = 0x00FF;

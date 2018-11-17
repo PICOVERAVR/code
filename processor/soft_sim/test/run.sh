@@ -12,5 +12,3 @@ for fn in *.src.c; do
 	CK_VERBOSITY=verbose ./$fn.out
 done
 
-# gcc *.src.c -I$srcdir $srcdir/execute.c $srdcdir/dispatch.c $flags -o cproc.out
-# CK_VERBOSITY=verbose ./cproc.out

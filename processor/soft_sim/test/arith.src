@@ -34,7 +34,7 @@
 	free(p);
 	
 #test add_byte
-	proc *p = malloc(sizeof(proc));
+	proc *p = calloc(1, sizeof(proc));
 	proc_set_vec(p);
 	
 	p->regfile[R1] = 0x00FF;
