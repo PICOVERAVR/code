@@ -17,5 +17,3 @@ export PS2="-> "
 export CLICOLOR=1
 export LSCOLORS=ExFxBxDxCxegedabagacad
 
-export GREP_OPTIONS='--color=auto'
-

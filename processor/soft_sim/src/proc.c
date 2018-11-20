@@ -3,6 +3,7 @@
 #include "execute.h" // for individual instruction implementations
 #include "dispatch.h" // for individual instruction dispatch
 #include "core.h" // for misc assist functions
+#include "__assist.h" // for external assist functions
 
 #define HAVE_TRAP 1 // tell execute.c that we can trap things
 
@@ -29,7 +30,8 @@ int main(int argc, char **argv) {
 	uint32_t *hex_mem = proc_setup(argc, argv, p); // this clears processor state!
 	if (hex_mem == NULL) {
 		fprintf(stderr, "ERR: setup error.\n");
-		free(p);
+		
+		__assist_free_all(2, p, hex_mem);
 		exit(NO_HEX_ERROR);
 	}
 	
@@ -70,8 +72,7 @@ int main(int argc, char **argv) {
 		
 	}
 	
-	free(p);
-	free(ram);
+	__assist_free_all(3, p, hex_mem, ram);
 	
 	fprintf(stderr, "INFO: reached end of sim\n");
 	return INTERNAL_ERROR;

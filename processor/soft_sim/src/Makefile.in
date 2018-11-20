@@ -288,7 +288,7 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-proc_SOURCES = dispatch.c execute.c proc.c setup.c core.c
+proc_SOURCES = dispatch.c execute.c proc.c setup.c core.c __assist.h
 include_HEADERS = dispatch.h execute.h proc.h setup.h core.h
 proc_CFLAGS = -I$(top_srcdir)/include # include headers without changing everything to be #include "../stuff/include"
 
