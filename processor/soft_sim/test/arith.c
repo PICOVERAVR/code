@@ -52,19 +52,20 @@ START_TEST(add_byte)
 {
 #line 35
 	SETUP_M();
-
+	
+	p->regfile[R3] = 0xFFFF;
 	p->regfile[R1] = 0x00FF;
 	p->regfile[R2] = 0x00A4;
 	
 	instr_add(p);
-	ck_assert_int_eq(p->regfile[R3], 0xA3);
+	ck_assert_int_eq(p->regfile[R3], 0xFFA3);
 
 }
 END_TEST
 
 START_TEST(add_immediate)
 {
-#line 44
+#line 45
 	SETUP_M();
 
 	p->i.f_pm = 0b100;
@@ -79,7 +80,7 @@ END_TEST
 
 START_TEST(add_word)
 {
-#line 54
+#line 55
 	SETUP_M();
 
 	p->i.f_pm = 0b010;
@@ -95,7 +96,7 @@ END_TEST
 
 START_TEST(add_dest_r0)
 {
-#line 65
+#line 66
 	SETUP_M();
 
 	p->i.f_d = R0;
@@ -112,7 +113,7 @@ END_TEST
 
 START_TEST(add_check_byte)
 {
-#line 77
+#line 78
 	SETUP_M();
 
 	// check if the data in byte_regfile matches regfile
@@ -126,22 +127,44 @@ END_TEST
 
 START_TEST(add_signed)
 {
-#line 86
+#line 87
 	SETUP_M();
-
-	p->regfile[R1] = -1;
+	
+	p->regfile[R1] = (uint16_t) -32767;
 	p->regfile[R2] = 10;
+	p->i.f_pm = 0b011;
 	
 	instr_add(p);
 	
-	ck_assert_int_eq(p->regfile[R3], 9);
+	ck_assert_int_eq(p->regfile[R3], (uint16_t) -32757);
+
+}
+END_TEST
+
+START_TEST(sub)
+{
+#line 100
+	SETUP_M();
+	
+	instr_sub(p);
+	ck_assert_int_eq(p->regfile[R3], 1);
+
+}
+END_TEST
+
+START_TEST(sub_signed)
+{
+#line 106
+	SETUP_M();
+	
+	
 
 }
 END_TEST
 
 START_TEST(mul_basic1)
 {
-#line 98
+#line 113
 	SETUP_M();
 
 	p->i.g_s0 = R6;
@@ -153,14 +176,36 @@ START_TEST(mul_basic1)
 	instr_mul(p);
 	
 	ck_assert_int_eq(p->regfile[R3], 36);
-	ck_assert_int_eq(p->regfile[R4], 4);
+	ck_assert_int_eq(p->regfile[R4], 4); // shouldn't be modified
 
+}
+END_TEST
+
+START_TEST(mul_signed)
+{
+#line 127
+	SETUP_M();
+
+	p->regfile[R5] = 0xFFFF;
+
+	p->i.g_s0 = R6;
+	p->i.g_s1 = R5;
+
+	p->i.g_l = R3;
+	p->i.g_h = R4;
+	
+	p->i.f_pm = 0b011;
+	
+	instr_mul(p);
+
+	ck_assert_int_eq(p->regfile[R3], (uint16_t) -6);
+	ck_assert_int_eq(p->regfile[R4], 4);
 }
 END_TEST
 
 START_TEST(ash_basic1)
 {
-#line 114
+#line 146
 	SETUP_M();
 
 	p->regfile[R2] = 0xAAFF;
@@ -175,7 +220,7 @@ END_TEST
 
 START_TEST(sex_basic1)
 {
-#line 126
+#line 158
 	SETUP_M();
 	
 	p->regfile[R1] = (int8_t) -1;
@@ -191,9 +236,10 @@ int main(void)
 {
     Suite *s1 = suite_create("arith-check");
     TCase *tc1_1 = tcase_create("add_instr");
-    TCase *tc1_2 = tcase_create("mul_instr");
-    TCase *tc1_3 = tcase_create("shift_instr");
-    TCase *tc1_4 = tcase_create("sign_extend_instr");
+    TCase *tc1_2 = tcase_create("sub_instr");
+    TCase *tc1_3 = tcase_create("mul_instr");
+    TCase *tc1_4 = tcase_create("shift_instr");
+    TCase *tc1_5 = tcase_create("sign_extend_instr");
     SRunner *sr = srunner_create(s1);
     int nf;
 
@@ -207,11 +253,15 @@ int main(void)
     tcase_add_test(tc1_1, add_check_byte);
     tcase_add_test(tc1_1, add_signed);
     suite_add_tcase(s1, tc1_2);
-    tcase_add_test(tc1_2, mul_basic1);
+    tcase_add_test(tc1_2, sub);
+    tcase_add_test(tc1_2, sub_signed);
     suite_add_tcase(s1, tc1_3);
-    tcase_add_test(tc1_3, ash_basic1);
+    tcase_add_test(tc1_3, mul_basic1);
+    tcase_add_test(tc1_3, mul_signed);
     suite_add_tcase(s1, tc1_4);
-    tcase_add_test(tc1_4, sex_basic1);
+    tcase_add_test(tc1_4, ash_basic1);
+    suite_add_tcase(s1, tc1_5);
+    tcase_add_test(tc1_5, sex_basic1);
 
     srunner_run_all(sr, CK_ENV);
     nf = srunner_ntests_failed(sr);

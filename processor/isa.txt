@@ -73,7 +73,7 @@ math
 	DIVB s0, s1, h, l	s0 / s1 (16bs)   -> {d0, d1}		s
 	DIVUB s0, s1, h, l	s0 / s1 (16bu) -> {d0, d1}			s
 	
-	SEX s			8b sign(s) -> 16b sign(d)	
+	SEX s			8b sign(s) -> 16b sign(d)	s
 	
 	// inc and dec functionality provided by ADD r, 1, r
 	// don't need signed bitwise ops

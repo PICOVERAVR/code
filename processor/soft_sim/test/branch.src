@@ -5,8 +5,7 @@
     #tcase branch
 
 #test unconditional_branch_32b
-    proc *p = malloc(sizeof(proc));
-    proc_set_vec(p);
+	SETUP_M();
 
     p->regfile[R3] = 0xAAFF;
     instr_stu(p);
@@ -15,3 +14,31 @@
     instr_bn(p);
 
     ck_assert_int_eq(p->PC, 0xAAFF1111);
+
+	#tcase ldu_stu
+
+#test stu
+	SETUP_M();
+
+	p->regfile[R3] = 0xFF01;
+	instr_stu(p);
+
+	ck_assert_int_eq(p->PCH, 0xFF01);
+
+#test ldu
+	SETUP_M();
+
+	p->PCH = 0x44;
+	instr_ldu(p);
+
+	ck_assert_int_eq(p->regfile[R3], 0x44);
+
+#test br
+	SETUP_M();
+
+	p->regfile[R3] = 5;
+	p->PC = 100;
+
+	instr_br(p);
+	ck_assert_int_eq(p->PC, 105);
+

@@ -45,13 +45,13 @@ int instr_add(proc *p) {
 			REGISTER_DEST_LOW = REGISTER_SRC1_LOW + imm_or_reg_byte(p);
 			break;
 		case 1: 
-			REGISTER_DEST = (int16_t) REGISTER_SRC1 + (int16_t) imm_or_reg(p);
+			REGISTER_DEST_LOW = (int8_t) REGISTER_SRC1_LOW + (int8_t) imm_or_reg_byte(p);
 			break;
 		case 2: 
 			REGISTER_DEST = REGISTER_SRC1 + imm_or_reg(p);
 			break;
 		case 3: 
-			REGISTER_DEST_LOW = (int8_t) REGISTER_SRC1_LOW + (int8_t) imm_or_reg_byte(p);
+			REGISTER_DEST = (int16_t) REGISTER_SRC1 + (int16_t) imm_or_reg(p);
 			break;
 		default:
 			return EXCP_ILL_INSTR;
@@ -65,13 +65,13 @@ int instr_sub(proc *p) {
 			REGISTER_DEST_LOW = REGISTER_SRC1_LOW - imm_or_reg_byte(p);
 			break;
 		case 1: 
-			REGISTER_DEST = (int16_t) REGISTER_SRC1 - (int16_t) imm_or_reg(p);
+			REGISTER_DEST_LOW = (int8_t) REGISTER_SRC1_LOW - (int8_t) imm_or_reg_byte(p);
 			break;
 		case 2: 
 			REGISTER_DEST = REGISTER_SRC1 - imm_or_reg(p);
 			break;
 		case 3: 
-			REGISTER_DEST = (int8_t) REGISTER_SRC1 - (int8_t) imm_or_reg(p);
+			REGISTER_DEST = (int16_t) REGISTER_SRC1 - (int16_t) imm_or_reg(p);
 			break;
 		default:
 			return EXCP_ILL_INSTR;
@@ -84,8 +84,6 @@ int instr_mul(proc *p) {
 	
 	switch (p->i.pm & 0b11) {
 		case 0:
-			//p->regfile[p->i.g_h] = (temp >> 16) & 0xffff;
-			//p->regfile[p->i.g_l] = temp & 0xffff;
 			p->regfile[p->i.g_l] = (uint16_t) (temp & 0xffff);
 			break;
 		case 1:
@@ -93,7 +91,6 @@ int instr_mul(proc *p) {
 			p->regfile[p->i.g_l] = (int16_t) (temp & 0xffff);
 			break;
 		case 2:
-			//p->regfile[p->i.g_l] = (uint16_t) (temp & 0xffff);
 			p->regfile[p->i.g_h] = (temp >> 16) & 0xffff;
 			p->regfile[p->i.g_l] = temp & 0xffff;
 			break;
@@ -268,20 +265,16 @@ int instr_ash(proc *p) {
 }
 
 // NOT FINISHED
-// might require more than a single instruction
+// will require more than a single instruction
 int instr_rot(proc *p) {
     switch (p->i.pm & 0b11) {
         case 0:
-            REGISTER_DEST_LOW = REGISTER_SRC1_LOW >> imm_or_reg_byte(p);
             break;
         case 1:
-            REGISTER_DEST_LOW = REGISTER_SRC1_LOW << imm_or_reg_byte(p);
             break;
         case 2:
-            REGISTER_DEST = REGISTER_SRC1 >> imm_or_reg(p);
             break;
         case 3:
-            REGISTER_DEST = REGISTER_SRC1 << imm_or_reg(p);
             break;
         default:
             return EXCP_ILL_INSTR;

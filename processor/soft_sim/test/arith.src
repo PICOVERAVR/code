@@ -33,12 +33,13 @@
 	
 #test add_byte
 	SETUP_M();
-
+	
+	p->regfile[R3] = 0xFFFF;
 	p->regfile[R1] = 0x00FF;
 	p->regfile[R2] = 0x00A4;
 	
 	instr_add(p);
-	ck_assert_int_eq(p->regfile[R3], 0xA3);
+	ck_assert_int_eq(p->regfile[R3], 0xFFA3);
 
 #test add_immediate
 	SETUP_M();
@@ -84,13 +85,27 @@
 
 #test add_signed
 	SETUP_M();
-
-	p->regfile[R1] = -1;
+	
+	p->regfile[R1] = (uint16_t) -32767;
 	p->regfile[R2] = 10;
+	p->i.f_pm = 0b011;
 	
 	instr_add(p);
 	
-	ck_assert_int_eq(p->regfile[R3], 9);
+	ck_assert_int_eq(p->regfile[R3], (uint16_t) -32757);
+
+	#tcase sub_instr
+
+#test sub
+	SETUP_M();
+	
+	instr_sub(p);
+	ck_assert_int_eq(p->regfile[R3], 1);
+
+#test sub_signed
+	SETUP_M();
+	
+	
 
 	#tcase mul_instr
 
@@ -106,8 +121,25 @@
 	instr_mul(p);
 	
 	ck_assert_int_eq(p->regfile[R3], 36);
-	ck_assert_int_eq(p->regfile[R4], 4);
+	ck_assert_int_eq(p->regfile[R4], 4); // shouldn't be modified
 
+#test mul_signed
+	SETUP_M();
+
+	p->regfile[R5] = 0xFFFF;
+
+	p->i.g_s0 = R6;
+	p->i.g_s1 = R5;
+
+	p->i.g_l = R3;
+	p->i.g_h = R4;
+	
+	p->i.f_pm = 0b011;
+	
+	instr_mul(p);
+
+	ck_assert_int_eq(p->regfile[R3], (uint16_t) -6);
+	ck_assert_int_eq(p->regfile[R4], 4);
 	#tcase shift_instr
 
 #test ash_basic1

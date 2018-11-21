@@ -13,8 +13,7 @@
 START_TEST(unconditional_branch_32b)
 {
 #line 8
-    proc *p = malloc(sizeof(proc));
-    proc_set_vec(p);
+	SETUP_M();
 
     p->regfile[R3] = 0xAAFF;
     instr_stu(p);
@@ -23,6 +22,47 @@ START_TEST(unconditional_branch_32b)
     instr_bn(p);
 
     ck_assert_int_eq(p->PC, 0xAAFF1111);
+
+}
+END_TEST
+
+START_TEST(stu)
+{
+#line 21
+	SETUP_M();
+
+	p->regfile[R3] = 0xFF01;
+	instr_stu(p);
+
+	ck_assert_int_eq(p->PCH, 0xFF01);
+
+}
+END_TEST
+
+START_TEST(ldu)
+{
+#line 29
+	SETUP_M();
+
+	p->PCH = 0x44;
+	instr_ldu(p);
+
+	ck_assert_int_eq(p->regfile[R3], 0x44);
+
+}
+END_TEST
+
+START_TEST(br)
+{
+#line 37
+	SETUP_M();
+
+	p->regfile[R3] = 5;
+	p->PC = 100;
+
+	instr_br(p);
+	ck_assert_int_eq(p->PC, 105);
+
 }
 END_TEST
 
@@ -30,11 +70,16 @@ int main(void)
 {
     Suite *s1 = suite_create("branch-check");
     TCase *tc1_1 = tcase_create("branch");
+    TCase *tc1_2 = tcase_create("ldu_stu");
     SRunner *sr = srunner_create(s1);
     int nf;
 
     suite_add_tcase(s1, tc1_1);
     tcase_add_test(tc1_1, unconditional_branch_32b);
+    suite_add_tcase(s1, tc1_2);
+    tcase_add_test(tc1_2, stu);
+    tcase_add_test(tc1_2, ldu);
+    tcase_add_test(tc1_2, br);
 
     srunner_run_all(sr, CK_ENV);
     nf = srunner_ntests_failed(sr);
