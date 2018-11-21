@@ -135,8 +135,8 @@ enum instruction_opcode {
 	BN,   // 7
 	BS,   // 8
 	Bcc,  // 9 EQ:0, NE:1, GT:2, GE:3, LT:4, LE:5
-	LD,   // A
-	ST,   // B
+	LDI,  // A
+	DNU,  // B, do not use this
 	IO,   // C
 	AND,  // D
 	OR,   // E
@@ -151,6 +151,8 @@ enum instruction_opcode {
 	RST,  // 17
 	LDU,  // 18
 	STU,  // 19
+	LDR,  // 20
+	STR,  // 21
 };
 
 uint32_t fetch(uint16_t addr, uint32_t *hex_mem);

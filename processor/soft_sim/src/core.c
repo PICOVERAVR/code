@@ -29,8 +29,8 @@ void interrupt_handle(proc *p) {
 }
 
 void signal_handler(int signum) {
-    dbprintf("signal caught: %d", signum);
-    interrupt_requested = 1;
+    dbprintf("caught interrupt signal %d", signum);
+	interrupt_requested = 1;
 }
 
 

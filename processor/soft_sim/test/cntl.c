@@ -30,13 +30,41 @@ END_TEST
 START_TEST(stop)
 {
 #line 20
-    proc *p = malloc(sizeof(proc));
-    proc_set_vec(p);
+	SETUP_M();
 
     int code = instr_stop(p);
     ck_assert_int_eq(code, RET_STOP);
 	
+}
+END_TEST
 
+START_TEST(load_basic1)
+{
+#line 28
+	SETUP_M();
+	
+	p->regfile[R3] = 0xFF01;
+	p->i.e_imm = 0xDEAD;
+	instr_ldi(p);
+	ck_assert_int_eq(p->regfile[R3], 0xFFAD);
+	
+}
+END_TEST
+
+START_TEST(load_full)
+{
+#line 36
+	SETUP_M();
+	uint16_t ram[8];
+	ram[0] = 42;
+
+	p->i.f_pm = 0b011;
+	p->i.d_s = R0;
+	p->i.d_d = R3;
+
+	instr_ldr(p, ram);
+	ck_assert_int_eq(p->regfile[R3], 42);
+	ck_assert_int_eq(ram[0], 42); // check for modification
 }
 END_TEST
 
@@ -44,12 +72,16 @@ int main(void)
 {
     Suite *s1 = suite_create("cntl-check");
     TCase *tc1_1 = tcase_create("cntl");
+    TCase *tc1_2 = tcase_create("load");
     SRunner *sr = srunner_create(s1);
     int nf;
 
     suite_add_tcase(s1, tc1_1);
     tcase_add_test(tc1_1, nop);
     tcase_add_test(tc1_1, stop);
+    suite_add_tcase(s1, tc1_2);
+    tcase_add_test(tc1_2, load_basic1);
+    tcase_add_test(tc1_2, load_full);
 
     srunner_run_all(sr, CK_ENV);
     nf = srunner_ntests_failed(sr);

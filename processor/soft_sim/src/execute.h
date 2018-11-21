@@ -26,8 +26,10 @@ int instr_inv(proc *p);
 int instr_mul(proc *p);
 int instr_div(proc *p);
 
-int instr_ld(proc *p, uint16_t *ram);
-int instr_st(proc *p, uint16_t *ram);
+int instr_ldi(proc *p);
+
+int instr_ldr(proc *p, uint16_t *ram);
+int instr_str(proc *p, uint16_t *ram);
 
 int instr_mov(proc *p);
 

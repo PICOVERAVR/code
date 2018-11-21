@@ -26,16 +26,16 @@ notes:
 		honestly, i'm hungry for something with an eval() statement.
 		the sim would be slow, but a lot cleaner.
 
-to check:
-	more error checking, using perror!
-	not sure if arithmetic encoding error in jmp_add is actually an error or not.
+to check/finish:
 	shift instructions
-	
-	rewrite the dispatch section.  Not clean and not the best way to do it.  Makes other stuff harder.
+	store
+	check for clearing upper byte when modifying low byte
+		also set upper byte to known value in tests when working with lower byte
+	usage of "s" and "d" inconsistant between proc.h and isa.txt, fix
 
 bugs:
-	if an instruction returns an illegal opcode, it gets ignored
-		unless it handles it manually like DIV
+	none that I know of!
+
 
 things to add eventually:
 	seperate floating point support

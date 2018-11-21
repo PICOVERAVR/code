@@ -90,7 +90,6 @@ math
 	NOT s		~s		       		   -> d	s
 	INV s		twos_comp(s)	       -> d	s
 	
-	// totally forgot shifting left and right
 	ASR s0, s1, d s0 >> s1 (signed 16b) -> d
 	LSR s0, s1, d s0 >> s1 (unsigned 16b) -> d
 	LSL s0, s1, d s0 << s1 (unsigned 16b) -> d
@@ -100,17 +99,19 @@ math
 moving
 	MOV s, d	s (16b)		-> d		s
 	MOVB s, d	s (8b)		-> d		s
+
+	// no storing literals
+	LDI imm, r	imm		-> r			s
+
+	// no 8b form since reg is used as address
+	LDR s, r	mem[s]  -> r			s
+	STR s, r	r		-> mem[s]		s
 	
-	//no LDB or STB, aligns stuff on 2-byte boundary
-	LD addr, r	mem[addr]	-> r 		s
-	LD i, r		mem[i]		-> r		s
-	LD imm, r	imm		-> r			s
 	STU r		r -> PCH				s
 	LDU r		PCH -> r				s
 
 	ST r, addr	r		-> addr			
 	ST r, i		r		-> mem[i]
-	ST r, imm	r		-> mem[imm]
 	
 branching
 	BN lit		lit		-> pc			s
@@ -160,7 +161,6 @@ opcode encoding
 	  |i b s|  ADD(x)  | b = 1 for word, s = 1 for signed, i = 1 for 12bu imm, 0 for reg
 	  |i b d|  LSH(x)  | b = 1 for word, i = 1 for 12bu imm, d = 1 for left
 	  |x b x|  MOV(x)  | b = 1 for word
-	  |x b m|  LD(x)   | b = 1 for word, m = 1 for mem, m = 0 for imm
 	  |x x x|  ST(x)   | 
 	  |x x x|  BN(x)   | 
 	  |x x r|  BR(x)   | r = 1 for +r //has to be seperate from BN due to differing encoding
@@ -178,4 +178,5 @@ interrupt architecture:
 stack:
 	starts wherever
 	grows down
+	see software notes
 

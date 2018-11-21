@@ -4,6 +4,10 @@
 
 #pragma once
 
+#define SETUP_M() \
+proc *p = malloc(sizeof(proc)); \
+proc_set_vec(p);
+
 enum registers {
     R0,
     R1,

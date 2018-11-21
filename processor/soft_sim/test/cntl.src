@@ -17,10 +17,30 @@
     ck_assert_int_eq(memcmp(p2, p, sizeof(p)), 0); // make sure it did nothing
 
 #test stop
-    proc *p = malloc(sizeof(proc));
-    proc_set_vec(p);
+	SETUP_M();
 
     int code = instr_stop(p);
     ck_assert_int_eq(code, RET_STOP);
 	
+	#tcase load
 
+#test load_basic1
+	SETUP_M();
+	
+	p->regfile[R3] = 0xFF01;
+	p->i.e_imm = 0xDEAD;
+	instr_ldi(p);
+	ck_assert_int_eq(p->regfile[R3], 0xFFAD);
+	
+#test load_full
+	SETUP_M();
+	uint16_t ram[8];
+	ram[0] = 42;
+
+	p->i.f_pm = 0b011;
+	p->i.d_s = R0;
+	p->i.d_d = R3;
+
+	instr_ldr(p, ram);
+	ck_assert_int_eq(p->regfile[R3], 42);
+	ck_assert_int_eq(ram[0], 42); // check for modification

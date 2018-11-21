@@ -7,7 +7,7 @@
 
 #line 1 "arith.src"
 #include "test.h"
-
+	
 
 #line 5
 // lots of identical code here, should really clean this up
@@ -20,9 +20,8 @@
 START_TEST(add_basic1)
 {
 #line 14
-	proc *p = malloc(sizeof(proc));
-	proc_set_vec(p);
-	
+	SETUP_M();
+
 	p->i.f_d = R3;
 	
 	instr_add(p);
@@ -34,10 +33,9 @@ END_TEST
 
 START_TEST(add_basic2)
 {
-#line 24
-	proc *p = malloc(sizeof(proc));
-	proc_set_vec(p);
-	
+#line 23
+	SETUP_M();
+
 	p->regfile[R1] = 44;
 	p->regfile[R2] = 32;
 
@@ -52,10 +50,9 @@ END_TEST
 
 START_TEST(add_byte)
 {
-#line 37
-	proc *p = calloc(1, sizeof(proc));
-	proc_set_vec(p);
-	
+#line 35
+	SETUP_M();
+
 	p->regfile[R1] = 0x00FF;
 	p->regfile[R2] = 0x00A4;
 	
@@ -67,9 +64,8 @@ END_TEST
 
 START_TEST(add_immediate)
 {
-#line 47
-	proc *p = malloc(sizeof(proc));
-	proc_set_vec(p);
+#line 44
+	SETUP_M();
 
 	p->i.f_pm = 0b100;
 	p->i.f2_s = R1;
@@ -83,9 +79,8 @@ END_TEST
 
 START_TEST(add_word)
 {
-#line 58
-	proc *p = malloc(sizeof(proc));
-	proc_set_vec(p);
+#line 54
+	SETUP_M();
 
 	p->i.f_pm = 0b010;
 	p->regfile[R1] = 0xFFA0;
@@ -100,10 +95,9 @@ END_TEST
 
 START_TEST(add_dest_r0)
 {
-#line 70
-	proc *p = malloc(sizeof(proc));
-	proc_set_vec(p);
-	
+#line 65
+	SETUP_M();
+
 	p->i.f_d = R0;
 	p->i.f_opcode = ADD;
 
@@ -118,10 +112,9 @@ END_TEST
 
 START_TEST(add_check_byte)
 {
-#line 83
-	proc *p = malloc(sizeof(proc));
-	proc_set_vec(p);
-	
+#line 77
+	SETUP_M();
+
 	// check if the data in byte_regfile matches regfile
 	p->regfile[R1] = 0xAAFF;
 	
@@ -133,10 +126,9 @@ END_TEST
 
 START_TEST(add_signed)
 {
-#line 93
-	proc *p = malloc(sizeof(proc));
-	proc_set_vec(p);
-	
+#line 86
+	SETUP_M();
+
 	p->regfile[R1] = -1;
 	p->regfile[R2] = 10;
 	
@@ -149,10 +141,9 @@ END_TEST
 
 START_TEST(mul_basic1)
 {
-#line 106
-	proc *p = malloc(sizeof(proc));
-	proc_set_vec(p);
-	
+#line 98
+	SETUP_M();
+
 	p->i.g_s0 = R6;
 	p->i.g_s1 = R6;
 	
@@ -169,10 +160,9 @@ END_TEST
 
 START_TEST(ash_basic1)
 {
-#line 123
-	proc *p = malloc(sizeof(proc));
-	proc_set_vec(p);
-	
+#line 114
+	SETUP_M();
+
 	p->regfile[R2] = 0xAAFF;
 	p->i.f_pm = 0b010; // word shift, right, using reg
 	
@@ -180,7 +170,20 @@ START_TEST(ash_basic1)
 	
 	ck_assert_int_eq(p->regfile[R3], 0x557F);
 
+}
+END_TEST
 
+START_TEST(sex_basic1)
+{
+#line 126
+	SETUP_M();
+	
+	p->regfile[R1] = (int8_t) -1;
+	ck_assert_int_eq((int8_t) p->byte_regfile[R1+1], -1);
+	instr_sex(p);
+	ck_assert_int_eq((int16_t) p->regfile[R1], -1);
+	
+	
 }
 END_TEST
 
@@ -190,6 +193,7 @@ int main(void)
     TCase *tc1_1 = tcase_create("add_instr");
     TCase *tc1_2 = tcase_create("mul_instr");
     TCase *tc1_3 = tcase_create("shift_instr");
+    TCase *tc1_4 = tcase_create("sign_extend_instr");
     SRunner *sr = srunner_create(s1);
     int nf;
 
@@ -206,6 +210,8 @@ int main(void)
     tcase_add_test(tc1_2, mul_basic1);
     suite_add_tcase(s1, tc1_3);
     tcase_add_test(tc1_3, ash_basic1);
+    suite_add_tcase(s1, tc1_4);
+    tcase_add_test(tc1_4, sex_basic1);
 
     srunner_run_all(sr, CK_ENV);
     nf = srunner_ntests_failed(sr);

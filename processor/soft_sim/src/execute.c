@@ -289,20 +289,23 @@ int instr_rot(proc *p) {
     return RET_OK;	
 }
 
-int instr_ld(proc *p, uint16_t *ram) {
-	uint16_t temp;
-
-	if ((p->i.pm & 1) == 1) {
-		temp = ram[p->regfile[p->i.e_imm]];
-	} else {
-		temp = p->i.e_imm;
-	}
-
+int instr_ldi(proc *p) {
 	if (((p->i.pm >> 1) & 1) == 1) {
-		p->regfile[p->i.e_s] = temp;
+		REGISTER_DEST = p->i.e_imm;
 	} else {
-		p->regfile[p->i.e_s] = (uint8_t) temp;
+		REGISTER_DEST_LOW = (uint8_t) p->i.e_imm;
 	}
+
+	return RET_OK;
+}
+
+int instr_ldr(proc *p, uint16_t *ram) {
+	REGISTER_DEST = ram[REGISTER_SRC1];
+	return RET_OK;
+}
+
+int instr_str(proc *p, uint16_t *ram) {
+	ram[REGISTER_DEST] = REGISTER_SRC1;
 	return RET_OK;
 }
 
@@ -311,14 +314,8 @@ int instr_mov(proc *p) {
 	if (((p->i.pm >> 1) & 1) == 1) {
 		REGISTER_DEST = REGISTER_SRC1;
 	} else {
-		REGISTER_DEST = (uint8_t) REGISTER_SRC1;
+		REGISTER_DEST_LOW = REGISTER_SRC1_LOW;
 	}
-	return RET_OK;
-}
-
-int instr_st(proc *p, uint16_t *ram) {
-	fprintf(stderr, "ST is not fully implemented.\n");
-	ram[REGISTER_DEST] = REGISTER_SRC1;
 	return RET_OK;
 }
 
@@ -348,9 +345,6 @@ int instr_br(proc *p) {
 }
 
 int instr_sex(proc *p) {
-	// don't really need to know how to do this at any level, verilog 
-	// handles this?
-	// s assumed to be 8bs
 	p->regfile[p->i.c_s] = (int16_t) p->regfile[p->i.c_s];
 	return RET_OK;
 }

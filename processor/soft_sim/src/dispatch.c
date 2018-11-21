@@ -16,10 +16,12 @@ instr_type instr_list[] = {
 	{.opcode=BS, .fp=instr_bs, .check_level=CHECK_NONE},
 	{.opcode=Bcc, .fp=instr_bcc, .check_level=CHECK_NONE},
 	
-	{.opcode=LD, .fp_ram=instr_ld, .check_level=CHECK_ARITH},
-	{.opcode=ST, .fp_ram=instr_st, .check_level=CHECK_NONE},
-    
-    {.opcode=IO, .fp=instr_io, .check_level=CHECK_ARITH}, // only one variant of this should be checked
+	{.opcode=LDI, .fp=instr_ldi, .check_level=CHECK_ARITH},
+    {.opcode=LDR, .fp_ram=instr_ldr, .check_level=CHECK_ARITH},
+	{.opcode=STR, .fp_ram=instr_str, .check_level=CHECK_NONE},
+	
+	// only one variant of this has to be be checked
+    {.opcode=IO, .fp=instr_io, .check_level=CHECK_ARITH},
 	
 	{.opcode=AND, .fp=instr_and, .check_level=CHECK_ARITH},
 	{.opcode=OR, .fp=instr_or, .check_level=CHECK_ARITH},
@@ -63,7 +65,7 @@ int disp(proc *p, uint16_t *ram) {
 			}
 
 			int err;
-			if (p->i.opcode == LD || p->i.opcode == ST) {
+			if (p->i.opcode == LDR || p->i.opcode == STR) {
 				err = instr_list[i].fp_ram(p, ram);
 			} else {
 				err = instr_list[i].fp(p);
@@ -74,96 +76,4 @@ int disp(proc *p, uint16_t *ram) {
 	
 	printf("ERR: unknown opcode!\n");
 	return EXCP_ILL_INSTR;
-
-	/*
-	switch (p->i.opcode) {
-		case ADD ... DIV:
-		case AND ... INV:
-			if (check_arithmetic(p)) {
-				dbprintf("Arithmetic encoding problem, aborting instruction execution.");
-				return 0;
-			}
-			break;
-	}
-	
-	switch (p->i.opcode) {
-		case NOP: break;
-		case RST: 
-			memset(p->regfile, 0, sizeof(p->regfile));
-			break;
-		case ADD:
-			instr_add(p); 
-			break;
-		case SUB:
-			instr_sub(p);
-			break;
-		case MUL:
-			instr_mul(p);
-			break;
-		case DIV:
-			instr_div(p);
-			break;
-		case AND:
-			instr_and(p);
-			break;
-		case OR:
-			instr_or(p);
-			break;
-		case XOR:
-			instr_xor(p);
-			break;
-		case NOT:
-			instr_not(p);
-			break;
-		case INV:
-			instr_inv(p);
-			break;
-		case SEX:
-			instr_sex(p);
-			break;
-		case LD:
-			instr_ld(p, ram);
-			break;
-		case ST:
-			instr_st(p, ram);
-			break;
-		case BN:
-			instr_bn(p);
-			break;
-		case BS:
-			instr_bs(p);
-			break;
-		case BR:
-			instr_br(p);
-			break;
-		case MOV:
-			instr_mov(p);
-			break;
-		case Bcc:
-			instr_bcc(p);
-			break;
-		case IO:
-			instr_io(p);
-			break;
-		case CALL:
-			instr_call(p);
-			break;
-		case RET:
-			instr_ret(p);
-			break;
-		case PS:
-			instr_ps(p);
-			break;
-		case STOP:
-			dbprintf("reached STOP instr, PC 0x%x", p->PC);
-			return SIM_STOP;
-		case LDU:
-			instr_ldu(p);
-			break;
-		default:
-			printf("ERR: unknown opcode!\n");
-			return EXCP_ILL_INSTR;
-	}
-	return 0;
-	*/
 }

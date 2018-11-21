@@ -1,5 +1,5 @@
 #include "test.h"
-
+	
 	#suite arith-check
 
 // lots of identical code here, should really clean this up
@@ -11,9 +11,8 @@
 	#tcase add_instr
 
 #test add_basic1
-	proc *p = malloc(sizeof(proc));
-	proc_set_vec(p);
-	
+	SETUP_M();
+
 	p->i.f_d = R3;
 	
 	instr_add(p);
@@ -21,9 +20,8 @@
 	ck_assert_int_eq(p->regfile[R3], 3);
 
 #test add_basic2
-	proc *p = malloc(sizeof(proc));
-	proc_set_vec(p);
-	
+	SETUP_M();
+
 	p->regfile[R1] = 44;
 	p->regfile[R2] = 32;
 
@@ -34,9 +32,8 @@
 	free(p);
 	
 #test add_byte
-	proc *p = calloc(1, sizeof(proc));
-	proc_set_vec(p);
-	
+	SETUP_M();
+
 	p->regfile[R1] = 0x00FF;
 	p->regfile[R2] = 0x00A4;
 	
@@ -44,8 +41,7 @@
 	ck_assert_int_eq(p->regfile[R3], 0xA3);
 
 #test add_immediate
-	proc *p = malloc(sizeof(proc));
-	proc_set_vec(p);
+	SETUP_M();
 
 	p->i.f_pm = 0b100;
 	p->i.f2_s = R1;
@@ -55,8 +51,7 @@
 	ck_assert_int_eq(p->regfile[R3], 21);
 
 #test add_word
-	proc *p = malloc(sizeof(proc));
-	proc_set_vec(p);
+	SETUP_M();
 
 	p->i.f_pm = 0b010;
 	p->regfile[R1] = 0xFFA0;
@@ -67,9 +62,8 @@
 	ck_assert_int_eq(p->regfile[R3], 0xFFCD);
 
 #test add_dest_r0
-	proc *p = malloc(sizeof(proc));
-	proc_set_vec(p);
-	
+	SETUP_M();
+
 	p->i.f_d = R0;
 	p->i.f_opcode = ADD;
 
@@ -80,9 +74,8 @@
 	ck_assert_int_eq(err, 0); // no error should be reported for R0 write
 
 #test add_check_byte
-	proc *p = malloc(sizeof(proc));
-	proc_set_vec(p);
-	
+	SETUP_M();
+
 	// check if the data in byte_regfile matches regfile
 	p->regfile[R1] = 0xAAFF;
 	
@@ -90,9 +83,8 @@
 	ck_assert_int_eq(p->byte_regfile[(R1*2)+1], 0xAA);
 
 #test add_signed
-	proc *p = malloc(sizeof(proc));
-	proc_set_vec(p);
-	
+	SETUP_M();
+
 	p->regfile[R1] = -1;
 	p->regfile[R2] = 10;
 	
@@ -103,9 +95,8 @@
 	#tcase mul_instr
 
 #test mul_basic1
-	proc *p = malloc(sizeof(proc));
-	proc_set_vec(p);
-	
+	SETUP_M();
+
 	p->i.g_s0 = R6;
 	p->i.g_s1 = R6;
 	
@@ -120,9 +111,8 @@
 	#tcase shift_instr
 
 #test ash_basic1
-	proc *p = malloc(sizeof(proc));
-	proc_set_vec(p);
-	
+	SETUP_M();
+
 	p->regfile[R2] = 0xAAFF;
 	p->i.f_pm = 0b010; // word shift, right, using reg
 	
@@ -130,4 +120,14 @@
 	
 	ck_assert_int_eq(p->regfile[R3], 0x557F);
 
+	#tcase sign_extend_instr
 
+#test sex_basic1
+	SETUP_M();
+	
+	p->regfile[R1] = (int8_t) -1;
+	ck_assert_int_eq((int8_t) p->byte_regfile[R1+1], -1);
+	instr_sex(p);
+	ck_assert_int_eq((int16_t) p->regfile[R1], -1);
+	
+	
