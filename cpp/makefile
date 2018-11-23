@@ -1,6 +1,6 @@
 # small makefile for C++ projects
 CC = g++
-DFLAGS = -g -Wall #generate symbol information
+DFLAGS = -Wall
 
 SRC = $(wildcard *.cpp) #grab anything with a .c ending
 
