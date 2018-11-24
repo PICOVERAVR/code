@@ -1,3 +1,0 @@
-find option to demangle C++ names
-find out what tf gmon is doing in executable
-etc.
