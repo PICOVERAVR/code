@@ -44,3 +44,17 @@
 	instr_ldr(p, ram);
 	ck_assert_int_eq(p->regfile[R3], 42);
 	ck_assert_int_eq(ram[0], 42); // check for modification
+
+#test store_full
+	SETUP_M();
+	uint16_t ram[8];
+	p->regfile[R1] = 42;
+
+	p->i.f_pm = 0b011;
+	p->i.d_s = R1;
+	p->i.d_d = R0;
+
+	instr_str(p, ram);
+	ck_assert_int_eq(ram[0], 42);
+	ck_assert_int_eq(p->regfile[R1], 42); // check for modification
+

@@ -33,4 +33,11 @@ void signal_handler(int signum) {
 	interrupt_requested = 1;
 }
 
+void proc_feat_set(proc *p, int bitpos, int val) {
+    p->proc_ext_state |= val << bitpos;
+}
+
+uint16_t proc_feat_get(proc *p, int bitpos) {
+    return (p->proc_ext_state >> bitpos);
+}
 

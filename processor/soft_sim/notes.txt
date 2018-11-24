@@ -25,6 +25,7 @@ notes:
 	sim should have been written in C++, hungry for overloading.
 		honestly, i'm hungry for something with an eval() statement.
 		the sim would be slow, but a lot cleaner.
+		OOP would also have been really nice here!
 
 to check/finish:
 	shift instructions
@@ -39,4 +40,8 @@ bugs:
 
 things to add eventually:
 	seperate floating point support
-	IEEE-754 compliant!
+		IEEE-754 compliant!
+	atomic memory accesses
+		multiple processors first
+	make things easier to modify
+		replace hard-coded types with typedefs (sigh)

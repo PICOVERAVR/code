@@ -25,5 +25,6 @@ uint32_t *proc_setup(int argc, char **argv, proc *p) {
 	fclose(hex);
 	
 	memset(p, 0, sizeof(proc)); // clear proc state
+	p->proc_ext_feat |= 1 << 1; // hardware mul/div supported
 	return hex_mem;
 }

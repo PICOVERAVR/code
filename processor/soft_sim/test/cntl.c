@@ -65,6 +65,25 @@ START_TEST(load_full)
 	instr_ldr(p, ram);
 	ck_assert_int_eq(p->regfile[R3], 42);
 	ck_assert_int_eq(ram[0], 42); // check for modification
+
+}
+END_TEST
+
+START_TEST(store_full)
+{
+#line 49
+	SETUP_M();
+	uint16_t ram[8];
+	p->regfile[R1] = 42;
+
+	p->i.f_pm = 0b011;
+	p->i.d_s = R1;
+	p->i.d_d = R0;
+
+	instr_str(p, ram);
+	ck_assert_int_eq(ram[0], 42);
+	ck_assert_int_eq(p->regfile[R1], 42); // check for modification
+
 }
 END_TEST
 
@@ -82,6 +101,7 @@ int main(void)
     suite_add_tcase(s1, tc1_2);
     tcase_add_test(tc1_2, load_basic1);
     tcase_add_test(tc1_2, load_full);
+    tcase_add_test(tc1_2, store_full);
 
     srunner_run_all(sr, CK_ENV);
     nf = srunner_ntests_failed(sr);

@@ -121,7 +121,8 @@ typedef struct {
 			instr i;
 		};
 	};
-	uint16_t proc_ext_state;
+	uint16_t proc_ext_state; // processor state
+	uint16_t proc_ext_feat;  // features supported in processor
 } proc;
 
 enum instruction_opcode {

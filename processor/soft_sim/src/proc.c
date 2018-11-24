@@ -7,14 +7,6 @@
 
 #define HAVE_TRAP 1 // tell execute.c that we can trap things
 
-static void proc_feat_set(proc *p, int bitpos, int val) {
-	p->proc_ext_state |= val << bitpos;
-}
-
-static uint16_t proc_feat_get(proc *p, int bitpos) {
-	return (p->proc_ext_state >> bitpos);
-}
-
 volatile sig_atomic_t interrupt_requested = 0;
 
 int main(int argc, char **argv) {
