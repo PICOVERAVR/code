@@ -9,15 +9,14 @@
 #define PORTNO 6060
 
 /*
-    Socket test code, client side.
+    Socket test code.
     Don't know what everything does exactly, as I copied this off of the internet in a different form and 
     modified it to strip out a lot of error reporting that was, in all likelihood, a really good idea to have,
     but as a beginner I wanted as little to understand as possible.
  
     Used this program to connect to a RasPi 2B. How to replicate:
-    1. ssh pi@<ip address>
-    2. nc -l 6060 (the port I chose)
-    3. run on client side.
+    1. run "nc -l 6060" on server side (random port)
+    2. run this program on client side.
 */
 
 int main(int argc, char *argv[])
@@ -31,7 +30,12 @@ int main(int argc, char *argv[])
     
     portno = PORTNO;
     sockfd = socket(AF_INET, SOCK_STREAM, 0); //IPv4, stream socket, '0' lets system choose default protocol for current settings
-    server = gethostbyname("Oasis"); //name of raspi, needs to be passed as a command-line arg to be portable.  converts name "Oasis" to byte format suitable for usage.
+    
+    char name_buf[256];
+    gethostname(name_buf, sizeof(name_buf));
+    printf("Client hostname: %s\n", name_buf);
+    
+    server = gethostbyname("Kyles-MBP"); //name of raspi, needs to be passed as a command-line arg to be portable.  converts name in quotes to byte format suitable for usage.
     
     if (server == NULL) { //keep this!
         fprintf(stderr, "Host does not exist\n");
