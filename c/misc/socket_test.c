@@ -19,8 +19,7 @@
     2. run this program on client side.
 */
 
-int main(int argc, char *argv[])
-{
+int main(int argc, char *argv[]) {
     int sockfd, portno;
     long n;
     struct sockaddr_in serv_addr;
@@ -35,7 +34,13 @@ int main(int argc, char *argv[])
     gethostname(name_buf, sizeof(name_buf));
     printf("Client hostname: %s\n", name_buf);
     
-    server = gethostbyname("Kyles-MBP"); //name of raspi, needs to be passed as a command-line arg to be portable.  converts name in quotes to byte format suitable for usage.
+	if (argc < 2) {
+		fprintf(stderr, "Usage: a.out <hostname>\n");
+		exit(-1);
+	}
+	
+	// try Oasis or Kyles-MBP
+    server = gethostbyname(argv[1]); //name of raspi, needs to be passed as a command-line arg to be portable.  converts name in quotes to byte format suitable for usage.
     
     if (server == NULL) { //keep this!
         fprintf(stderr, "Host does not exist\n");
