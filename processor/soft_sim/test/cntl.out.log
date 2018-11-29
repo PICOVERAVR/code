@@ -1,4 +1,0 @@
-Running suite(s): cntl-check
-DBG: reached STOP instr, PC 0x0
-100%: Checks: 4, Failures: 0, Errors: 0
-PASS cntl.out (exit status: 0)

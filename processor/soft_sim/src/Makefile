@@ -204,7 +204,7 @@ AUTOMAKE = ${SHELL} /root/main/processor/soft_sim/missing automake-1.15
 AWK = mawk
 CC = gcc
 CCDEPMODE = depmode=gcc3
-CFLAGS = -g -Wall -Wextra -Og
+CFLAGS =  -Wall -Wextra
 CHECK_CFLAGS = -pthread
 CHECK_LIBS = -lcheck_pic -pthread -lrt -lm -lsubunit
 CPP = gcc -E
@@ -290,7 +290,10 @@ top_builddir = ..
 top_srcdir = ..
 proc_SOURCES = dispatch.c execute.c proc.c setup.c core.c __assist.h
 include_HEADERS = dispatch.h execute.h proc.h setup.h core.h
-proc_CFLAGS = -I$(top_srcdir)/include # include headers without changing everything to be #include "../stuff/include"
+
+# include headers without changing everything to be #include "../stuff/include"
+# also include debugging info and turn down optimization level
+proc_CFLAGS = -I$(top_srcdir)/include $(AM_CFLAGS) -g -Og
 
 # include doc for how to use processor and test programs for software simulator
 noinst_DIST = test_programs assist test

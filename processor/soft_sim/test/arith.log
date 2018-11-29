@@ -1,5 +1,5 @@
 Running suite(s): arith-check
 DBG: Write to R0 detected.
 DBG: Arithmetic check failed, aborting instruction execution.
-100%: Checks: 11, Failures: 0, Errors: 0
-PASS arith.out (exit status: 0)
+100%: Checks: 14, Failures: 0, Errors: 0
+PASS arith (exit status: 0)

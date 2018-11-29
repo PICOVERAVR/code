@@ -209,7 +209,7 @@ AUTOMAKE = ${SHELL} /root/main/processor/soft_sim/missing automake-1.15
 AWK = mawk
 CC = gcc
 CCDEPMODE = depmode=gcc3
-CFLAGS = -g -Wall -Wextra -Og
+CFLAGS =  -Wall -Wextra
 CHECK_CFLAGS = -pthread
 CHECK_LIBS = -lcheck_pic -pthread -lrt -lm -lsubunit
 CPP = gcc -E

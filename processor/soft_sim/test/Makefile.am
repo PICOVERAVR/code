@@ -1,7 +1,15 @@
- TESTS = arith.out branch.out cntl.out
-# check_PROGRAMS = check_foo
-# check_foo_SOURCES = arith_test.c /root/main/processor/soft_sim/src/proc.c
+TESTS = $(check_PROGRAMS)
+check_PROGRAMS = arith cntl branch
 
-# check_proc_CFLAGS = $(CFLAGS) $(CHECK_CFLAGS)
-# check_proc_LDADD = $(LDFLAGS) $(CHECK_LIBS)
+arith_SOURCES = arith.c $(top_builddir)/src/execute.c $(top_builddir)/src/dispatch.c
+arith_CFLAGS = -I$(top_builddir)/src -O3 @CHECK_CFLAGS@
+arith_LDADD = @CHECK_LIBS@
+
+cntl_SOURCES = cntl.c $(top_builddir)/src/execute.c 
+cntl_CFLAGS = -I$(top_builddir)/src -O3 @CHECK_CFLAGS@
+cntl_LDADD = @CHECK_LIBS@
+
+branch_SOURCES = branch.c $(top_builddir)/src/execute.c
+branch_CFLAGS = -I$(top_builddir)/src -O3 @CHECK_CFLAGS@
+branch_LDADD = @CHECK_LIBS@
 

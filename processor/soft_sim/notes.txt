@@ -21,13 +21,13 @@ to do:
 		show people
 		put in showcase
 
-notes:
+observations:
 	sim should have been written in C++, hungry for overloading.
 		honestly, i'm hungry for something with an eval() statement.
 		the sim would be slow, but a lot cleaner.
 		OOP would also have been really nice here!
 
-to check/finish:
+verify/finish:
 	shift instructions
 	store
 	check for clearing upper byte when modifying low byte
@@ -35,10 +35,9 @@ to check/finish:
 	usage of "s" and "d" inconsistant between proc.h and isa.txt, fix
 
 bugs:
-	none that I know of!
+	make distcheck is still broken.
 
-
-things to add eventually:
+larger additions::
 	seperate floating point support
 		IEEE-754 compliant!
 	atomic memory accesses
