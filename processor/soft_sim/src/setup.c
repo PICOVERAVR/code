@@ -1,14 +1,41 @@
 #include "proc.h"
 
-uint32_t *proc_setup(int argc, char **argv, proc *p) {
+const char *help_string = "proc -vhb: \
+\nh: print help menu \
+\nv: print version info \
+\nb <path>: pass path to simulator";
+
+const char *version_string = "Fives 0.2, by Kyle Neil";
+// sets up execution environment for the processor
+// by loading the file passed to it into memory and resetting the processor
+
+uint32_t *proc_setup(int argc, char **argv) {
 	if (argc < 2) {
-		fprintf(stderr, "ERR: no hex file provided!\n");
-		return NULL;
+		fprintf(stderr, "INFO: No arguments provided, doing nothing.\n");
+		exit(0);
 	}
 	
-	FILE *hex = fopen(*(argv+1), "rb"); // get the hex file and load it into memory
+	int c;
+	char *hex_path = NULL;
+	while ((c = getopt(argc, argv, "vhb:")) != -1) {
+		switch (c) {
+			case 'v':
+				printf("%s\n", version_string);
+				exit(0);
+			case 'h':
+				printf("%s\n", help_string);
+				exit(0);
+			case 'b':
+				hex_path = optarg;
+				break;
+			case '?':
+				break;
+		}
+	}
+	
+	FILE *hex = fopen(hex_path, "rb"); // get the hex file and load it into memory
 	if (hex == NULL) {
-		fprintf(stderr, "ERR: unable to open hex file!\n");
+		perror("ERR");
 		return NULL;
 	}
 	
@@ -24,7 +51,5 @@ uint32_t *proc_setup(int argc, char **argv, proc *p) {
 	}
 	fclose(hex);
 	
-	memset(p, 0, sizeof(proc)); // clear proc state
-	p->proc_ext_feat |= 1 << 1; // hardware mul/div supported
 	return hex_mem;
 }

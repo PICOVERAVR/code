@@ -30,5 +30,5 @@ AC_CHECK_FUNCS([memset])
 AC_CONFIG_FILES([Makefile
                  src/Makefile
                  test/Makefile])
-AC_CONFIG_SUBDIRS([fives-0.1])
+AC_CONFIG_SUBDIRS([fives-0.2])
 AC_OUTPUT

@@ -8,6 +8,7 @@
 #include <assert.h>
 #include <signal.h>
 #include <unistd.h>
+#include <ctype.h>
 
 // locks us into gcc, but I don't care and enables helpful macros
 #define _GNU_SOURCE
@@ -26,9 +27,11 @@ enum exception_vec {
 
 #define SYSTEM_TRAP_VEC_SIZE 4
 
-// organize into enums
-#define INTERNAL_ERROR 2
-#define NO_HEX_ERROR 3
+enum error_list {
+	INTERNAL_ERROR = 2,
+	HO_HEX_ERROR,
+	SETUP_ERROR
+};
 
 #define PROC_RAM 2048
 //rom is as big as the hex file

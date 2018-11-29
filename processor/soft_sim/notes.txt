@@ -33,11 +33,13 @@ verify/finish:
 	check for clearing upper byte when modifying low byte
 		also set upper byte to known value in tests when working with lower byte
 	usage of "s" and "d" inconsistant between proc.h and isa.txt, fix
-
+	
+	use getopt for argument parsing!
+	
 bugs:
 	make distcheck is still broken.
 
-larger additions::
+larger additions:
 	seperate floating point support
 		IEEE-754 compliant!
 	atomic memory accesses

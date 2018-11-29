@@ -10,26 +10,27 @@
 volatile sig_atomic_t interrupt_requested = 0;
 
 int main(int argc, char **argv) {
-	proc *p = malloc(sizeof(proc));
-	if (!p) {
-		perror("malloc");
-		return INTERNAL_ERROR;
-	}
-	
 	uint64_t perf_counter = 0;
 
 	jmp_buf start;
 	if (setjmp(start)) {
 		dbprintf("RST encountered, resetting processor\n");
 	}
-
-	uint32_t *hex_mem = proc_setup(argc, argv, p); // this clears processor state!
+	
+	uint32_t *hex_mem = proc_setup(argc, argv); // this inits all proc state to 0
 	if (hex_mem == NULL) {
 		fprintf(stderr, "ERR: setup error.\n");
-		
-		__assist_free_all(2, p, hex_mem);
-		exit(NO_HEX_ERROR);
+		return SETUP_ERROR;
 	}
+
+	proc *p = malloc(sizeof(proc));
+	if (!p) {
+		perror("malloc");
+		return INTERNAL_ERROR;
+	}
+
+	memset(p, 0, sizeof(proc));
+	p->proc_ext_feat |= 1 << 1; // hardware mul/div supported
 	
 	// disable interrupts by default
 	proc_feat_set(p, PROC_FEAT_IE, 0);
@@ -43,7 +44,7 @@ int main(int argc, char **argv) {
 		return INTERNAL_ERROR;
 	}
 	
-	dbprintf("starting simulation... (ctl-\\ for interrupt)\n");
+	fprintf(stderr, "INFO: starting sim (ctl-\\ for interrupt)\n");
 	for(;;) {
 		
 		perf_counter++;
