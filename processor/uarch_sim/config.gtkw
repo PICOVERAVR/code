@@ -1,0 +1,30 @@
+[*]
+[*] GTKWave Analyzer v3.3.94 (w)1999-2018 BSI
+[*] Thu Nov 29 22:59:24 2018
+[*]
+[dumpfile] "/Users/kyleneil/code/main/processor/uarch_sim/proc_dump.vcd"
+[dumpfile_mtime] "Thu Nov 29 22:58:45 2018"
+[dumpfile_size] 652
+[savefile] "/Users/kyleneil/code/main/processor/uarch_sim/config.gtkw"
+[timestart] 0
+[size] 1000 600
+[pos] -1 -1
+*-1.700276 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] main.
+[sst_width] 193
+[signals_width] 133
+[sst_expanded] 1
+[sst_vpaned_height] 167
+@22
+main.m.addr_i[10:0]
+@28
+main.m.clk_i
+@22
+main.m.data_i[31:0]
+main.m.data_o[31:0]
+@28
+main.m.en_i
+@29
+main.m.wr_i
+[pattern_trace] 1
+[pattern_trace] 0

@@ -1,10 +1,8 @@
 to do:
 	write simulator in C
-		have some way of verifying that the output is correct!
 		nothing low level, just identify instructions we want/need and encoding
-		a great chance to use new features of c that I wouldn't touch!
 	? write assembler in yacc/bison (normally would create backend for gcc)
-	write low-level simulator in C
+	write low-level simulator in Verilog
 		include microarchitecture this time
 		start with something that works properly, then play around with optimizations
 	write verilog code
@@ -33,8 +31,6 @@ verify/finish:
 	check for clearing upper byte when modifying low byte
 		also set upper byte to known value in tests when working with lower byte
 	usage of "s" and "d" inconsistant between proc.h and isa.txt, fix
-	
-	use getopt for argument parsing!
 	
 bugs:
 	make distcheck is still broken.

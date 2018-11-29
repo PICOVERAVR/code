@@ -28,3 +28,11 @@
 4. update isa.txt
 5. write into hardware
 
+to test a module:
+	
+	1. write module
+	2. write test
+	3. make it
+	4. show all signals
+	5. update config.gtkw
+	6. verify it's correct
