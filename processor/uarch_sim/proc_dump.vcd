@@ -1,5 +1,5 @@
 $date
-	Thu Nov 29 19:24:01 2018
+	Fri Nov 30 12:19:42 2018
 $end
 $version
 	Icarus Verilog
@@ -7,7 +7,7 @@ $end
 $timescale
 	1ns
 $end
-$scope module main $end
+$scope module pc_unit_test $end
 $var wire 32 ! pc_m [31:0] $end
 $var wire 1 " is_aligned $end
 $var reg 1 # clk $end
