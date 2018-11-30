@@ -3,6 +3,10 @@
 	initially just makes memory acceses controllable and synchronous.
 	
 	delay of .5 cycles when writing / reading
+	
+	if en and wr are 1, write occurs
+	if en is 1 and wr is 0, read occurs
+	if en is 0, memory goes into hi-z
 
 	instruction will be updated if module is enabled.
 	otherwise, instruction will go hi-z

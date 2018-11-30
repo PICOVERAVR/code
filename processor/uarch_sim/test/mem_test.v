@@ -15,7 +15,8 @@ module main();
 
 	wire [31:0] data_o;
 	
-	 mem_unit m(.clk_i(clk), .en_i(en), .wr_i(wr), .addr_i(addr), .data_i(data_i), .data_o(data_o));
+	// make sure to use parameters as well
+	mem_unit m(.clk_i(clk), .en_i(en), .wr_i(wr), .addr_i(addr), .data_i(data_i), .data_o(data_o));
 
 	always #(1) begin
 		clk <= ~clk;	

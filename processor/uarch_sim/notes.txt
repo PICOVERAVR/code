@@ -1,4 +1,3 @@
-1. Get software sim working! -- test out instructions we may want? DONE, mostly
 2. Translate to execution units
 	write this in SV!
 	make sure the memory is external to the processor and writable
@@ -36,3 +35,14 @@ to test a module:
 	4. show all signals
 	5. update config.gtkw
 	6. verify it's correct
+
+to make a module:
+	name the module <module>_unit in file <module>.v
+	name the test <module>_test.v
+	run: make src=<module>
+
+for first model:
+	round robin execution, just abysmal IPC
+	mem needs two cycles, everything else 1 cycle?
+	lays groundwork for pipelining later!
+	
