@@ -4,7 +4,7 @@
 
 `timescale 1ns / 1ns
 
-module main();
+module mem_unit_test();
 	
 	reg clk = 0;
 	reg en = 0;
@@ -25,7 +25,7 @@ module main();
 	initial begin
 		$display("Running mem_unit testbench...");
 		$dumpfile("proc_dump.vcd");
-		$dumpvars(0, main);
+		$dumpvars(0, mem_unit_test);
 		
 		#1;
 		en <= 1'b1;
