@@ -1,5 +1,5 @@
 $date
-	Fri Nov 30 12:19:42 2018
+	Fri Nov 30 19:09:31 2018
 $end
 $version
 	Icarus Verilog
@@ -7,139 +7,128 @@ $end
 $timescale
 	1ns
 $end
-$scope module pc_unit_test $end
-$var wire 32 ! pc_m [31:0] $end
-$var wire 1 " is_aligned $end
+$scope module regfile_unit_test $end
+$var wire 16 ! reg_b [15:0] $end
+$var wire 16 " reg_a [15:0] $end
 $var reg 1 # clk $end
-$var reg 1 $ d_r_i $end
-$var reg 1 % en $end
-$var reg 32 & ld [31:0] $end
-$var reg 1 ' ld_ct $end
-$var reg 1 ( rst $end
-$scope module p $end
+$var reg 1 $ en $end
+$var reg 16 % reg_ld [15:0] $end
+$var reg 1 & rst $end
+$var reg 5 ' sel_a [4:0] $end
+$var reg 5 ( sel_b [4:0] $end
+$var reg 1 ) wr $end
+$var reg 5 * wr_sel [4:0] $end
+$scope module r $end
 $var wire 1 # clk_i $end
-$var wire 1 $ d_r_i $end
-$var wire 1 % en_i $end
-$var wire 1 ' ld_ct_i $end
-$var wire 32 ) ld_i [31:0] $end
-$var wire 1 ( rst_i $end
-$var wire 1 " is_aligned_o $end
-$var reg 32 * pc_o [31:0] $end
+$var wire 1 $ en_i $end
+$var wire 16 + reg_ld_i [15:0] $end
+$var wire 1 & rst_i $end
+$var wire 5 , sel_a_i [4:0] $end
+$var wire 5 - sel_b_i [4:0] $end
+$var wire 1 ) wr_i $end
+$var wire 5 . wr_sel_i [4:0] $end
+$var reg 16 / reg_a_o [15:0] $end
+$var reg 16 0 reg_b_o [15:0] $end
 $upscope $end
 $upscope $end
 $enddefinitions $end
 #0
 $dumpvars
-bx *
-bx )
-1(
-0'
-bx &
-0%
+bx 0
+bx /
+b0 .
+b0 -
+b0 ,
+b0 +
+b0 *
+0)
+b0 (
+b0 '
+0&
+b0 %
 0$
 0#
-x"
+bx "
 bx !
 $end
 #1
-1"
-b0 !
-b0 *
-b0 &
-b0 )
-1'
-1%
-0(
+b1111111110101010 %
+b1111111110101010 +
+b11 *
+b11 .
+1)
+1$
 1#
 #2
-0'
+b1010000000000000 %
+b1010000000000000 +
+b10 *
+b10 .
 0#
 #3
-b100 !
-b100 *
 1#
 #4
 0#
+b10 (
+b10 -
+b11 '
+b11 ,
+0)
 #5
-b1000 !
-b1000 *
+b1010000000000000 !
+b1010000000000000 0
+b1111111110101010 "
+b1111111110101010 /
 1#
 #6
 0#
 #7
-b1100 !
-b1100 *
 1#
 #8
 0#
+0$
 #9
-b10000 !
-b10000 *
+bz !
+bz 0
+bz "
+bz /
 1#
 #10
 0#
 #11
-0"
-b10001 !
-b10001 *
 1#
-b1 &
-b1 )
-1'
-1$
 #12
 0#
 #13
-b11 !
-b11 *
 1#
-b11 &
-b11 )
-0$
 #14
 0#
 #15
-b111 !
-b111 *
 1#
-0'
-b10011001 &
-b10011001 )
 #16
 0#
 #17
-b1011 !
-b1011 *
 1#
 #18
 0#
 #19
-b1111 !
-b1111 *
 1#
 #20
 0#
 #21
-b10011 !
-b10011 *
 1#
 #22
 0#
 #23
-b10111 !
-b10111 *
 1#
 #24
 0#
 #25
-b11011 !
-b11011 *
 1#
 #26
 0#
 #27
 1#
-0%
 #28
 0#
 #29
@@ -166,25 +155,3 @@ b11011 *
 1#
 #40
 0#
-#41
-1#
-#42
-0#
-#43
-1#
-#44
-0#
-#45
-1#
-#46
-0#
-#47
-1#
-#48
-0#
-#49
-1#
-#50
-0#
-#51
-1#

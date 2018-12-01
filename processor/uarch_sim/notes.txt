@@ -45,4 +45,7 @@ for first model:
 	round robin execution, just abysmal IPC
 	mem needs two cycles, everything else 1 cycle?
 	lays groundwork for pipelining later!
-	
+
+TODO:
+	alu stuff
+	make timescale universal

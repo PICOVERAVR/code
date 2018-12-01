@@ -1,31 +1,35 @@
 [*]
 [*] GTKWave Analyzer v3.3.94 (w)1999-2018 BSI
-[*] Fri Nov 30 03:24:34 2018
+[*] Sat Dec  1 02:39:22 2018
 [*]
 [dumpfile] "/Users/kyleneil/code/main/processor/uarch_sim/proc_dump.vcd"
-[dumpfile_mtime] "Fri Nov 30 03:24:01 2018"
-[dumpfile_size] 1304
+[dumpfile_mtime] "Sat Dec  1 02:39:02 2018"
+[dumpfile_size] 1305
 [savefile] "/Users/kyleneil/code/main/processor/uarch_sim/config.gtkw"
 [timestart] 0
 [size] 1000 600
 [pos] -1 -1
-*-4.254183 11 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
-[treeopen] main.
+*-3.458847 11 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] regfile_unit_test.
 [sst_width] 193
 [signals_width] 206
 [sst_expanded] 1
 [sst_vpaned_height] 167
 @28
-main.p.clk_i
-main.p.en_i
-main.p.ld_ct_i
+regfile_unit_test.r.clk_i
+regfile_unit_test.r.en_i
 @22
-main.p.ld_i[31:0]
-main.p.pc_o[31:0]
+regfile_unit_test.r.reg_a_o[15:0]
+regfile_unit_test.r.reg_b_o[15:0]
+regfile_unit_test.r.reg_ld_i[15:0]
 @28
-main.p.rst_i
-main.p.is_aligned_o
-@29
-main.p.d_r_i
+regfile_unit_test.r.rst_i
+@22
+regfile_unit_test.r.sel_a_i[4:0]
+regfile_unit_test.r.sel_b_i[4:0]
+@28
+regfile_unit_test.r.wr_i
+@23
+regfile_unit_test.r.wr_sel_i[4:0]
 [pattern_trace] 1
 [pattern_trace] 0
