@@ -1,11 +1,11 @@
 # small makefile for C++ projects
 CC = g++
-DFLAGS = -Wall
+DFLAGS = -Wall -std=c++17
 
 SRC = $(wildcard *.cpp) #grab anything with a .c ending
 
 debug:
-	@$(CC) $(SRC) $(DFLAGS) -o 'db.out'
+	@$(CC) $(SRC) $(DFLAGS)
 	@echo "Debug build completed."
 
 clean:
