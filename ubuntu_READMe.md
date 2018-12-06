@@ -48,8 +48,16 @@
 	follow linux install instructions
 
 9. NVIDIA driver
-	download latest version from site
-	run executable as root
+	$ sudo apt-add-repository ppa:graphics-drivers/ppa
+	$ sudo apt update
+	$ sudo apt-get install nvidia-driver-<version>
+	open software and updates and select <version>?
+	sudo reboot
+		remove with "sudo apt --purge autoremove nvidia*"
+	
+	$ ubuntu-drivers list # will list all available drivers
+	check with nvidia--smi
+	
 	NOTE: Nouveau probably doesn't work properly. Install NVIDIA proprietary driver.
 	
 ?. to fix:
