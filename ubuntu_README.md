@@ -31,6 +31,7 @@
 	modify .bashrc
 		strip out comments
 		enable color by uncommenting the force color line
+		add export EDITOR=/usr/bin/vim
 	sudo apt-get install vim (ubuntu version comes with a bunch of options disabled)
 	create .vimrc
 		set nocompatible to enable arrow keys
