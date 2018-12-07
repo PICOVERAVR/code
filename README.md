@@ -7,3 +7,5 @@ Check the showcase folder!
 - clone repository: `clone https://www.github.com/PICOVERAVR/code`
 - manually point .gitconfig to inside repo: `git config --local include.path ../.gitconfig` in main folder
 - checkout and track individual branches: `git checkout --track origin/<branch>`
+## Things to do:
+- fix makefile softlinks everywhere

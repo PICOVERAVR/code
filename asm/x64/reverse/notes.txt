@@ -1,0 +1,8 @@
+on gcc 8.2:
+	replace bytes 1200 and 1201 with 0xa8 0x00
+	for "test 0x0, %al"
+	subsequent "je <addr>" relies on zero flag
+	run executable
+
+	-g includes OS and build dir
+		

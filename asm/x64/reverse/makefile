@@ -23,7 +23,7 @@ fast: pre
 
 # quick compile just to test things
 dirty: pre
-	@$(CC) $(SRC) $(STANDARD) -g -o 'a.out'
+	@$(CC) $(SRC) $(STANDARD) -o 'a.out'
 	@echo "Quick and dirty build completed."
 
 pre:
