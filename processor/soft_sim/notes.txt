@@ -34,6 +34,9 @@ verify/finish:
 	
 	nicer error message for check
 	ax_check_compile_flag isn't standard!
+	use perror for fopen in setup.c
+	use config.h
+	
 	
 bugs:
 	make distcheck is still broken.

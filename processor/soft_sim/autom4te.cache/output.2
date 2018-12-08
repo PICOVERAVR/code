@@ -2349,7 +2349,7 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 
 ac_config_headers="$ac_config_headers config.h"
-
+ # used to be config.h
 
 # Checks for programs.
 am__api_version='1.16'
@@ -4791,14 +4791,9 @@ _ACEOF
   esac
 
 
-# check for relevant compiler flags and add them if needed globally
-# and do nothing if only needed in some areas
 # I'm assuming global compiler flags go here and more specific ones go in correct Makefile
+# Need to find a way to check these without using AX_CHECK_COMPILE_FLAG
 CFLAGS="-g -Wall -Wextra -Og"
-#AX_CHECK_COMPILE_FLAG([-g], [CFLAGS=""], , [-Werror])
-#AX_CHECK_COMPILE_FLAG([-Wall], [CFLAGS="$CFLAGS -Wall"], , [-Werror])
-#AX_CHECK_COMPILE_FLAG([-Wextra], [CFLAGS="$CFLAGS -Wextra"], , [-Werror])
-#AX_CHECK_COMPILE_FLAG([-Og], , , [-Werror])
 
 # Checks for library functions.
 for ac_header in stdlib.h
@@ -6516,8 +6511,6 @@ if test -n "$ac_unrecognized_opts" && test "$enable_option_checking" != no; then
 $as_echo "$as_me: WARNING: unrecognized options: $ac_unrecognized_opts" >&2;}
 fi
 
-
-echo $(top_srcdir)
 
 echo "
 ${PACKAGE_NAME} ${PACKAGE_VERSION} located in ${prefix}.
