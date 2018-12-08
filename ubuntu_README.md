@@ -25,6 +25,7 @@
 	customize -> toolbars (at bottom) -> bookmark toolbars
 6. CLI
 	(most of the dev tools I want were installed by bcmwl-kernel-source)
+	make font size smaller (size 10)
 	apt-get install git
 	follow git setup instructions in repo
 	run sudo dpkg-reconfigure dash and select option not to use dash
