@@ -32,11 +32,14 @@ verify/finish:
 		also set upper byte to known value in tests when working with lower byte
 	usage of "s" and "d" inconsistant between proc.h and isa.txt, fix
 	
+	if paths aren't getting updated:
+		autoreconf -f -iv && ./configure && make
+	( -f forces all files to be considered obsolete )
+	( a requirement when building on a different OS, even if timestamps say it's fine )
+	
 	nicer error message for check
 	use perror for fopen in setup.c
 	use config.h
-	this fails in ubuntu for some reason... works elsewhere...?
-	git never adds Makefile.in for some reason
 	
 bugs:
 	make distcheck is still broken.
