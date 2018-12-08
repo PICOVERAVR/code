@@ -28,10 +28,11 @@ AC_TYPE_UINT8_T
 # check for relevant compiler flags and add them if needed globally
 # and do nothing if only needed in some areas
 # I'm assuming global compiler flags go here and more specific ones go in correct Makefile
-AX_CHECK_COMPILE_FLAG([-g], [CFLAGS=""], , [-Werror])
-AX_CHECK_COMPILE_FLAG([-Wall], [CFLAGS="$CFLAGS -Wall"], , [-Werror])
-AX_CHECK_COMPILE_FLAG([-Wextra], [CFLAGS="$CFLAGS -Wextra"], , [-Werror])
-AX_CHECK_COMPILE_FLAG([-Og], , , [-Werror])
+CFLAGS="-g -Wall -Wextra -Og"
+#AX_CHECK_COMPILE_FLAG([-g], [CFLAGS=""], , [-Werror])
+#AX_CHECK_COMPILE_FLAG([-Wall], [CFLAGS="$CFLAGS -Wall"], , [-Werror])
+#AX_CHECK_COMPILE_FLAG([-Wextra], [CFLAGS="$CFLAGS -Wextra"], , [-Werror])
+#AX_CHECK_COMPILE_FLAG([-Og], , , [-Werror])
 
 # Checks for library functions.
 AC_FUNC_MALLOC

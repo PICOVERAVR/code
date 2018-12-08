@@ -32,6 +32,9 @@ verify/finish:
 		also set upper byte to known value in tests when working with lower byte
 	usage of "s" and "d" inconsistant between proc.h and isa.txt, fix
 	
+	nicer error message for check
+	ax_check_compile_flag isn't standard!
+	
 bugs:
 	make distcheck is still broken.
 
