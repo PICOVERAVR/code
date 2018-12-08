@@ -4,7 +4,7 @@
 AC_PREREQ([2.69])
 AC_INIT([fives], [0.2])
 AC_CONFIG_SRCDIR([src/])
-AC_CONFIG_HEADERS([config.h])
+AC_CONFIG_HEADERS([config.h]) # used to be config.h
 
 # Checks for programs.
 AM_INIT_AUTOMAKE([subdir-objects])
@@ -25,14 +25,9 @@ AC_TYPE_UINT32_T
 AC_TYPE_UINT64_T
 AC_TYPE_UINT8_T
 
-# check for relevant compiler flags and add them if needed globally
-# and do nothing if only needed in some areas
 # I'm assuming global compiler flags go here and more specific ones go in correct Makefile
+# Need to find a way to check these without using AX_CHECK_COMPILE_FLAG
 CFLAGS="-g -Wall -Wextra -Og"
-#AX_CHECK_COMPILE_FLAG([-g], [CFLAGS=""], , [-Werror])
-#AX_CHECK_COMPILE_FLAG([-Wall], [CFLAGS="$CFLAGS -Wall"], , [-Werror])
-#AX_CHECK_COMPILE_FLAG([-Wextra], [CFLAGS="$CFLAGS -Wextra"], , [-Werror])
-#AX_CHECK_COMPILE_FLAG([-Og], , , [-Werror])
 
 # Checks for library functions.
 AC_FUNC_MALLOC
