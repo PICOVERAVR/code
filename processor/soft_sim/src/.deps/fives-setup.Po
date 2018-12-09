@@ -1,4 +1,4 @@
-proc-setup.o: setup.c /usr/include/stdc-predef.h setup.h proc.h \
+fives-setup.o: setup.c /usr/include/stdc-predef.h setup.h proc.h \
  /usr/include/stdio.h \
  /usr/include/x86_64-linux-gnu/bits/libc-header-start.h \
  /usr/include/features.h /usr/include/x86_64-linux-gnu/sys/cdefs.h \

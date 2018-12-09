@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.69])
-AC_INIT([fives], [0.2])
+AC_INIT([fives], [0.2], [/dev/null for now])
 AC_CONFIG_SRCDIR([src/])
 AC_CONFIG_HEADERS([config.h]) # used to be config.h
 
@@ -26,8 +26,7 @@ AC_TYPE_UINT64_T
 AC_TYPE_UINT8_T
 
 # I'm assuming global compiler flags go here and more specific ones go in correct Makefile
-# Need to find a way to check these without using AX_CHECK_COMPILE_FLAG
-CFLAGS="-g -Wall -Wextra -Og"
+CFLAGS="-Wall -Wextra"
 
 # Checks for library functions.
 AC_FUNC_MALLOC

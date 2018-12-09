@@ -42,7 +42,7 @@
 #define PACKAGE "fives"
 
 /* Define to the address where bug reports for this package should be sent. */
-#define PACKAGE_BUGREPORT ""
+#define PACKAGE_BUGREPORT "/dev/null for now"
 
 /* Define to the full name of this package. */
 #define PACKAGE_NAME "fives"

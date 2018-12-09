@@ -1,4 +1,5 @@
 #include "proc.h"
+#include "config.h"
 
 #pragma once
 

@@ -5,7 +5,7 @@ INT_0: BN int
 
 .org 0x100
 org:
-	// has to be aligned to ?-byte boundary
+	// has to be aligned to 2-byte boundary
 	LD 0xfff0, BP
 	MOV BP, SP
 	

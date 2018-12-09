@@ -209,7 +209,7 @@ AUTOMAKE = ${SHELL} /home/kyle/code/processor/soft_sim/missing automake-1.16
 AWK = mawk
 CC = gcc
 CCDEPMODE = depmode=gcc3
-CFLAGS = -g -Wall -Wextra -Og
+CFLAGS = -Wall -Wextra
 CHECK_CFLAGS = -pthread
 CHECK_LIBS = -lcheck_pic -pthread -lrt -lm -lsubunit
 CPP = gcc -E
@@ -236,7 +236,7 @@ MAKEINFO = ${SHELL} /home/kyle/code/processor/soft_sim/missing makeinfo
 MKDIR_P = /bin/mkdir -p
 OBJEXT = o
 PACKAGE = fives
-PACKAGE_BUGREPORT = 
+PACKAGE_BUGREPORT = /dev/null for now
 PACKAGE_NAME = fives
 PACKAGE_STRING = fives 0.2
 PACKAGE_TARNAME = fives

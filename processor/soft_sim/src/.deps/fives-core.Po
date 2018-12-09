@@ -1,4 +1,4 @@
-proc-setup.o: setup.c /usr/include/stdc-predef.h setup.h proc.h \
+fives-core.o: core.c /usr/include/stdc-predef.h core.h proc.h \
  /usr/include/stdio.h \
  /usr/include/x86_64-linux-gnu/bits/libc-header-start.h \
  /usr/include/features.h /usr/include/x86_64-linux-gnu/sys/cdefs.h \
@@ -81,12 +81,11 @@ proc-setup.o: setup.c /usr/include/stdc-predef.h setup.h proc.h \
  /usr/include/x86_64-linux-gnu/bits/confname.h \
  /usr/include/x86_64-linux-gnu/bits/getopt_posix.h \
  /usr/include/x86_64-linux-gnu/bits/getopt_core.h \
- /usr/include/x86_64-linux-gnu/bits/unistd.h /usr/include/ctype.h \
- ../config.h
+ /usr/include/x86_64-linux-gnu/bits/unistd.h /usr/include/ctype.h
 
 /usr/include/stdc-predef.h:
 
-setup.h:
+core.h:
 
 proc.h:
 
@@ -275,5 +274,3 @@ proc.h:
 /usr/include/x86_64-linux-gnu/bits/unistd.h:
 
 /usr/include/ctype.h:
-
-../config.h:
