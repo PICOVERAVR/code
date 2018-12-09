@@ -60,7 +60,7 @@ uint32_t *proc_setup(int argc, char **argv) {
 	
 	FILE *hex = fopen(hex_path, "rb"); // get the hex file and load it into memory
 	if (hex == NULL) {
-		perror("ERR");
+		perror("fopen");
 		return NULL;
 	}
 	
