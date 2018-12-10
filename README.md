@@ -25,7 +25,11 @@ Check the showcase folder!
 	- Networking basics (token ring, RR, etc)
 ### Major Projects:
 - 68000 system with MMU and DMA, write custom OS for this obviously
-	- first make sure I know how everything works and that it works properly, then try doing more fancy stuff
+	- Need to skip the breadboarding, processor has too many pins.  Use the simplest working computer in the datasheet and modify for my needs
+	- Processor, RAM, and boot ROM all need to be socketed, ROM should either be in a removable card or a ZIF socket (maybe both?)
+	- Order to add things: Processor, ROM, RAM, IO (UART), DMA, MMU
+	- Find a C compiler that supports the 68000 (gcc?) and use it
+	- Find a Forth implementation that works on the 68000 and use it (use something existing already!)
 - Graphical program in Python
 - Doing something major with Go
 ### Minor Projects:
