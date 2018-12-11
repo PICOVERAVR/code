@@ -64,9 +64,11 @@
 	NOTE: Nouveau probably doesn't work properly. Install NVIDIA proprietary driver.
 	
 ?. to fix:
-	keyboard backlights - works now?
 	battery not full
 	takes a while to sleep
 	fans spin up when watching youtube
+		driver problem?
+		not an iGPU problem
+	prime-select seems to have messed with some stuff, can't wake from sleep
 	make gnome faster?
 
