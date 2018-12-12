@@ -3,7 +3,7 @@ Personal projects from almost non-existant to small.
 ## Looking for working and/or complete projects?
 Check the showcase folder!
 ## On a new dev box:
-	- See the [`ubuntu_README.md`](ubuntu_README.md) for setup instructions
+	- See the [ubuntu\_README.md](ubuntu_README.md) for setup instructions
 ## To try:
 (product ideas excluded)
 ### Major Topics:
