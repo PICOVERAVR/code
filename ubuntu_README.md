@@ -56,6 +56,7 @@
 	- `$ sudo apt-get install nvidia-driver-<version>`
 	- open software and updates and select <version>
 	- sudo reboot
+	
 	- `sudo apt --purge autoremove nvidia* # removes nvidia driver`
 	
 	- `$ ubuntu-drivers list # will list all available drivers`
