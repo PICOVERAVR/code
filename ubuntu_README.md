@@ -1,5 +1,5 @@
-# Setup Instructions
-## These are only valid for Ubuntu 18.10
+## Setup Instructions
+### These are only valid for Ubuntu 18.10
 1. Install Ubuntu, full install, uncheck "install third party drivers" box
 2. if no wifi:
 	- `lspci | grep 0280` to check for wifi hardware
