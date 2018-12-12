@@ -34,13 +34,8 @@
 	- enable color by uncommenting the force color line
 	- add export EDITOR=/usr/bin/vim
 	- sudo apt-get install vim (ubuntu version comes with a bunch of options disabled)
-	- create .vimrc
-	- set nocompatible to enable arrow keys
-	- set number for line numbers
-	- set visualbell, then "set t\_vb="
-	- set tabstop=4
-	- create .inputrc
-	- set bell-style none (to turn off bell)
+	- link vimrc from config directory
+	- create .inputrc, write `set bell-style none` to turn off bell
 
 7. Thunderbird Mail
 	- use \<name\>@icloud.com
