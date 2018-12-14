@@ -4,7 +4,7 @@ const char *help_string = "-vhb: \
 \nh: print help menu \
 \nv: print version info \
 \nb <path>: pass path to simulator \
-\n\n";
+\n";
 
 const char *gpl_string_short = "Copyright (C) 2018, Kyle Neil \
 \n    This program comes with ABSOLUTELY NO WARRANTY. \

@@ -38,10 +38,11 @@ verify/finish:
 	( a requirement when building on a different OS, even if timestamps say it's fine )
 	
 	nicer error message for check
-	check for compiler flags (although I'm pretty sure they're all super standard)
+
 	
 bugs:
 	make distcheck is still broken.
+	`$ ./fives -b` prints error message before welcome message.
 
 larger additions:
 	seperate floating point support
