@@ -1,0 +1,3 @@
+everything is prefixed with "m68k-elf-"
+not sure what version of the 68000 we're assembling for, or if we can turn on or off hardware floating point support or something
+

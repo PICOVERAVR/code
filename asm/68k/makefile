@@ -1,0 +1,23 @@
+CC := m68k-elf-as
+SRC := $(filter-out test.S, $(wildcard *.S))
+
+FLAGS := -march=68000 -mcpu=68000
+DFLAGS := $(FLAGS)
+
+UNAME := $(shell uname)
+
+debug: pre
+	@$(CC) $(DFLAGS) $(SRC) -o db.out
+	@echo "Debug build completed."
+
+check: pre debug
+	@m68k-elf-objdump -D db.out
+
+release: pre
+	@$(CC) $(SRC)-o release.out
+
+pre:
+	@echo "Building on: $(UNAME)"
+	
+clean:
+	@rm -f	{*.out,*.o}
