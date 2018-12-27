@@ -65,3 +65,15 @@
 	- `prime-select <intel/nvidia>` breaks everything, never type this
 	- make gnome faster?
 
+
+
+Test fixes:
+
+Turns out the fan thing was an apple SMC thing.
+- type `$ sudo vi /etc/modules`
+- add the following entries:
+  - coretemp
+  - applesmc
+- should resolve the fans spinning up a lot
+
+
