@@ -7,10 +7,11 @@ DFLAGS := $(FLAGS)
 UNAME := $(shell uname)
 
 debug: pre
-	@$(CC) $(DFLAGS) $(SRC) -o db.out # @m68k-elf-ld -T link_script.l db.out
+	@$(CC) $(DFLAGS) $(SRC) -o db.out
 	@echo "Debug build completed."
 
 check: pre debug
+	@m68k-elf-ld -T link_script.l db.out
 	@m68k-elf-objdump -d db.out
 
 release: pre
