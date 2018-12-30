@@ -1,3 +1,5 @@
 everything is prefixed with "m68k-elf-"
-not sure what version of the 68000 we're assembling for, or if we can turn on or off hardware floating point support or something
 
+configure ld to strip out linker stuff
+take everything from 0x2000 to SYMTAB stuff
+this can be thrown into a python script!
