@@ -12,6 +12,9 @@ debug: pre
 
 check: pre debug
 	@m68k-elf-ld -T link_script.l db.out
+	@m68k-elf-readelf -a a.out
+
+asm: pre debug
 	@m68k-elf-objdump -d db.out
 
 release: pre

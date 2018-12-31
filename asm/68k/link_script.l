@@ -7,10 +7,10 @@ MEMORY
 
 SECTIONS
 {
-  .rodata : { *(.rodata) }
+  .rodata : { *(.rodata) } > rom
   . = 0x400;
-  .text : { *(.text) }
-  .data : { *(.data) }
-  .bss : { *(.bss) *(COMMON) }
+  .text : { *(.text) } > rom
+  .data : { *(.data) } > ram
+  .bss : { *(.bss) *(COMMON) } > ram
   /* none of this stuff actually works yet */
 }
