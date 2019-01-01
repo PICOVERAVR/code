@@ -2,7 +2,7 @@
 MEMORY
 {
   rom (rx) : ORIGIN = 0x0, LENGTH = 128K
-  ram (wx) : ORIGIN = 0x20000, LENGTH = 128K 
+  ram (wx) : ORIGIN = 0x20000, LENGTH = 128K
 }
 
 SECTIONS

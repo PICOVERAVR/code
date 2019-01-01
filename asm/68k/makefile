@@ -6,16 +6,16 @@ DFLAGS := $(FLAGS)
 
 UNAME := $(shell uname)
 
-debug: pre
-	@$(CC) $(DFLAGS) $(SRC) -o db.out
+start: pre
+	@$(CC) $(DFLAGS) $(SRC) -o db.o
 	@echo "Debug build completed."
 
-check: pre debug
-	@m68k-elf-ld -T link_script.l db.out
-	@m68k-elf-readelf -a a.out
+check: pre start
+	@m68k-elf-ld -T link_script.l db.o -o db.out
+	@m68k-elf-readelf -a db.out
 
-asm: pre debug
-	@m68k-elf-objdump -d db.out
+asm: pre start
+	@m68k-elf-objdump -d db.o
 
 release: pre
 	@$(CC) $(SRC)-o release.out

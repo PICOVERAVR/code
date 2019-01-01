@@ -1,15 +1,17 @@
+|  Memory Map:
 |  0x00000 -> 0x1FFFF: EEPROM
 	|  0x0 -> 0x3FC: EVT
 	|  0x1FFFF: config byte
 |  0x20000 -> 0x3FFFF: SRAM
-	|  both stacks are really really small!
 	|  0x3FFFE -> 0x3FF00: Supervisor stack (254b)
 	|  0x3FEFE -> 0x3FE00: User stack (254b)
 |  0x40000 -> 0x40001: UART data (00 is cntl, 01 is data)
 
-|  need to figure out how to call subroutines!
+|  TODO: write stuff to zero out .bss segment, required for C programs
 |  will need to adjust link script when we start executing code out of RAM
-|  multiple .text sections?
+|  also need to write enough startup code that gcc will work ok
+|  or compile some small version of libc to go with gcc
+
 	.section .rodata
 .long SSP_PTR
 .long PC
@@ -19,8 +21,8 @@
 .set PC, 0x400
 
 	.text
-	.global main
-main:
+	.global init
+init:
 	ori #0x2700, %SR | set IPL to max
 	reset
 	
@@ -29,39 +31,37 @@ main:
 	move.l (0x20000), %D1
 	
 	cmp %D1, %D0
-	bne no_ram_found
-	jmp uart_setup
+	reset
+	jsr uart_setup
+	jmp _start
 	
+_start:
+	andi #0xDFFF, %SR | switch to user mode
+	move.l #0x3FEFE, %A7 | set up user stack
+	| (user mode code starts here)
+
+
+
+
+| UART interfacing stuff
+| written to work with the MC6850 ACIA
 uart_setup:
 	bset #0, (0x40000) | reset the ACIA
 	bset #1, (0x40000)
 	
-	bclr #0, (0x40000) | divide clock by 1
+	bclr #0, (0x40000) | pull out of reset, divide clock by 1
 	bclr #1, (0x40000)
 	
 	bset #2, (0x40000) | 8N1 encoding
 	bclr #3, (0x40000)
 	bset #4, (0x40000)
 	
-	bclr #5, (0x40000) | tx interrupt disabling
+	bclr #5, (0x40000) | tx interrupt disable
 	bclr #6, (0x40000)
 	
-	bclr #7, (0x40000) | rx interrupt disabling
-	jmp user_setup
-	
-user_setup:
-	andi #0xDFFF, %SR | switch to user mode
-	move.l #0x3FEFE, %A7
-loop: jmp loop
-	nop
+	bclr #7, (0x40000) | rx interrupt disable
+	rts
 
-no_ram_found:
-	reset | in hopes that the memory will cooperate the next time
-	jmp main
-
-freerun:
-	ori.b #0, %D0
-	
 	.data | for future use...
 .ascii "Booting..."
 .ascii "done."
