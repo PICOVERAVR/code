@@ -6,3 +6,39 @@ this can be thrown into a python script!
 
 freerun asm is ori.b #0, D0
 
+# unpack source
+mkdir ~/68k_cross
+tar -xvf binutils-<version>.tar.xz
+tar -xvf gcc-<version>.tar.gz
+tar -xvf newlib-<version>.tar.gz
+
+# build binutils
+./configure --prefix=/home/kyle/68k_cross --target=m68k-elf
+make
+make install
+
+# build gcc
+cd ..
+mkdir gcc-build
+cd gcc-build
+../gcc-<version>/configure --prefix=/home/kyle/68k_cross --target=m68k-elf --without-headers --with-newlib --with-gnu-as --with-gnu-ld --disable-libssp --enable-languages=c,c++
+PATH=$PATH:/home/kyle/68k_cross/bin make all-gcc
+PATH=$PATH:/home/kyle/68k_cross/bin make install-gcc
+
+# build newlib
+cd ..
+mkdir newlib-build
+cd newlib-build
+../newlib-<version>/configure --prefix=/home/kyle/68k_cross --target=m68k-elf
+PATH=$PATH:/home/kyle/68k_cross/bin make all
+PATH=$PATH:/home/kyle/68k_cross/bin make install
+
+# build gcc again
+cd ../build-gcc
+../gcc-<version>/configure --prefix=/home/kyle/68k_cross --target=m68k-elf --with-newlib --with-gnu-as --with-gnu-ld --disable-shared --disable-libssp --enable-languages=c,c++
+PATH=$PATH:/home/kyle/68k_cross/bin make all
+PATH=$PATH:/home/kyle/68k_cross/bin make install
+
+add compiler to path
+compile with "m68k-elf-gcc main.c -e main", not sure if this works or not...
+

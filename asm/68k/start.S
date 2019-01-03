@@ -38,8 +38,10 @@ init:
 	jmp _start
 	
 _start:
-	andi #0xDFFF, %sr | switch to user mode
-	move.l #0x3FEFE, %sp
+	| the below instructions would crash the system in its current state
+	| since EEPROM is deselected when you go out of supervisor mode
+	#andi #0xDFFF, %sr | switch to user mode
+	#move.l #0x3FEFE, %sp
 	
 	move.w (boot_text), -(%sp)
 	jsr uart_write

@@ -1,16 +1,7 @@
-// cannot link to libc since we haven't compiled and linked it in yet
-// so everything has to be bare-metal
-
-int addone(int x) {
-	return x+1;
-}
+#include <stdlib.h>
 
 int main() {
-	int x = 4;
-	x = addone(x);
+	int x = atoi("42");
+	return x;
 }
 
-void _start() {
-	main();
-	hang: goto hang;
-}
