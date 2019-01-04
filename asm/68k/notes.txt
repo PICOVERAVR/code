@@ -1,9 +1,5 @@
 everything is prefixed with "m68k-elf-"
 
-configure ld to strip out linker stuff
-take everything from 0x2000 to SYMTAB stuff
-this can be thrown into a python script!
-
 freerun asm is ori.b #0, D0
 
 # unpack source

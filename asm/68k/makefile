@@ -1,4 +1,3 @@
-CC := m68k-elf-as
 SRC := $(filter-out test.S, $(wildcard *.S))
 
 FLAGS := -march=68000 -mcpu=68000
@@ -7,7 +6,7 @@ DFLAGS := $(FLAGS)
 UNAME := $(shell uname)
 
 start: pre
-	@$(CC) $(DFLAGS) $(SRC) -o db.o
+	@m68k-elf-as $(DFLAGS) $(SRC) -o db.o
 	@echo "Debug build completed."
 
 check: pre start
@@ -17,9 +16,9 @@ check: pre start
 asm: pre start
 	@m68k-elf-objdump -d db.o
 
-release: pre
-	@$(CC) $(SRC)-o release.out
-
+final: check
+	@m68k-elf-objcopy -O binary db.out db.bin
+	
 pre:
 	@echo "Building on: $(UNAME)"
 	

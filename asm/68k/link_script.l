@@ -10,7 +10,7 @@ SECTIONS
   .rodata : { *(.rodata) } > rom
   . = 0x400;
   .text : { *(.text) } > rom
-  .data : { *(.data) } > ram
+  .data : { *(.data) } > rom
   .bss : { *(.bss) *(COMMON) } > ram
   /* none of this stuff actually works yet */
 }
