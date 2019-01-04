@@ -76,4 +76,9 @@ Turns out the fan thing was an apple SMC thing.
   - applesmc
 - should resolve the fans spinning up a lot
 
+Battery life can be vastly improved by installing powertop
+- sudo apt-get install powertop
+- sudo powertop --calibrate
+- create rc.local, add powertop --auto-tune
+
 
