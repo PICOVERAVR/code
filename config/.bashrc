@@ -19,3 +19,5 @@ export LSCOLORS=ExFxBxDxCxegedabagacad
 
 export GREP_OPTIONS='--color=auto'
 
+export PATH=$PATH:~/code/68k/bin
+
