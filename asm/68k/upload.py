@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 import sys # for exit
-import os # for changing permissions
+import os # for checking file existance
+from math import ceil # for arithmetic
+
 try:
-	import serial # for serial communication
-	# pip3 install pyserial to get pyserial module
+	import serial # for serial communication, try "pip3 install pyserial"
 except ModuleNotFoundError:
 	print("ERR: pyserial module not found!")
 	sys.exit(2)
@@ -14,8 +15,8 @@ EEPROM_SIZE = 0x1FFFF # 128Kbytes memory to flash
 
 if __name__ == "__main__":
 	print("EEPROM flasher tool v0.1")
-	if len(sys.argv) < 3:
-		print("usage: ./upload.py <binary> <instruction>")
+	if len(sys.argv) < 4:
+		print("usage: ./upload.py <binary file> <instruction> <device>")
 		sys.exit(1)
 	
 	try:
@@ -24,32 +25,51 @@ if __name__ == "__main__":
 	except IOError:
 		print("ERR: cannot locate binary file!")
 	else:
-		print("binary file read in.")
+		print("binary located.")
 	
-	if os.system("ls /dev/ | grep [USB,usb] > /dev/null") != 0:
-		print("ERR: cannot find arduino!")
-		sys.exit(2)
-	
-	# edit this device string to find device
-	device_str = "/dev/tty.usbserial-1420"
+	device_str = sys.argv[3]
 	
 	serport = serial.Serial(device_str, 115200, timeout=5)
 	serport.readline()
 
-	# crappy option parsing, fix later
 	if sys.argv[2] == '-v': # version
-		print("Kyle's EEPROM flasher targeting the <name> EEPROM chip")
+		print("Kyle's EEPROM flasher, currently targeting two GLS29EE010 EEPROM chips")
 	elif sys.argv[2] == '-e':
 		print("Erasing EEPROM chips...", end='')
 		serport.write("ER;".encode('ascii', 'encode'))
 		temp = serport.readline()
 		while temp != b'done.\r\n':
 			temp = serport.readline()
+		print("done.")
+	elif sys.argv[2] == '-w':
+		# write all the pages up to the last one, since the last one may not be on a page boundary.
+		endpage = len(bindata) + (128 - len(bindata) % 128)
+		
+		print("Writing " + str(endpage) + " bytes to EEPROM...")
+		
+		for page in range(0, endpage, 128):
+			page_str = "WP:" + str(page)
+			for byte in range(0, 128):
+				if (page + byte) >= len(bindata):
+					page_str += ":0"
+				else: 
+					page_str += ":" + str(bindata[page + byte])
+			page_str += ";"
+			
+			serport.write(page_str.encode("ascii", "encode"))
+			temp = serport.readline()
+			while temp != b'done.\r\n':
+				temp = serport.readline()
+			print("writing page " + str((page // 128) + 1) + "/" + str(endpage // 128) + "...")
 		
 		print("done.")
-		
+	
+	elif sys.argv[2] == '-r':
+		print("Reading EEPROM contents...")
+		# ...
+		print("done.")
+
 	else:
 		print("unknown argument!")
+		sys.exit(1)
 	
-	sys.exit(0)
-
