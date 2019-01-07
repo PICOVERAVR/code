@@ -42,6 +42,11 @@ if __name__ == "__main__":
 			temp = serport.readline()
 		print("done.")
 	elif sys.argv[2] == '-w':
+		
+		# WARNING WARNING WARNING the page boundaries for this really don't line up.
+		# WP writes 128 sequential bytes to the target, but we want 128 words, and then arduino will write odd and even bytes onto data bus.
+		# should inc by 256 instead of 128, since we're writing one word at a time!
+		
 		# write all the pages up to the last one, since the last one may not be on a page boundary.
 		endpage = len(bindata) + (128 - len(bindata) % 128)
 		
@@ -55,6 +60,7 @@ if __name__ == "__main__":
 				else: 
 					page_str += ":" + str(bindata[page + byte])
 			page_str += ";"
+			print(page_str)
 			
 			serport.write(page_str.encode("ascii", "encode"))
 			temp = serport.readline()
