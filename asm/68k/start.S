@@ -13,7 +13,7 @@
 .long PC
 .space 0x3F8 | 0x400 bytes for the EVT, no executable code here
 
-.set SSP_PTR, 0x3FFFE
+.set SSP_PTR, 0x40000 | stack is pre-decrement
 .set PC, 0x400
 
 	.text
@@ -22,7 +22,20 @@ _start:
 	ori #0x2700, %sr | set IPL to max
 	reset
 	
-	| do a memory check here
+test_fill:
+	move.l #0x20000, %a0 | start address
+	move.l #0x40000, %a1 | end address
+	move.w #0xCAFE, (%a0)+
+	cmpa %a0, %a1
+	bra test_fill
+
+test_read:
+	move.w -(%a0), %d0
+	cmp.w #0xCAFE, %d0
+	bne ram_cmp_error
+	bra test_read
+	
+	
 	
 	| zero out .bss segment
 	move.w scratch, %a0
@@ -30,7 +43,7 @@ _start:
 bss_zero_loop:
 	move.w #0x0, (%a0)+
 	cmpa %d0, %a0
-	bne bss_zero_loop	
+	bra bss_zero_loop	
 	
 	jsr uart_setup
 	
@@ -40,7 +53,7 @@ user_start:
 	| the below instructions would crash the system in its current state
 	| since EEPROM is deselected when you go out of supervisor mode
 	#andi #0xDFFF, %sr | switch to user mode
-	#move.l #0x3FEFE, %sp
+	#move.l #0x3FF00, %sp
 	
 	move.w (boot_text), -(%sp)
 	jsr uart_write
@@ -51,7 +64,10 @@ user_start:
 	move.w (boot_done), -(%sp)
 	jsr uart_write
 	addq #4, %sp
-
+	
+ram_cmp_error:
+hang: jmp hang
+	
 	.data
 boot_text: .asciz "Booting..."
 boot_done: .asciz "done."

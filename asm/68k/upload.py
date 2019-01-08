@@ -2,80 +2,98 @@
 import sys # for exit
 import os # for checking file existance
 from math import ceil # for arithmetic
-
-try:
-	import serial # for serial communication, try "pip3 install pyserial"
-except ModuleNotFoundError:
-	print("ERR: pyserial module not found!")
-	sys.exit(2)
-else:
-	print("pyserial module found.")
-
-EEPROM_SIZE = 0x1FFFF # 128Kbytes memory to flash
+import argparse # for argument processing
+import logging # for simple debug logging
 
 if __name__ == "__main__":
-	print("EEPROM flasher tool v0.1")
-	if len(sys.argv) < 4:
-		print("usage: ./upload.py <binary file> <instruction> <device>")
-		sys.exit(1)
+	parser = argparse.ArgumentParser(description='Python script to interface with a pair of GLS29EE010 EEPROMs.')
+	parser.add_argument('--version', action='version', version='EEPROM flasher tool v0.2')
+	parser.add_argument('-a', '--action', type=str, default='nop', help='action to perform. <include list of actions>')
+	parser.add_argument('-d', '--device', type=str, help='device to communicate with, usually something like \'/dev/ttyUSB0\'.')
+	parser.add_argument('-v', '--verbose', action='store_true', help='enable verbose output.')
+	parser.add_argument('-b', '--binary', type=str, default='', help='binary to manipulate.')
+	parser.add_argument('-s', '--size'. type=int, default=0x1FFFF, help='EEPROM size, defaults to 128K')
+	args = parser.parse_args()
+
+	EEPROM_SIZE = args.size
 	
 	try:
-		with open(sys.argv[1], "rb") as binfile:
-			bindata = binfile.read(EEPROM_SIZE)
-	except IOError:
-		print("ERR: cannot locate binary file!")
+		import serial
+	except ModuleNotFoundError:
+		logging.error("pyserial module not found!")
+		logging.debug("try \'pip3 install pyserial\'")
+		sys.exit(2)
 	else:
-		print("binary located.")
+		logging.info("pyserial module found.")
 	
-	device_str = sys.argv[3]
+	if args.device:
+		device_str = args.device
+	else:
+		logging.error("device not found!")
+		sys.exit(3)
 	
 	serport = serial.Serial(device_str, 115200, timeout=5)
 	serport.readline()
 
-	if sys.argv[2] == '-v': # version
-		print("Kyle's EEPROM flasher, currently targeting two GLS29EE010 EEPROM chips")
-	elif sys.argv[2] == '-e':
+	if args.action == 'erase':
 		print("Erasing EEPROM chips...", end='')
 		serport.write("ER;".encode('ascii', 'encode'))
 		temp = serport.readline()
 		while temp != b'done.\r\n':
 			temp = serport.readline()
 		print("done.")
-	elif sys.argv[2] == '-w':
+	elif args.action == 'write':
+		try:
+			with open(args.binary, "rb") as binfile:
+				bindata = binfile.read(EEPROM_SIZE)
+		except IOError:
+			logging.error("binary cannot be opened!")
+			sys.exit(4)
+		else:
+			logging.info("binary located.")
 		
-		# WARNING WARNING WARNING the page boundaries for this really don't line up.
-		# WP writes 128 sequential bytes to the target, but we want 128 words, and then arduino will write odd and even bytes onto data bus.
-		# should inc by 256 instead of 128, since we're writing one word at a time!
-		
+		# TODO: make sure byte and word order is same as 68k memory layout!
+		# TODO: fix page counting, should be half of bin size since we're consuming a word at a time.
 		# write all the pages up to the last one, since the last one may not be on a page boundary.
+		
 		endpage = len(bindata) + (128 - len(bindata) % 128)
 		
 		print("Writing " + str(endpage) + " bytes to EEPROM...")
 		
 		for page in range(0, endpage, 128):
 			page_str = "WP:" + str(page)
-			for byte in range(0, 128):
-				if (page + byte) >= len(bindata):
+			for word in range(0, 256, 2):
+				if (page + word + 1) >= len(bindata):
 					page_str += ":0"
-				else: 
-					page_str += ":" + str(bindata[page + byte])
+				else:
+					page_str += ":" + str(((bindata[page + word]) << 8) + bindata[page + word + 1])
 			page_str += ";"
-			print(page_str)
+			logging.debug(page_str)
 			
 			serport.write(page_str.encode("ascii", "encode"))
 			temp = serport.readline()
 			while temp != b'done.\r\n':
 				temp = serport.readline()
-			print("writing page " + str((page // 128) + 1) + "/" + str(endpage // 128) + "...")
-		
+			print("writing page " + str((page // 128) + 1) + "/" + str(endpage // 128) + "...") # number of pages written still correct, bytes split up.
 		print("done.")
 	
-	elif sys.argv[2] == '-r':
-		print("Reading EEPROM contents...")
-		# ...
-		print("done.")
+	elif args.action == 'read':
+		print("Reading EEPROM contents into file dump.bin...")
+		
+		# read contents into memory, then file
+		
+		try:
+			with open(args.binary, "wb") as readfile:
+				print("stuff")
+		except IOError:
+			logging.error("binary cannot be opened!")
+		else:
+			logging.info("binary located.")
 
+	elif args.action == 'nop':
+		logging.info('doing nothing.')
+	
 	else:
-		print("unknown argument!")
+		logging.error("unknown action!")
 		sys.exit(1)
 	

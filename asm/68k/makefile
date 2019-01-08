@@ -1,6 +1,6 @@
 SRC := $(filter-out test.S, $(wildcard *.S))
 
-FLAGS := -march=68000 -mcpu=68000
+FLAGS := -march=68000 -mcpu=68000 -mno-float
 DFLAGS := $(FLAGS)
 
 UNAME := $(shell uname)

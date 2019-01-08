@@ -1,6 +1,9 @@
 |  UART interfacing code, written to work with the MC6850 ACIA
 |  should be enough to load an image into RAM over UART
-|  TODO: no error checking at all is done here
+
+| Memory Map:
+| 0x40000: ACIA control
+| 0v40001: ACIA data
 
 .section .text
 
@@ -30,14 +33,13 @@ uart_setup:
 | returns: number of characters printed
 uart_write:
 	move.l -4(%sp), %a0
-w_begin:
-	btst #1, (0x40000) | test for transmit bit clear
-	bne w_begin
 	moveq #0, %d0
 	moveq #0, %d1
 w_loop:
 	cmp.b (%a0), %d1 | test for null character
 	beq w_done
+w_busy: btst #1, (0x40000)
+	bne w_busy
 	move.b (%a0)+, (0x40001) | write byte to ACIA
 	addq #1, %d0
 	bra w_loop
@@ -50,14 +52,13 @@ w_done:
 uart_read:
 	move.l -4(%sp), %a0
 	move.l -8(%sp), %d1
-r_begin:
-	btst #0, (0x40000) | test for receive bit set
-	bne r_begin
 	moveq #0, %d0
 	moveq #0, %d1
 r_loop:
 	cmp.b (%a0), %d1
 	beq r_done
+r_busy: btst #0, (0x40000)
+	bne r_busy
 	move.b (0x40001), (%a0)+
 	addq #1, %d0
 	bra r_loop
@@ -78,3 +79,14 @@ uart_readc:
 	move.b (0x40001), -4(%sp)
 	rts
 
+| check for ACIA errors
+| parameters: none
+| returns: error bits in d0
+| bit 0: Framing Error
+| bit 1: Overrun Error
+| bit 2: Parity Error
+uart_errcount:
+	move.b (0x40000), %d0
+	and.b #0x70, %d0
+	lsr.b #4, %d0
+	rts
