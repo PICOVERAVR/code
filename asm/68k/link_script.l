@@ -1,4 +1,4 @@
-/* not sure about filename extension */
+/* simple m68k link script */
 MEMORY
 {
   rom (rx) : ORIGIN = 0x0, LENGTH = 128K
@@ -12,5 +12,4 @@ SECTIONS
   .text : { *(.text) } > rom
   .data : { *(.data) } > rom
   .bss : { *(.bss) *(COMMON) } > ram
-  /* none of this stuff actually works yet */
 }

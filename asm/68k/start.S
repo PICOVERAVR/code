@@ -11,66 +11,57 @@
 	.section .rodata
 .long SSP_PTR
 .long PC
-.space 0x3F8 | 0x400 bytes for the EVT, no executable code here
+.space 0x3F8 | 0x400 bytes for the EVT
 
 .set SSP_PTR, 0x40000 | stack is pre-decrement
 .set PC, 0x400
+
+.set STACK_SPACE, 0xFFFF
 
 	.text
 	.global _start
 _start:
 	ori #0x2700, %sr | set IPL to max
-	reset
-	
-test_fill:
-	move.l #0x20000, %a0 | start address
-	move.l #0x40000, %a1 | end address
-	move.w #0xCAFE, (%a0)+
-	cmpa %a0, %a1
-	bra test_fill
 
-test_read:
-	move.w -(%a0), %d0
+| test the RAM by reading and writing to all memory locations
+| jump to ram_cmp_error if problems occur.
+	move.l #0x20000, %a0
+	move.l #0x40000, %a1
+1:	move.w #0xCAFE, (%a0)+
+	cmpa %a0, %a1
+	bne 1b
+
+2:	move.w -(%a0), %d0
 	cmp.w #0xCAFE, %d0
 	bne ram_cmp_error
-	bra test_read
+	cmpa %a0, %a1
+	bne 2b
 	
-	
-	
-	| zero out .bss segment
+| zero out .bss segment
 	move.w scratch, %a0
 	move.l #scratch+0xFFFF, %d0
-bss_zero_loop:
-	move.w #0x0, (%a0)+
+1:	move.w #0x0, (%a0)+
 	cmpa %d0, %a0
-	bra bss_zero_loop	
+	bne 1b
 	
 	jsr uart_setup
 	
-	jmp user_start
-	
-user_start:
-	| the below instructions would crash the system in its current state
-	| since EEPROM is deselected when you go out of supervisor mode
-	#andi #0xDFFF, %sr | switch to user mode
-	#move.l #0x3FF00, %sp
-	
 	move.w (boot_text), -(%sp)
-	jsr uart_write
-	addq #4, %sp | recover stack space
-	
-	| boot the rest of the system here
-	
-	move.w (boot_done), -(%sp)
 	jsr uart_write
 	addq #4, %sp
 	
+user_start:
+| switch to user mode and initialize stack
+	andi #0xDFFF, %sr
+	move.l #0x3FF00, %sp
+	
 ram_cmp_error:
-hang: jmp hang
+	reset
+1:	jmp .
 	
 	.data
-boot_text: .asciz "Booting..."
-boot_done: .asciz "done."
+.align 4
+boot_text: .asciz "Nomadic"
 
 	.bss
 .align 4

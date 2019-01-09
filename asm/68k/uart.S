@@ -9,7 +9,7 @@
 
 |  Set up the ACIA on reset
 |  parameters: none
-|  returns: 0
+|  returns: nothing
 uart_setup:
 	bset #0, (0x40000) | reset the ACIA
 	bset #1, (0x40000)
@@ -25,8 +25,11 @@ uart_setup:
 	bclr #6, (0x40000)
 	
 	bclr #7, (0x40000) | rx interrupt disable
-	moveq #0, %d0
 	rts
+
+| TODO: uart_write never prints the null character, since it returns when null is seen
+| TODO: uart_writec and readc probably don't work properly since I haven't read
+| the addressing mode section of the GAS manual yet.
 
 | write a null-terminated string to output
 | parameters: address of string to print
@@ -35,48 +38,43 @@ uart_write:
 	move.l -4(%sp), %a0
 	moveq #0, %d0
 	moveq #0, %d1
-w_loop:
-	cmp.b (%a0), %d1 | test for null character
-	beq w_done
-w_busy: btst #1, (0x40000)
-	bne w_busy
+1:	cmp.b (%a0), %d1 | test for null character
+	beq 3f
+2:	btst #1, (0x40000)
+	bne 2b
 	move.b (%a0)+, (0x40001) | write byte to ACIA
 	addq #1, %d0
-	bra w_loop
-w_done:
-	rts
+	bra 1b
+3:	rts
 
 | read a null-terminated string from input
 | parameters: address of string to print, character to stop at
-| returns: number of characters read
+| returns: number of characters read (not including stop character)
 uart_read:
 	move.l -4(%sp), %a0
 	move.l -8(%sp), %d1
 	moveq #0, %d0
 	moveq #0, %d1
-r_loop:
-	cmp.b (%a0), %d1
-	beq r_done
-r_busy: btst #0, (0x40000)
-	bne r_busy
+1:	cmp.b (%a0), %d1
+	beq 3f
+2:	btst #0, (0x40000)
+	bne 2b
 	move.b (0x40001), (%a0)+
 	addq #1, %d0
-	bra r_loop
-r_done:
-	rts
+	bra 1b
+3:	rts
 
-| write a character to the ACIA
+| pop character off stack and write it to the ACIA
 | parameters: character to write
-| returns: whatever is in d0
+| returns: nothing
 uart_writec:
-	move.b -4(%sp), (0x40001)
+	# move.b +4(%sp), (0x40001)
 	rts
 
-| read a character from the ACIA
-| parameters: space for character to read
-| returns: whatever is in d0
+| read a character from the ACIA and pushes it on stack
+| returns: nothing
 uart_readc:
-	move.b (0x40001), -4(%sp)
+	# move.b (0x40001), -4(%sp)
 	rts
 
 | check for ACIA errors
