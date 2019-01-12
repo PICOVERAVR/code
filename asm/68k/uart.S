@@ -28,16 +28,14 @@ uart_setup:
 	rts
 
 | TODO: uart_write never prints the null character, since it returns when null is seen
-| TODO: uart_writec and readc probably don't work properly since I haven't read
-| the addressing mode section of the GAS manual yet.
 
 | write a null-terminated string to output
 | parameters: address of string to print
 | returns: number of characters printed
 uart_write:
 	move.l -4(%sp), %a0
-	moveq #0, %d0
-	moveq #0, %d1
+	clr %d0
+	clr %d1
 1:	cmp.b (%a0), %d1 | test for null character
 	beq 3f
 2:	btst #1, (0x40000)
@@ -53,8 +51,8 @@ uart_write:
 uart_read:
 	move.l -4(%sp), %a0
 	move.l -8(%sp), %d1
-	moveq #0, %d0
-	moveq #0, %d1
+	clr %d0
+	clr %d1
 1:	cmp.b (%a0), %d1
 	beq 3f
 2:	btst #0, (0x40000)
@@ -68,13 +66,13 @@ uart_read:
 | parameters: character to write
 | returns: nothing
 uart_writec:
-	# move.b +4(%sp), (0x40001)
+	move.b +4(%sp), (0x40001)
 	rts
 
 | read a character from the ACIA and pushes it on stack
 | returns: nothing
 uart_readc:
-	# move.b (0x40001), -4(%sp)
+	move.b (0x40001), -4(%sp)
 	rts
 
 | check for ACIA errors
