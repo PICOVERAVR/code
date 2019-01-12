@@ -1,1 +1,1 @@
-config files for everything
+config files for everything, some of them may be hidden files!

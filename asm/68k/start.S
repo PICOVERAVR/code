@@ -1,17 +1,9 @@
-|  0x00000 -> 0x1FFFF: EEPROM
-	|  0x0 -> 0x400: EVT
-|  0x20000 -> 0x3FFFF: SRAM
-	|  0x3FFFE -> 0x3FF00: Supervisor stack (254b)
-	|  0x3FEFE -> 0x3FE00: User stack (254b)
-|  0x40000 -> 0x40001: UART data (00 is cntl, 01 is data)
-
-|  will need to adjust link script when we start executing code out of RAM
-|  NOTE: we cannot actually load anything into RAM at assemble time.  
+| Bootloader section of 68k device
 
 	.section .rodata
 .long SSP_PTR
 .long PC
-.space 0x3F8 | 0x400 bytes for the EVT
+.space 0x3F8
 
 .set SSP_PTR, 0x40000 | stack is pre-decrement
 .set PC, 0x400
@@ -21,8 +13,6 @@
 	.text
 	.global _start
 _start:
-	ori #0x2700, %sr | set IPL to max
-
 | test the RAM by reading and writing to all memory locations
 | jump to ram_cmp_error if problems occur.
 	move.l #0x20000, %a0
