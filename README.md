@@ -43,3 +43,4 @@ Check the showcase folder!
 ## Things to fix:
 - Fix makefile softlinks everywhere
 	- constantly breaking all the time
+- Can't find setup instructions... (in ubuntu_README.md?)
