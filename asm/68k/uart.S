@@ -1,10 +1,6 @@
 |  UART interfacing code, written to work with the MC6850 ACIA
 |  should be enough to load an image into RAM over UART
 
-| Memory Map:
-| 0x40000: ACIA control
-| 0v40001: ACIA data
-
 .section .text
 
 |  Set up the ACIA on reset
@@ -26,8 +22,6 @@ uart_setup:
 	
 	bclr #7, (0x40000) | rx interrupt disable
 	rts
-
-| TODO: uart_write never prints the null character, since it returns when null is seen
 
 | write a null-terminated string to output
 | parameters: address of string to print

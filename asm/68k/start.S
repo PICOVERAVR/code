@@ -8,7 +8,7 @@
 .set SSP_PTR, 0x40000 | stack is pre-decrement
 .set PC, 0x400
 
-.set STACK_SPACE, 0xFFFF
+.set SCRATCH_SPACE, 0xFFFF
 
 	.text
 	.global _start
@@ -55,4 +55,4 @@ boot_text: .asciz "Nomadic"
 
 	.bss
 .align 4
-scratch: .space 0xFFFF | 64Kbytes for scratch memory
+scratch: .space SCRATCH_SPACE
