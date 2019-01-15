@@ -10,22 +10,25 @@ import logging # for simple debug logging
 eeprom_id_values = {0x7: "GLS29EE010", 0x8: "GLS29VE010"}
 
 if __name__ == "__main__":
-	parser = argparse.ArgumentParser(description='Python script to interface with a pair of GLS29EE010 EEPROMs.')
+	parser = argparse.ArgumentParser(description='Python script to interface with EEPROMs.')
 	parser.add_argument('--version', action='version', version='EEPROM flasher tool v0.2')
 	parser.add_argument('-a', '--action', type=str, default='nop', help='action to perform. <include list of actions>')
 	parser.add_argument('-d', '--device', type=str, help='device to communicate with, usually something like \'/dev/ttyUSB0\'.')
-	parser.add_argument('-v', '--verbose', action='store_true', help='enable verbose output.') # TODO: use this!
+	parser.add_argument('-v', '--verbose', action='store_true', help='enable verbose output.')
 	parser.add_argument('-b', '--binary', type=str, default='', help='binary to manipulate.')
 	parser.add_argument('-s', '--size', type=int, default=0x1FFFF, help='EEPROM size, defaults to 128K')
 	args = parser.parse_args()
 
 	EEPROM_SIZE = args.size
 	
+	if args.verbose:
+		logging.setLevel(INFO)
+	
 	try:
 		import serial
 	except ModuleNotFoundError:
 		logging.error("pyserial module not found!")
-		logging.debug("try \'pip3 install pyserial\'")
+		logging.info("try \'pip3 install pyserial\'")
 		sys.exit(2)
 	else:
 		logging.info("pyserial module found.")
@@ -66,7 +69,7 @@ if __name__ == "__main__":
 			logging.info("binary located.")
 		
 		# TODO: make sure byte and word order is same as 68k memory layout!
-		# TODO: write a byte at a time because doing a whole seperate socket is annoying
+		
 		# write all the pages up to the last one, since the last one may not be on a page boundary.
 		
 		endpage = len(bindata) + (128 - len(bindata) % 128)

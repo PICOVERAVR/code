@@ -12,6 +12,9 @@
 
 	.text
 	.global _start
+
+# TODO: add another .text section in RAM so we can execute out of it
+
 _start:
 | test the RAM by reading and writing to all memory locations
 | jump to ram_cmp_error if problems occur.
