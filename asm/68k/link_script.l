@@ -7,9 +7,13 @@ MEMORY
 
 SECTIONS
 {
-  .rodata : { *(.rodata) } > rom
+  /* room for EVT table */
+  .rodata : { *(.rodata) } > rom 
   . = 0x400;
-  .text : { *(.text) } > rom
+  boot_text : { *(boot_text) } > rom
   .data : { *(.data) } > rom
   .bss : { *(.bss) *(COMMON) } > ram
+  /* room for not bootloader code */
+  . = 0x10000;
+  ram_text : { *(ram_text) } > ram
 }

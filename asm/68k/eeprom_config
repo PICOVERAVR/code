@@ -12,7 +12,7 @@ eeprom_id_values = {0x7: "GLS29EE010", 0x8: "GLS29VE010"}
 if __name__ == "__main__":
 	parser = argparse.ArgumentParser(description='Python script to interface with EEPROMs.')
 	parser.add_argument('--version', action='version', version='EEPROM flasher tool v0.2')
-	parser.add_argument('-a', '--action', type=str, default='nop', help='action to perform. <include list of actions>')
+	parser.add_argument('-a', '--action', type=str, default='nop', help='action to perform: id, read, write, erase, and nop.')
 	parser.add_argument('-d', '--device', type=str, help='device to communicate with, usually something like \'/dev/ttyUSB0\'.')
 	parser.add_argument('-v', '--verbose', action='store_true', help='enable verbose output.')
 	parser.add_argument('-b', '--binary', type=str, default='', help='binary to manipulate.')
@@ -39,6 +39,9 @@ if __name__ == "__main__":
 		logging.error("device not found!")
 		sys.exit(3)
 	
+	# TODO: check if the path actually exists rather than assuming it's fine
+	
+	logging.info("Opening serial port with 8N1 2M baud settings...")
 	serport = serial.Serial(device_str, 2000000, timeout=5)
 	serport.readline()
 
@@ -78,11 +81,11 @@ if __name__ == "__main__":
 		
 		for page in range(0, endpage, 128):
 			page_str = "WP:" + str(page)
-			for word in range(0, 256, 2):
-				if (page + word + 1) >= len(bindata):
+			for byte in range(0, 256, 2):
+				if (page + byte) >= len(bindata):
 					page_str += ":0"
 				else:
-					page_str += ":" + str(((bindata[page + word]) << 8) + bindata[page + word + 1])
+					page_str += ":" + str(bindata[page + byte])
 			page_str += ";"
 			logging.debug(page_str)
 			
@@ -90,7 +93,7 @@ if __name__ == "__main__":
 			temp = serport.readline()
 			while temp != b'done.\r\n':
 				temp = serport.readline()
-			print("writing page " + str((page // 128) + 1) + "/" + str(endpage // 128) + "...") # number of pages written still correct, bytes split up.
+			print("writing page " + str((page // 128) + 1) + "/" + str(endpage // 128) + "...")
 		print("done.")
 	
 	# WARNING: this takes ~25 seconds to complete for a 128K EEPROM at a baud rate of 2M.
@@ -108,9 +111,10 @@ if __name__ == "__main__":
 		for page in range(0, EEPROM_SIZE, 128):
 			page_str = "RP:" + str(page) + ";"
 			serport.write(page_str.encode("ascii", "encode"))
-			print(serport.readline().decode('ascii').strip('\n'))
+			print(serport.readline().decode('ascii').strip('\n:;'))
+			# TODO: write this to actual binary file
 			serport.readline()
-
+		
 	elif args.action == 'nop':
 		logging.info('doing nothing.')
 	

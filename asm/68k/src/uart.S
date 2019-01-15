@@ -1,7 +1,7 @@
 |  UART interfacing code, written to work with the MC6850 ACIA
 |  should be enough to load an image into RAM over UART
 
-.section .text
+.section boot_text
 
 |  Set up the ACIA on reset
 |  parameters: none

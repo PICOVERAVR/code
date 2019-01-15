@@ -29,15 +29,19 @@ if __name__ == "__main__":
 			msbdata.append(byte)
 		even ^= 1
 	
-	print("lsb data: ", end='')
-	for i in range(0, len(lsbdata)):
-		print(hex(lsbdata[i]), end=' ')
-	print("")
-
-	print("msb data: ", end='')
-	for i in range(0, len(msbdata)):
-		print(hex(msbdata[i]), end=' ')
-	print("")
-
-#	with open(sys.argv[1] + ".L", "wb") as lsb_bin:	
-#	with open(sys.argv[1] + ".R", "wb") as msb_bin:
+	#print("lsb data: ", end='')
+	#for i in range(0, len(lsbdata)):
+	#	print(hex(lsbdata[i]), end=' ')
+	#print("")
+	
+	#print("msb data: ", end='')
+	#for i in range(0, len(msbdata)):
+	#	print(hex(msbdata[i]), end=' ')
+	#print("")
+	
+	with open(sys.argv[1] + ".lsb", "wb") as lsb_bin:
+		lsb_bin.write(bytes(lsbdata))
+	with open(sys.argv[1] + ".msb", "wb") as msb_bin:
+		msb_bin.write(bytes(msbdata))
+	
+	print("done.")

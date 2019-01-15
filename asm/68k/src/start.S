@@ -10,10 +10,12 @@
 
 .set SCRATCH_SPACE, 0xFFFF
 
-	.text
+	.section boot_text, "x"
 	.global _start
 
-# TODO: add another .text section in RAM so we can execute out of it
+| TODO: make sure none of the sections are overlapping in memory (data section is overlapping... fix!)
+| and also make sure start and length parameters are correct.
+| also .bss section is way too big.
 
 _start:
 | test the RAM by reading and writing to all memory locations
@@ -52,10 +54,13 @@ ram_cmp_error:
 	reset
 1:	jmp .
 	
-	.data
+	.section .data
 .align 4
-boot_text: .asciz "Nomadic"
+boot_name: .asciz "Nomadic"
 
-	.bss
+	.section .bss, "w"
 .align 4
 scratch: .space SCRATCH_SPACE
+
+	.section ram_text, "wx"
+.space 0xFFFF | space to use for executing loaded code over RAM
