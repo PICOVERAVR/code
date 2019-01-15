@@ -5,14 +5,18 @@ from math import ceil # for arithmetic
 import argparse # for argument processing
 import logging # for simple debug logging
 
+# add values to dictionary for different chips
+# TODO: come up with a more robust way of doing this, values will collide eventually.
+eeprom_id_values = {0x7: "GLS29EE010", 0x8: "GLS29VE010"}
+
 if __name__ == "__main__":
 	parser = argparse.ArgumentParser(description='Python script to interface with a pair of GLS29EE010 EEPROMs.')
 	parser.add_argument('--version', action='version', version='EEPROM flasher tool v0.2')
 	parser.add_argument('-a', '--action', type=str, default='nop', help='action to perform. <include list of actions>')
 	parser.add_argument('-d', '--device', type=str, help='device to communicate with, usually something like \'/dev/ttyUSB0\'.')
-	parser.add_argument('-v', '--verbose', action='store_true', help='enable verbose output.')
+	parser.add_argument('-v', '--verbose', action='store_true', help='enable verbose output.') # TODO: use this!
 	parser.add_argument('-b', '--binary', type=str, default='', help='binary to manipulate.')
-	parser.add_argument('-s', '--size'. type=int, default=0x1FFFF, help='EEPROM size, defaults to 128K')
+	parser.add_argument('-s', '--size', type=int, default=0x1FFFF, help='EEPROM size, defaults to 128K')
 	args = parser.parse_args()
 
 	EEPROM_SIZE = args.size
@@ -32,7 +36,7 @@ if __name__ == "__main__":
 		logging.error("device not found!")
 		sys.exit(3)
 	
-	serport = serial.Serial(device_str, 115200, timeout=5)
+	serport = serial.Serial(device_str, 2000000, timeout=5)
 	serport.readline()
 
 	if args.action == 'erase':
@@ -42,6 +46,15 @@ if __name__ == "__main__":
 		while temp != b'done.\r\n':
 			temp = serport.readline()
 		print("done.")
+	elif args.action == 'id':
+		print("Version info:")
+		serport.write("VE;".encode('ascii', 'encode'))
+		print(serport.readline().decode('ascii').strip('\n')) # reader version
+		print(serport.readline().decode('ascii').strip('\n')) # manufacturer ID
+		num = serport.readline().decode('ascii').strip('\n') # device ID
+		print("Device Model: ", end='')
+		print(eeprom_id_values[int(num[11:14], 16)])
+		
 	elif args.action == 'write':
 		try:
 			with open(args.binary, "rb") as binfile:
@@ -53,7 +66,7 @@ if __name__ == "__main__":
 			logging.info("binary located.")
 		
 		# TODO: make sure byte and word order is same as 68k memory layout!
-		# TODO: fix page counting, should be half of bin size since we're consuming a word at a time.
+		# TODO: write a byte at a time because doing a whole seperate socket is annoying
 		# write all the pages up to the last one, since the last one may not be on a page boundary.
 		
 		endpage = len(bindata) + (128 - len(bindata) % 128)
@@ -77,18 +90,23 @@ if __name__ == "__main__":
 			print("writing page " + str((page // 128) + 1) + "/" + str(endpage // 128) + "...") # number of pages written still correct, bytes split up.
 		print("done.")
 	
+	# WARNING: this takes ~25 seconds to complete for a 128K EEPROM at a baud rate of 2M.
 	elif args.action == 'read':
-		print("Reading EEPROM contents into file dump.bin...")
-		
-		# read contents into memory, then file
+		print("Reading EEPROM contents into file ", end='')
+		print(args.binary, end='')
+		print("...")
 		
 		try:
 			with open(args.binary, "wb") as readfile:
-				print("stuff")
+				logging.info("binary located.")
 		except IOError:
 			logging.error("binary cannot be opened!")
-		else:
-			logging.info("binary located.")
+			sys.exit(5)
+		for page in range(0, EEPROM_SIZE, 128):
+			page_str = "RP:" + str(page) + ";"
+			serport.write(page_str.encode("ascii", "encode"))
+			print(serport.readline().decode('ascii').strip('\n'))
+			serport.readline()
 
 	elif args.action == 'nop':
 		logging.info('doing nothing.')
