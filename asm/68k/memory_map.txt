@@ -1,7 +1,8 @@
 0x00000 -> 0x1FFFF: EEPROM
 	0x0 -> 0x400: EVT
-	0x400 -> 0x1FFFF: Bootloader and safe lib code
+	0x400 -> 0x1FFFF: Bootloader and uart lib code
 0x20000 -> 0x3FFFF: SRAM
+	(application defines how RAM is used)
 0x40000 -> 0x40001: ACIA Peripheral
 
 code starts at 0x400
@@ -10,4 +11,3 @@ still need to do housekeeping such as zeroing out .bss section because
 no OS will do it for us
 
 cannot load anything into SRAM at assemble time (yet, bootloader could do that for us)
-might need to adjust link script when we start executing code out of RAM?

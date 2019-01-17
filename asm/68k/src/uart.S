@@ -27,7 +27,7 @@ uart_setup:
 | parameters: address of string to print
 | returns: number of characters printed
 uart_write:
-	move.l -4(%sp), %a0
+	move.l 4(%sp), %a0
 	clr %d0
 	clr %d1
 1:	cmp.b (%a0), %d1 | test for null character
@@ -43,15 +43,14 @@ uart_write:
 | parameters: address of string to print, character to stop at
 | returns: number of characters read (not including stop character)
 uart_read:
-	move.l -4(%sp), %a0
-	move.l -8(%sp), %d1
+	move.l 4(%sp), %a0
+	move.l 8(%sp), %d1
 	clr %d0
-	clr %d1
-1:	cmp.b (%a0), %d1
+1:	cmp.b (%a0), %d1 | test for end character
 	beq 3f
 2:	btst #0, (0x40000)
 	bne 2b
-	move.b (0x40001), (%a0)+
+	move.b (0x40001), (%a0)+ | read character from ACIA
 	addq #1, %d0
 	bra 1b
 3:	rts

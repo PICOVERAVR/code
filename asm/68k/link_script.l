@@ -12,8 +12,7 @@ SECTIONS
   . = 0x400;
   boot_text : { *(boot_text) } > rom
   .data : { *(.data) } > rom
-  .bss : { *(.bss) *(COMMON) } > ram
-  /* room for not bootloader code */
+  /* room for application code */
   . = 0x10000;
   ram_text : { *(ram_text) } > ram
 }
