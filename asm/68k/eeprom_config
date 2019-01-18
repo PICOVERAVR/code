@@ -3,15 +3,18 @@ import sys # for exit
 import os # for checking file existance
 from math import ceil # for arithmetic
 import argparse # for argument processing
-import logging # for simple debug logging
+import logging # for simple debug logger
 
 # add values to dictionary for different chips
 # TODO: come up with a more robust way of doing this, values will collide eventually.
 # TODO: split more stuff into functions, make this script more readable
+# TODO: send all data to EEPROM in binary, not ascii!
 
 eeprom_id_values = {0x7: "GLS29EE010", 0x8: "GLS29VE010"}
 
 if __name__ == "__main__":
+	logger = logging.getLogger('eeprom_parse_logger')
+	
 	parser = argparse.ArgumentParser(description='Python script to interface with EEPROMs.')
 	parser.add_argument('--version', action='version', version='EEPROM flasher tool v0.2')
 	parser.add_argument('-a', '--action', type=str, default='nop', help='action to perform: id, read, write, erase, and nop.')
@@ -23,31 +26,31 @@ if __name__ == "__main__":
 
 	EEPROM_SIZE = args.size
 	
-	# TODO: this is broken for some reason, fix this!!
 	if args.verbose == 'verbose':
-		logging.setLevel(INFO)
+		logger.setLevel(logging.INFO)
 	elif args.verbose == 'debug':
-		logging.setLevel(DEBUG)
-	
+		logger.setLevel(logging.DEBUG)
+		logging.debug("Debug information enabled.")
 	try:
 		import serial
 	except ModuleNotFoundError:
-		logging.error("pyserial module not found!")
-		logging.info("try \'pip3 install pyserial\'")
+		logger.error("pyserial module not found!")
+		logger.info("try \'pip3 install pyserial\'")
 		sys.exit(2)
 	else:
-		logging.info("pyserial module found.")
+		logger.info("pyserial module found.")
 	
-	if args.device:
-		device_str = args.device
-	else:
-		logging.error("device not found!")
-		sys.exit(3)
+	try:
+		if args.device == None:
+			raise IOError
+		with open(args.device) as file:
+			pass
+	except IOError as bad_file:
+		logger.error('Device file cannot be opened.')
+		sys.exit(1)
 	
-	# TODO: check if the path actually exists rather than assuming it's fine
-	
-	logging.info("Opening serial port with 8N1 2M baud settings...")
-	serport = serial.Serial(device_str, 2000000, timeout=5)
+	logger.info("Opening serial port with 8N1 2M baud settings...")
+	serport = serial.Serial(args.device, 2000000, timeout=5)
 	serport.readline()
 
 	if args.action == 'erase':
@@ -63,7 +66,7 @@ if __name__ == "__main__":
 		print(serport.readline().decode('ascii').strip('\n')) # reader version
 		print(serport.readline().decode('ascii').strip('\n')) # manufacturer ID
 		num = serport.readline().decode('ascii').strip('\n') # device ID
-		print("Device Model: ", end='')
+		print("Device: ", end='')
 		print(eeprom_id_values[int(num[11:14], 16)])
 		
 	elif args.action == 'write':
@@ -71,10 +74,10 @@ if __name__ == "__main__":
 			with open(args.binary, "rb") as binfile:
 				bindata = binfile.read(EEPROM_SIZE)
 		except IOError:
-			logging.error("binary cannot be opened!")
+			logger.error("binary cannot be opened!")
 			sys.exit(4)
 		else:
-			logging.info("binary located.")
+			logger.info("binary located.")
 		
 		# TODO: make sure byte and word order is same as 68k memory layout!
 		
@@ -92,7 +95,7 @@ if __name__ == "__main__":
 				else:
 					page_str += ":" + str(bindata[page + byte])
 			page_str += ";"
-			logging.debug(page_str)
+			logger.debug(page_str)
 			
 			serport.write(page_str.encode("ascii", "encode"))
 			temp = serport.readline()
@@ -101,38 +104,32 @@ if __name__ == "__main__":
 			print("writing page " + str((page // 128) + 1) + "/" + str(endpage // 128) + "...")
 		print("done.")
 	
-	# WARNING: this takes ~25 seconds to complete for a 128K EEPROM at a baud rate of 2M.
+	# takes ~6 seconds with 2M baud, 128K EEPROM
 	elif args.action == 'read':
 		print("Reading EEPROM contents into file ", end='')
 		print(args.binary, end='')
 		print("...")
 		
-		binread = []
-		
 		try:
 			with open(args.binary, "wb") as readfile:
-				logging.info("binary located.")
+				logger.info("binary located.")
 
 				for page in range(0, EEPROM_SIZE, 128):
 					page_str = "RP:" + str(page) + ";"
 					serport.write(page_str.encode("ascii", "encode"))
 					
-					temp = serport.readline().decode('ascii').strip('\n:;')
-					logging.debug(temp)
-					binread.append(temp)
-					# TODO: does this actually write the binary information, or encode it as ascii?
-					
-					serport.readline()
-				
-				readfile.write(bytes(binread))
+					temp = serport.readline()[:-1] # strip out \n
+					logger.debug(temp)
+					readfile.write(temp)
+
 		except IOError:
-			logging.error("binary cannot be opened!")
+			logger.error("binary cannot be opened!")
 			sys.exit(5)
 
 	elif args.action == 'nop':
-		logging.info('doing nothing.')
+		logger.info('doing nothing.')
 	
 	else:
-		logging.error("unknown action!")
+		logger.error("unknown action!")
 		sys.exit(1)
 	
