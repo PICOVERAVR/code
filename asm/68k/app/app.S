@@ -6,9 +6,10 @@
 user_start:
 	|andi #0xDFFF, %sr (put in by bootloader)
 	nop|
-
-	.section .data
-.align 4
 	
 	.section .bss
 .align 4
+
+	.section .data
+.align 4
+.byte '$' | to indicate end of app

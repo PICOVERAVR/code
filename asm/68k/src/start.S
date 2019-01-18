@@ -19,7 +19,7 @@
 | TODO: make sure none of the sections are overlapping in memory (data section is overlapping... fix!)
 | and also make sure start and length parameters are correct.
 | TODO: add a R/W line to EEPROM and test to add self-update capabilities?
-| TODO: possibly load in all the UART code for applications to use
+| UART code can stay where it is since it's just as fast as RAM in this board.
 
 _start:
 | test the RAM by reading and writing to all memory locations

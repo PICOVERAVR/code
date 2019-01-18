@@ -7,6 +7,8 @@ import logging # for simple debug logging
 
 # add values to dictionary for different chips
 # TODO: come up with a more robust way of doing this, values will collide eventually.
+# TODO: split more stuff into functions, make this script more readable
+
 eeprom_id_values = {0x7: "GLS29EE010", 0x8: "GLS29VE010"}
 
 if __name__ == "__main__":
@@ -14,15 +16,18 @@ if __name__ == "__main__":
 	parser.add_argument('--version', action='version', version='EEPROM flasher tool v0.2')
 	parser.add_argument('-a', '--action', type=str, default='nop', help='action to perform: id, read, write, erase, and nop.')
 	parser.add_argument('-d', '--device', type=str, help='device to communicate with, usually something like \'/dev/ttyUSB0\'.')
-	parser.add_argument('-v', '--verbose', action='store_true', help='enable verbose output.')
+	parser.add_argument('-v', '--verbose', type=str, default='verbose', help='enable more verbose output, options are \'verbose\' and \'debug\'.')
 	parser.add_argument('-b', '--binary', type=str, default='', help='binary to manipulate.')
-	parser.add_argument('-s', '--size', type=int, default=0x1FFFF, help='EEPROM size, defaults to 128K')
+	parser.add_argument('-s', '--size', type=int, default=0x1FFFF, help='EEPROM size, defaults to 128K.')
 	args = parser.parse_args()
 
 	EEPROM_SIZE = args.size
 	
-	if args.verbose:
+	# TODO: this is broken for some reason, fix this!!
+	if args.verbose == 'verbose':
 		logging.setLevel(INFO)
+	elif args.verbose == 'debug':
+		logging.setLevel(DEBUG)
 	
 	try:
 		import serial
@@ -102,19 +107,28 @@ if __name__ == "__main__":
 		print(args.binary, end='')
 		print("...")
 		
+		binread = []
+		
 		try:
 			with open(args.binary, "wb") as readfile:
 				logging.info("binary located.")
+
+				for page in range(0, EEPROM_SIZE, 128):
+					page_str = "RP:" + str(page) + ";"
+					serport.write(page_str.encode("ascii", "encode"))
+					
+					temp = serport.readline().decode('ascii').strip('\n:;')
+					logging.debug(temp)
+					binread.append(temp)
+					# TODO: does this actually write the binary information, or encode it as ascii?
+					
+					serport.readline()
+				
+				readfile.write(bytes(binread))
 		except IOError:
 			logging.error("binary cannot be opened!")
 			sys.exit(5)
-		for page in range(0, EEPROM_SIZE, 128):
-			page_str = "RP:" + str(page) + ";"
-			serport.write(page_str.encode("ascii", "encode"))
-			print(serport.readline().decode('ascii').strip('\n:;'))
-			# TODO: write this to actual binary file
-			serport.readline()
-		
+
 	elif args.action == 'nop':
 		logging.info('doing nothing.')
 	
