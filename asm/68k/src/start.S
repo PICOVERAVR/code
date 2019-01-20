@@ -39,7 +39,9 @@
 | 0: verbose bootloading
 | 1: ?
 
-	.section boot_text, "x"
+.set ram_addr, 0x20000
+
+	.text
 	.global _start
 
 | TODO: actually check for verbose booting.
@@ -67,7 +69,7 @@ _start:
 	addq #4, %sp
 	
 	| need to add space for andi #0xDFFF, %sr to change to user mode
-	move.l #ram_text, %d0
+	move.l #ram_addr, %d0
 	addq #4, %d0
 	move.l %d0, -(%sp) | wait for a '$' from the host to indicate app code is done being uploaded
 	move.l #'$', -(%sp)
@@ -78,7 +80,7 @@ _start:
 	jsr uart_write
 	addq #4, %sp
 	
-	jmp ram_text
+	jmp ram_addr
 
 ram_cmp_error:
 	reset
@@ -90,6 +92,3 @@ boot_name: .asciz "Nomadic\n"
 splash_message: .asciz "Bootloader initialized.\n"
 done_message: .asciz "Booting application...\n"
 .byte config_parameters | bootloader configuration parameters
-
-	.section ram_text, "wx"
-.space 0x1FFFF

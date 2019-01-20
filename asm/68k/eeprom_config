@@ -4,11 +4,11 @@ import os # for checking file existance
 from math import ceil # for arithmetic
 import argparse # for argument processing
 import logging # for simple debug logger
+from time import sleep # for timing
 
 # add values to dictionary for different chips
 # TODO: come up with a more robust way of doing this, values will collide eventually.
 # TODO: split more stuff into functions, make this script more readable
-# TODO: send all data to EEPROM in binary, not ascii!
 
 eeprom_id_values = {0x7: "GLS29EE010", 0x8: "GLS29VE010"}
 
@@ -19,23 +19,26 @@ if __name__ == "__main__":
 	parser.add_argument('--version', action='version', version='EEPROM flasher tool v0.2')
 	parser.add_argument('-a', '--action', type=str, default='nop', help='action to perform: id, read, write, erase, and nop.')
 	parser.add_argument('-d', '--device', type=str, help='device to communicate with, usually something like \'/dev/ttyUSB0\'.')
-	parser.add_argument('-v', '--verbose', type=str, default='verbose', help='enable more verbose output, options are \'verbose\' and \'debug\'.')
+	parser.add_argument('-v', '--verbose', type=str, default='', help='enable more verbose output, options are \'info\' and \'debug\'.')
 	parser.add_argument('-b', '--binary', type=str, default='', help='binary to manipulate.')
-	parser.add_argument('-s', '--size', type=int, default=0x1FFFF, help='EEPROM size, defaults to 128K.')
+	parser.add_argument('-s', '--size', type=int, default=0x20000, help='EEPROM size, defaults to 128K.')
 	args = parser.parse_args()
 
 	EEPROM_SIZE = args.size
-	
-	if args.verbose == 'verbose':
+
+	if args.verbose == 'info':
 		logger.setLevel(logging.INFO)
+		logging.info("dummy") # not sure why I have to do this, but logging is silent without it.
+		logger.info("Verbose information enabled.")
 	elif args.verbose == 'debug':
 		logger.setLevel(logging.DEBUG)
-		logging.debug("Debug information enabled.")
+		logging.debug("dummy")
+		logger.debug("Debug information enabled.")
 	try:
 		import serial
 	except ModuleNotFoundError:
 		logger.error("pyserial module not found!")
-		logger.info("try \'pip3 install pyserial\'")
+		logger.debug("try \'pip3 install pyserial\'")
 		sys.exit(2)
 	else:
 		logger.info("pyserial module found.")
@@ -49,8 +52,8 @@ if __name__ == "__main__":
 		logger.error('Device file cannot be opened.')
 		sys.exit(1)
 	
-	logger.info("Opening serial port with 8N1 2M baud settings...")
-	serport = serial.Serial(args.device, 2000000, timeout=5)
+	logger.info("Opening serial port with 8N1 250k baud settings...")
+	serport = serial.Serial(args.device, 250000, timeout=5)
 	serport.readline()
 
 	if args.action == 'erase':
@@ -80,24 +83,33 @@ if __name__ == "__main__":
 			logger.info("binary located.")
 		
 		# TODO: make sure byte and word order is same as 68k memory layout!
-		
+		# TODO: delete EOF from last byte in file!
 		# write all the pages up to the last one, since the last one may not be on a page boundary.
 		
-		endpage = len(bindata) + (128 - len(bindata) % 128)
+		endpage = len(bindata) + ((128 - len(bindata)) % 128)
 		
 		print("Writing " + str(endpage) + " bytes to EEPROM...")
 		
 		for page in range(0, endpage, 128):
-			page_str = "WP:" + str(page)
-			for byte in range(0, 256, 2):
+			page_str = "WP:" + str(page) + ":"
+			byte_arr = bytearray(128)
+
+			for byte in range(0, 128):
 				if (page + byte) >= len(bindata):
-					page_str += ":0"
+					byte_arr.append(0)
 				else:
-					page_str += ":" + str(bindata[page + byte])
-			page_str += ";"
+					byte_arr.append(bindata[page + byte])
 			logger.debug(page_str)
+			logger.debug(byte_arr)
 			
 			serport.write(page_str.encode("ascii", "encode"))
+			serport.write(byte_arr[0:32]) # split up for timing reasons, because the Arduino Mega only has a 64-byte serial buffer
+			serport.write(byte_arr[32:64])
+			serport.write(byte_arr[64:96])
+			if page == endpage - 1 and byte_arr[127] == 0xa:
+				byte_arr[127] = 0 # take out EOF
+			serport.write(byte_arr[96:128])
+			
 			temp = serport.readline()
 			while temp != b'done.\r\n':
 				temp = serport.readline()
@@ -105,10 +117,11 @@ if __name__ == "__main__":
 		print("done.")
 	
 	# takes ~6 seconds with 2M baud, 128K EEPROM
+	# TODO: file is not checked at the same time as "write" function. fix this.
 	elif args.action == 'read':
-		print("Reading EEPROM contents into file ", end='')
-		print(args.binary, end='')
-		print("...")
+		print("Reading ", end='')
+		print(str(EEPROM_SIZE), end='')
+		print(" bytes out of EEPROM... ")
 		
 		try:
 			with open(args.binary, "wb") as readfile:

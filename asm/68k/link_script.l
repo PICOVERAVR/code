@@ -1,8 +1,10 @@
 /* simple m68k link script */
+
+/* RAM shouldn't be included because we can't allocate anything there at assemble time */
+
 MEMORY
 {
   rom (rx) : ORIGIN = 0x0, LENGTH = 128K
-  ram (wx) : ORIGIN = 0x20000, LENGTH = 128K
 }
 
 SECTIONS
@@ -10,9 +12,6 @@ SECTIONS
   /* room for EVT table */
   .rodata : { *(.rodata) } > rom 
   . = 0x400;
-  boot_text : { *(boot_text) } > rom
+  .text : { *(.text) } > rom
   .data : { *(.data) } > rom
-  /* room for application code */
-  . = 0x10000;
-  ram_text : { *(ram_text) } > ram
 }
