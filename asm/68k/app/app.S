@@ -5,7 +5,7 @@
 
 user_start:
 	|andi #0xDFFF, %sr (put in by bootloader)
-	nop|
+	nop
 	
 	.section .bss
 .align 4

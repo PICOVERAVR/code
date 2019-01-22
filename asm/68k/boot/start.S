@@ -37,17 +37,16 @@
 
 .set config_parameters, 0b00000001
 | 0: verbose bootloading
-| 1: ?
 
 .set ram_addr, 0x20000
 
 	.text
 	.global _start
 
-| TODO: actually check for verbose booting.
-| TODO: make sure none of the sections are overlapping in memory (data section is overlapping... fix!)
-| and also make sure start and length parameters are correct.
+| hardware revisions:
 | TODO: add a R/W line to EEPROM and test to add self-update capabilities?
+| note: this would allow users to upload programs to re-write EEPROM...
+| can protect with MMU set up in bootloader if we want!
 
 _start:
 | test the RAM by reading and writing to all memory locations
@@ -64,31 +63,51 @@ _start:
 	cmpa %a0, %a1
 	bne 2b
 	
-	move.l (splash_message), -(%sp)
-	jsr uart_write
-	addq #4, %sp
+	move.l splash_message, -(%sp)
+	jsr print_if_verbose
 	
-	| need to add space for andi #0xDFFF, %sr to change to user mode
-	move.l #ram_addr, %d0
-	addq #4, %d0
-	move.l %d0, -(%sp) | wait for a '$' from the host to indicate app code is done being uploaded
+	move.l #ram_addr, -(%sp) | wait for a '$' from the host to indicate app code is done being uploaded
 	move.l #'$', -(%sp)
 	jsr uart_read
 	add #8, %sp
 
-	move.l (done_message), -(%sp)
-	jsr uart_write
+	move.l %d0, %d7 | save number of bytes read from host
+
+	btst #0, config_parameters
+	bne 1f
+	move.l done_message, -(%sp)
+	jsr print_if_verbose
 	addq #4, %sp
 	
+	| TODO: call lib_itoa
+	
+	move.l done_message2, -(%sp)
+	jsr print_if_verbose
+	addq #4, %sp
+
+1:	andi #0xDFFF, %sr
 	jmp ram_addr
 
 ram_cmp_error:
 	reset
 1:	jmp .
-	
+
+| print if config_parameters[0] is set
+| parameters: addr of string to print
+| returns: uart_write
+print_if_verbose:
+	btst #0, config_parameters
+	bne 1f
+	jsr uart_write
+	addq #4, %sp
+1:	rts
+
 	.section .data
 .align 4
 boot_name: .asciz "Nomadic\n"
 splash_message: .asciz "Bootloader initialized.\n"
-done_message: .asciz "Booting application...\n"
+
+done_message: .asciz "Read "
+done_message2: .asciz " bytes. Booting application...\n"
 .byte config_parameters | bootloader configuration parameters
+

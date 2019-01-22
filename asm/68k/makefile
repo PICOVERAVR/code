@@ -1,10 +1,11 @@
-SRC := $(wildcard src/*.S)
+SRC := $(wildcard boot/*.S)
 
 FLAGS := -march=68000 -mcpu=68000 -mno-float
 DFLAGS := $(FLAGS)
 
 UNAME := $(shell uname)
 
+# TODO: rename the db stuff to something more helpful
 start: pre # assemble files
 	@m68k-elf-as $(DFLAGS) $(SRC) -o db.o
 	@echo "Debug build completed."
