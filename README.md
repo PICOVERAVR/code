@@ -3,7 +3,12 @@ Personal projects from almost non-existant to small.
 ## Looking for working and/or complete projects?
 Check the showcase folder!
 ## On a new dev box:
-   [See the ubuntu_README.md file for setup instructions](ubuntu_README.md)
+- set bashrc location
+- clone repository: `clone https://www.github.com/PICOVERAVR/code`
+- manually point .gitconfig to inside repo: `git config --local include.path ../.gitconfig` in main folder
+- checkout and track individual branches: `git checkout --track origin/<branch>`
+- link .bashrc and .vimrc files to home directory
+
 ## To try:
 (product ideas excluded)
 ### Major Topics:
@@ -43,4 +48,3 @@ Check the showcase folder!
 ## Things to fix:
 - Fix makefile softlinks everywhere
 	- constantly breaking all the time
-- Can't find setup instructions... (in ubuntu_README.md?)
