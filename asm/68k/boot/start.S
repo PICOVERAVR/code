@@ -45,8 +45,8 @@
 
 | hardware revisions:
 | TODO: add a R/W line to EEPROM and test to add self-update capabilities?
+| TODO: add headers to decoded IRQ lines on add-on board.
 | note: this would allow users to upload programs to re-write EEPROM...
-| can protect with MMU set up in bootloader if we want!
 
 _start:
 | test the RAM by reading and writing to all memory locations

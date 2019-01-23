@@ -8,8 +8,6 @@ set tabstop=4 " tabs = 4 spaces
 set ignorecase " ignore case when searching
 set smartcase " better case matching
 
-set showmatch " show matching brackets when text indicator is over them
-
 set ai " autoindent
 
 syntax enable " enable syntax highlighting
