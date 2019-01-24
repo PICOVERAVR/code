@@ -2,6 +2,11 @@ everything is prefixed with "m68k-elf-"
 
 freerun asm is ori.b #0, D0
 
+bad ideas:
+	R/!W going to EEPROM - processor would do weird stuff while EEPROM is writing itself
+	letting the MMU handle illegal accesses to low 128K of memory - MMU has to sit between processor and memory
+	remove pullup on AS - there to prevent spurious memory acceses once bus master is done and CPU has not relinquished the bus yet
+
 ideas for add-on boards:
 	UART (in progress)
 	Teensy board (audio)

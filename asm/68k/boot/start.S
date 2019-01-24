@@ -43,11 +43,6 @@
 	.text
 	.global _start
 
-| hardware revisions:
-| TODO: add a R/W line to EEPROM and test to add self-update capabilities?
-| TODO: add headers to decoded IRQ lines on add-on board.
-| note: this would allow users to upload programs to re-write EEPROM...
-
 _start:
 | test the RAM by reading and writing to all memory locations
 | jump to ram_cmp_error if problems occur.
@@ -67,6 +62,9 @@ _start:
 	jsr print_if_verbose
 	
 	move.l #ram_addr, -(%sp) | wait for a '$' from the host to indicate app code is done being uploaded
+	| TODO: this means we can't have a '$' anywhere in the binary except for at the very end.  not going to work.
+	| not going to write a full image unless we have to, takes time over a bad serial link
+	| could send 128 bytes at a time...? would require a seperate uart function
 	move.l #'$', -(%sp)
 	jsr uart_read
 	add #8, %sp
@@ -93,8 +91,8 @@ ram_cmp_error:
 1:	jmp .
 
 | print if config_parameters[0] is set
-| parameters: addr of string to print
-| returns: uart_write
+| @param: addr of string to print
+| @returns: uart_write(address of string to print)
 print_if_verbose:
 	btst #0, config_parameters
 	bne 1f

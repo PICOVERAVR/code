@@ -11,13 +11,96 @@ from time import sleep # for timing
 # TODO: split more stuff into functions, make this script more readable
 
 eeprom_id_values = {0x7: "GLS29EE010", 0x8: "GLS29VE010"}
+eeprom_manufactuerer_values = {0xBF: "Greenliant"} # TODO: use this
+
+def eeprom_erase():
+	print("Erasing EEPROM chips...", end='')
+	serport.write("ER;".encode('ascii', 'encode'))
+	temp = serport.readline()
+	while temp != b'done.\r\n':
+		temp = serport.readline()
+	print("done.")
+
+def eeprom_id():
+	print("Version info:")
+	serport.write("VE;".encode('ascii', 'encode'))
+	print(serport.readline().decode('ascii').strip('\n')) # reader version
+	print(serport.readline().decode('ascii').strip('\n')) # manufacturer ID
+	num = serport.readline().decode('ascii').strip('\n') # device ID
+	print("Device: ", end='')
+	print(eeprom_id_values[int(num[11:14], 16)])
+
+def eeprom_write():
+	try:
+		with open(args.binary, "rb") as binfile:
+			bindata = binfile.read(EEPROM_SIZE)
+	except IOError:
+		logger.error("binary cannot be opened!")
+		sys.exit(4)
+	else:
+		logger.info("binary located.")
+	
+	# TODO: make sure byte and word order is same as 68k memory layout!
+	# TODO: delete EOF from last byte in file!
+	# write all the pages up to the last one, since the last one may not be on a page boundary.
+	
+	endpage = len(bindata) + ((128 - len(bindata)) % 128)
+	
+	print("Writing " + str(endpage) + " bytes to EEPROM...")
+	
+	for page in range(0, endpage, 128):
+		page_str = "WP:" + str(page) + ":"
+		byte_arr = bytearray(128)
+
+		for byte in range(0, 128):
+			if (page + byte) >= len(bindata):
+				byte_arr.append(0)
+			else:
+				byte_arr.append(bindata[page + byte])
+		logger.debug(page_str)
+		logger.debug(byte_arr)
+		
+		serport.write(page_str.encode("ascii", "encode"))
+		serport.write(byte_arr[0:32]) # split up for timing reasons, because the Arduino Mega only has a 64-byte serial buffer
+		serport.write(byte_arr[32:64])
+		serport.write(byte_arr[64:96])
+		if page == endpage - 1 and byte_arr[127] == 0xa:
+			byte_arr[127] = 0 # take out EOF
+		serport.write(byte_arr[96:128])
+		
+		temp = serport.readline()
+		while temp != b'done.\r\n':
+			temp = serport.readline()
+		print("writing page " + str((page // 128) + 1) + "/" + str(endpage // 128) + "...")
+	print("done.")
+
+def eeprom_read():
+	print("Reading ", end='')
+	print(str(EEPROM_SIZE), end='')
+	print(" bytes out of EEPROM... ")
+	
+	try:
+		with open(args.binary, "wb") as readfile:
+			logger.info("binary located.")
+
+			for page in range(0, EEPROM_SIZE, 128):
+				page_str = "RP:" + str(page) + ";"
+				serport.write(page_str.encode("ascii", "encode"))
+				
+				temp = serport.readline()[:-1] # strip out \n
+				logger.debug(temp)
+				readfile.write(temp)
+
+	except IOError:
+		logger.error("binary cannot be opened!")
+		sys.exit(5)
 
 if __name__ == "__main__":
 	logger = logging.getLogger('eeprom_parse_logger')
 	
 	parser = argparse.ArgumentParser(description='Python script to interface with EEPROMs.')
 	parser.add_argument('--version', action='version', version='EEPROM flasher tool v0.2')
-	parser.add_argument('-a', '--action', type=str, default='nop', help='action to perform: id, read, write, erase, and nop.')
+	parser.add_argument('-a', '--action', type=str, default='nop', help='action to perform: id, read, write, and erase.')
 	parser.add_argument('-d', '--device', type=str, help='device to communicate with, usually something like \'/dev/ttyUSB0\'.')
 	parser.add_argument('-v', '--verbose', type=str, default='', help='enable more verbose output, options are \'info\' and \'debug\'.')
 	parser.add_argument('-b', '--binary', type=str, default='', help='binary to manipulate.')
@@ -57,91 +140,15 @@ if __name__ == "__main__":
 	serport.readline()
 
 	if args.action == 'erase':
-		print("Erasing EEPROM chips...", end='')
-		serport.write("ER;".encode('ascii', 'encode'))
-		temp = serport.readline()
-		while temp != b'done.\r\n':
-			temp = serport.readline()
-		print("done.")
+		eeprom_erase()
 	elif args.action == 'id':
-		print("Version info:")
-		serport.write("VE;".encode('ascii', 'encode'))
-		print(serport.readline().decode('ascii').strip('\n')) # reader version
-		print(serport.readline().decode('ascii').strip('\n')) # manufacturer ID
-		num = serport.readline().decode('ascii').strip('\n') # device ID
-		print("Device: ", end='')
-		print(eeprom_id_values[int(num[11:14], 16)])
-		
+		eeprom_id()
 	elif args.action == 'write':
-		try:
-			with open(args.binary, "rb") as binfile:
-				bindata = binfile.read(EEPROM_SIZE)
-		except IOError:
-			logger.error("binary cannot be opened!")
-			sys.exit(4)
-		else:
-			logger.info("binary located.")
-		
-		# TODO: make sure byte and word order is same as 68k memory layout!
-		# TODO: delete EOF from last byte in file!
-		# write all the pages up to the last one, since the last one may not be on a page boundary.
-		
-		endpage = len(bindata) + ((128 - len(bindata)) % 128)
-		
-		print("Writing " + str(endpage) + " bytes to EEPROM...")
-		
-		for page in range(0, endpage, 128):
-			page_str = "WP:" + str(page) + ":"
-			byte_arr = bytearray(128)
-
-			for byte in range(0, 128):
-				if (page + byte) >= len(bindata):
-					byte_arr.append(0)
-				else:
-					byte_arr.append(bindata[page + byte])
-			logger.debug(page_str)
-			logger.debug(byte_arr)
-			
-			serport.write(page_str.encode("ascii", "encode"))
-			serport.write(byte_arr[0:32]) # split up for timing reasons, because the Arduino Mega only has a 64-byte serial buffer
-			serport.write(byte_arr[32:64])
-			serport.write(byte_arr[64:96])
-			if page == endpage - 1 and byte_arr[127] == 0xa:
-				byte_arr[127] = 0 # take out EOF
-			serport.write(byte_arr[96:128])
-			
-			temp = serport.readline()
-			while temp != b'done.\r\n':
-				temp = serport.readline()
-			print("writing page " + str((page // 128) + 1) + "/" + str(endpage // 128) + "...")
-		print("done.")
-	
+		eeprom_write()
 	# takes ~6 seconds with 2M baud, 128K EEPROM
 	# TODO: file is not checked at the same time as "write" function. fix this.
 	elif args.action == 'read':
-		print("Reading ", end='')
-		print(str(EEPROM_SIZE), end='')
-		print(" bytes out of EEPROM... ")
-		
-		try:
-			with open(args.binary, "wb") as readfile:
-				logger.info("binary located.")
-
-				for page in range(0, EEPROM_SIZE, 128):
-					page_str = "RP:" + str(page) + ";"
-					serport.write(page_str.encode("ascii", "encode"))
-					
-					temp = serport.readline()[:-1] # strip out \n
-					logger.debug(temp)
-					readfile.write(temp)
-
-		except IOError:
-			logger.error("binary cannot be opened!")
-			sys.exit(5)
-
-	elif args.action == 'nop':
-		logger.info('doing nothing.')
-	
+		eeprom_read()
 	else:
 		logger.error("unknown action!")
 		sys.exit(1)

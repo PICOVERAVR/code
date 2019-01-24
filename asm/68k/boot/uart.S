@@ -3,8 +3,6 @@
 
 .text
 |  Set up the ACIA on reset
-|  parameters: none
-|  returns: nothing
 uart_setup:
 	bset #0, (0x40000) | reset the ACIA
 	bset #1, (0x40000)
@@ -23,8 +21,8 @@ uart_setup:
 	rts
 
 | write a null-terminated string to output
-| parameters: address of string to print
-| returns: number of characters printed
+| @param: address of string to print
+| @returns: number of characters printed
 uart_write:
 	move.l 4(%sp), %a0
 	clr %d0
@@ -39,8 +37,9 @@ uart_write:
 3:	rts
 
 | read a null-terminated string from input
-| parameters: address of string to print, character to stop at
-| returns: number of characters read (not including stop character)
+| @parame: address of string to print
+| @param: character to stop at
+| @returns: number of characters read (not including stop character)
 uart_read:
 	move.l 4(%sp), %a0
 	move.l 8(%sp), %d1
@@ -54,22 +53,40 @@ uart_read:
 	bra 1b
 3:	rts
 
+| read memory contents out of UART
+| @param: address to read
+| @param: length of block to read
+| @returns: number of characters read
+uart_readblock:
+	move.l 4(%sp), %a0 | start
+	move.l 8(%sp), %a1 | end
+1:	cmp.l %a0, %a1
+	beq 3f
+2:	
+3:	
+
+| write memory contents into UART
+| @param: address to write
+| @param: length of block to write
+| @returns: number of characters written
+uart_writeblock:
+| TODO: finish this
+
 | pop character off stack and write it to the ACIA
-| parameters: character to write
-| returns: nothing
+| @param: character to write
+| @returns: nothing
 uart_writec:
 	move.b +4(%sp), (0x40001)
 	rts
 
 | read a character from the ACIA and pushes it on stack
-| returns: nothing
+| @returns: nothing
 uart_readc:
 	move.b (0x40001), -4(%sp)
 	rts
 
 | check for ACIA errors
-| parameters: none
-| returns: error bits in d0
+| @returns: error bits in d0
 | bit 0: Framing Error
 | bit 1: Overrun Error
 | bit 2: Parity Error

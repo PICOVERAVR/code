@@ -4,13 +4,22 @@
 .text
 
 | integer to ascii conversion, base 10. (32 bit)
-| parameters: address to put converted integer, integer itself
-| returns: nothing
+| @param: address to put converted integer
+| @param: integer itself
 lib_itoa:
 	move.l 4(%sp), %a0 | addr
 	move.l 8(%sp), %d0 | int
 	
-	| 
-	
 	| TODO: finish this
 	rts
+
+| copy memory
+memcpy:
+
+| fun time with optimization?
+| hehe just ask the GPU board to do it
+prime_finder:
+	
+| check validity of stuff
+checksum:
+	

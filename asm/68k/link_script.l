@@ -1,5 +1,4 @@
 /* simple m68k link script */
-
 /* RAM shouldn't be included because we can't allocate anything there at assemble time */
 
 MEMORY
