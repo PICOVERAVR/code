@@ -27,9 +27,9 @@ uart_write:
 	move.l 4(%sp), %a0
 	clr %d0
 	clr %d1
-1:	cmp.b (%a0), %d1 | test for null character
+1:	cmp.b -1(%a0), %d1 | test for null character
 	beq 3f
-2:	btst #1, (0x40000)
+2:	btst #1, (0x40000) | wait until buffer is empty
 	bne 2b
 	move.b (%a0)+, (0x40001) | write byte to ACIA
 	addq #1, %d0
@@ -37,18 +37,18 @@ uart_write:
 3:	rts
 
 | read a null-terminated string from input
-| @parame: address of string to print
+| @param: address of string to print
 | @param: character to stop at
 | @returns: number of characters read (not including stop character)
 uart_read:
-	move.l 4(%sp), %a0
-	move.l 8(%sp), %d1
+	move.l 4(%sp), %a0 | addr
+	move.l 8(%sp), %d1 | char
 	clr %d0
-1:	cmp.b (%a0), %d1 | test for end character
+1:	cmp.b -1(%a0), %d1 | test last character written for end character
 	beq 3f
-2:	btst #0, (0x40000)
+2:	btst #0, (0x40000) | wait until characters are available to read
 	bne 2b
-	move.b (0x40001), (%a0)+ | read character from ACIA
+	move.b (0x40001), (%a0)+ | read character
 	addq #1, %d0
 	bra 1b
 3:	rts
@@ -56,31 +56,38 @@ uart_read:
 | read memory contents out of UART
 | @param: address to read
 | @param: length of block to read
-| @returns: number of characters read
 uart_readblock:
 	move.l 4(%sp), %a0 | start
-	move.l 8(%sp), %a1 | end
+	move.l 8(%sp), %a1 | len
+	add.l %a1, %a0
 1:	cmp.l %a0, %a1
 	beq 3f
-2:	
-3:	
+2:	btst #0, (0x40000)
+	bne 2b
+	move.b (0x40001), (%a0)+
+3:	rts
 
 | write memory contents into UART
 | @param: address to write
 | @param: length of block to write
-| @returns: number of characters written
 uart_writeblock:
-| TODO: finish this
+	move.l 4(%sp), %a0 | start
+	move.l 8(%sp), %a1 | len
+	add.l %a1, %a0
+1:	cmp.l %a0, %a1
+	beq 3f
+2:	btst #1, (0x40000)
+	bne 2b
+	move.b (%a0)+, (0x40001)
+3:	rts
 
 | pop character off stack and write it to the ACIA
 | @param: character to write
-| @returns: nothing
 uart_writec:
 	move.b +4(%sp), (0x40001)
 	rts
 
 | read a character from the ACIA and pushes it on stack
-| @returns: nothing
 uart_readc:
 	move.b (0x40001), -4(%sp)
 	rts

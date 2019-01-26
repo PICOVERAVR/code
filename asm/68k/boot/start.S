@@ -1,4 +1,5 @@
 | Bootloader section of 68k device
+| TODO: review all this code once it's fully written
 
 | to use: replace with space and set to exception processing code
 	.section .rodata
@@ -61,34 +62,24 @@ _start:
 	move.l splash_message, -(%sp)
 	jsr print_if_verbose
 	
-	move.l #ram_addr, -(%sp) | wait for a '$' from the host to indicate app code is done being uploaded
-	| TODO: this means we can't have a '$' anywhere in the binary except for at the very end.  not going to work.
-	| not going to write a full image unless we have to, takes time over a bad serial link
-	| could send 128 bytes at a time...? would require a seperate uart function
-	move.l #'$', -(%sp)
-	jsr uart_read
-	add #8, %sp
+	| bootloader format:
+	| <8b><8b><8b><8b>(lsb);<actual memory>
+
+	| TODO: read in longword for length of memory to write (bin, not ascii!)
+	| TODO: read in a block of memory
 
 	move.l %d0, %d7 | save number of bytes read from host
 
-	btst #0, config_parameters
-	bne 1f
 	move.l done_message, -(%sp)
 	jsr print_if_verbose
 	addq #4, %sp
-	
-	| TODO: call lib_itoa
-	
-	move.l done_message2, -(%sp)
-	jsr print_if_verbose
-	addq #4, %sp
 
-1:	andi #0xDFFF, %sr
+	andi #0xDFFF, %sr
 	jmp ram_addr
 
 ram_cmp_error:
 	reset
-1:	jmp .
+	jmp .
 
 | print if config_parameters[0] is set
 | @param: addr of string to print
@@ -104,8 +95,6 @@ print_if_verbose:
 .align 4
 boot_name: .asciz "Nomadic\n"
 splash_message: .asciz "Bootloader initialized.\n"
-
-done_message: .asciz "Read "
-done_message2: .asciz " bytes. Booting application...\n"
+done_message: .asciz "Booting application...\n"
 .byte config_parameters | bootloader configuration parameters
 

@@ -4,7 +4,7 @@
 	.global user_start
 
 user_start:
-	|andi #0xDFFF, %sr (put in by bootloader)
+	| starts in user mode
 	nop
 	
 	.section .bss
@@ -12,4 +12,3 @@ user_start:
 
 	.section .data
 .align 4
-.byte '$' | to indicate end of app
