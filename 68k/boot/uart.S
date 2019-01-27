@@ -81,6 +81,8 @@ uart_writeblock:
 	move.b (%a0)+, (0x40001)
 3:	rts
 
+| NOTE: both uart_writec and uart_readc are non-blocking!
+
 | pop character off stack and write it to the ACIA
 | @param: character to write
 uart_writec:

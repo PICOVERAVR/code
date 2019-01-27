@@ -47,13 +47,16 @@
 _start:
 | test the RAM by reading and writing to all memory locations
 | jump to ram_cmp_error if problems occur.
+
+| TODO: check the instruction timing of this, may be large with 128K of memory and an 8-16MHz processor
 	move.l #0x20000, %a0
 	move.l #0x40000, %a1
-1:	move.w #0xCAFE, (%a0)+
+1:	move.w #0xCAFE, (%a0)+ | put special pattern into memory
 	cmpa %a0, %a1
 	bne 1b
 
 2:	move.w -(%a0), %d0
+	cmp.w -(%a0), %d0
 	cmp.w #0xCAFE, %d0
 	bne ram_cmp_error
 	cmpa %a0, %a1
@@ -63,9 +66,17 @@ _start:
 	jsr print_if_verbose
 	
 	| bootloader format:
-	| <8b><8b><8b><8b>(lsb);<actual memory>
+	| could be the same format as the EEPROM programmer... would be interesting
+	| read the Arduino bootloader source code to see how they do it, or bootloader src code
+	| want this to be small, not feature-packed.
+	| <8b><8b><8b><8b>;<actual memory>
+	
+	| TODO: this has to comply with the 68k memory layout!
 
-	| TODO: read in longword for length of memory to write (bin, not ascii!)
+	move.l ';', -(%sp)
+	move.l #0x
+	jsr uart_read
+	addq #8, %sp
 	| TODO: read in a block of memory
 
 	move.l %d0, %d7 | save number of bytes read from host

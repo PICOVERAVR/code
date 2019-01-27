@@ -5,7 +5,7 @@ freerun asm is ori.b #0, D0
 bad ideas:
 	R/!W going to EEPROM - processor would do weird stuff while EEPROM is writing itself
 	letting the MMU handle illegal accesses to low 128K of memory - MMU has to sit between processor and memory
-	remove pullup on AS - there to prevent spurious memory acceses once bus master is done and CPU has not relinquished the bus yet
+	remove pullup on AS - there to prevent spurious memory acceses once bus master is done and CPU has not relinquished control of the bus yet
 
 ideas for add-on boards:
 	UART (in progress)
@@ -20,3 +20,8 @@ ideas for add-on boards:
 		use the 68k chip I already have
 	SD support
 		should be pretty simple, just a parallel to SPI converter and software for host side
+
+what everything does:
+	eeprom-config: python tool for writing and reading data to/from EEPROMs
+	split: splits a binary file in two
+	upload: application code upload to 68k baseboard + uart board

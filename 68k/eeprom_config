@@ -41,7 +41,6 @@ def eeprom_write():
 		logger.info("binary located.")
 	
 	# TODO: make sure byte and word order is same as 68k memory layout!
-	# TODO: delete EOF from last byte in file!
 	# write all the pages up to the last one, since the last one may not be on a page boundary.
 	
 	endpage = len(bindata) + ((128 - len(bindata)) % 128)
