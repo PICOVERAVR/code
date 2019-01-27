@@ -1,1 +1,1 @@
-/root/main/common/makefiles/makefile_c
+../../common/makefiles/makefile_c
