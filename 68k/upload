@@ -41,8 +41,6 @@ if __name__ == "__main__":
 	serport.write(bindata) # TODO: not sure if the device can read this fast, do we need delays?
 	
 	# TODO: read the data back out to verify it
-	# get bootloader version
-	# do a command processor in 68k asm.
 	
 	print("done.")
 

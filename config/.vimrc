@@ -16,3 +16,11 @@ try " try to enable desert colorscheme, do nothing if it fails
 	colorscheme desert
 catch
 endtry
+
+" pathogen pulls in vim plugins every time you start vim
+" in order to pull in a plugin, put it in .vim/bundle/<package name> and restart vim
+
+try " execute pathogen, if installed
+	execute pathogen#infect()
+catch
+endtry

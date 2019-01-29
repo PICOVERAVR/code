@@ -1,4 +1,5 @@
 SRC := $(wildcard boot/*.S)
+TEST := $(boot/test.S)
 
 FLAGS := -march=68000 -mcpu=68000 -mno-float
 DFLAGS := $(FLAGS)
@@ -20,8 +21,14 @@ asm: pre start # verify assembly
 final: check # strip out all ELF information
 	@m68k-elf-objcopy -O binary db.out db.bin
 	
+test: pre
+	@m68k-elf-as $(DFLAGS) $(TEST) -o test.o
+	@m68k-elf-ld -T link_script.l test.o -o test.out
+	@m68k-elf-objcopy -O binary test.out test.bin
+	@m68k-elf-readelf -a test.out
+
 pre:
 	@echo "Building on: $(UNAME)"
-	
+
 clean:
 	@rm -f	{*.out,*.o}

@@ -1,6 +1,8 @@
 |  UART interfacing code, written to work with the MC6850 ACIA
 |  should be enough to load an image into RAM over UART
 
+| NOTE: None of these functions require any stack space!
+
 .text
 |  Set up the ACIA on reset
 uart_setup:
@@ -81,17 +83,21 @@ uart_writeblock:
 	move.b (%a0)+, (0x40001)
 3:	rts
 
-| NOTE: both uart_writec and uart_readc are non-blocking!
 
 | pop character off stack and write it to the ACIA
-| @param: character to write
+| @param: byte character to write
 uart_writec:
-	move.b +4(%sp), (0x40001)
+1:	btst #1, (0x40000)
+	bne 1b
+	move.b %d0, (0x40001)
 	rts
 
 | read a character from the ACIA and pushes it on stack
+| @returns: byte character read
 uart_readc:
-	move.b (0x40001), -4(%sp)
+1:	btst #0, (0x40000)
+	bne 1b
+	move.b (0x40001), %d0
 	rts
 
 | check for ACIA errors

@@ -44,6 +44,8 @@
 	.text
 	.global _start
 
+| TODO: add R/W line back to processor, can be executing code out of RAM when EEPROM is being written to
+
 _start:
 | test the RAM by reading and writing to all memory locations
 | jump to ram_cmp_error if problems occur.
@@ -51,15 +53,16 @@ _start:
 | TODO: check the instruction timing of this, may be large with 128K of memory and an 8-16MHz processor
 	move.l #0x20000, %a0
 	move.l #0x40000, %a1
-1:	move.w #0xCAFE, (%a0)+ | put special pattern into memory
+1:	move.w #0xCAFE, (%a0)
 	cmpa %a0, %a1
+	addq #2, %a0
 	bne 1b
 
-2:	move.w -(%a0), %d0
-	cmp.w -(%a0), %d0
+2:	move.w (%a0), %d0
 	cmp.w #0xCAFE, %d0
 	bne ram_cmp_error
 	cmpa %a0, %a1
+	subq #2, %a0
 	bne 2b
 	
 	move.l splash_message, -(%sp)
@@ -69,23 +72,38 @@ _start:
 	| could be the same format as the EEPROM programmer... would be interesting
 	| read the Arduino bootloader source code to see how they do it, or bootloader src code
 	| want this to be small, not feature-packed.
-	| <8b><8b><8b><8b>;<actual memory>
+	| <config><8b><8b><8b><8b><actual memory>
 	
-	| TODO: this has to comply with the 68k memory layout!
-
-	move.l ';', -(%sp)
-	move.l #0x
-	jsr uart_read
+	clr %d0
+	jsr uart_readc
+	| TODO: parse config options byte
+	| TODO: go to app code if no response (nothing needs to be uploaded)
+	
+	move.w #24, %d1
+	jsr uart_readc
+	lsl %d1, %d0
+	jsr uart_readc
+	subq #8, %d1
+	lsl %d1, %d0
+	jsr uart_readc
+	subq #8, %d1
+	lsl %d1, %d0
+	jsr uart_readc
+	
+	move %d0, -(%sp) | len
+	move.l #0x20000, -(%sp) | start
+	jsr uart_readblock
 	addq #8, %sp
-	| TODO: read in a block of memory
-
-	move.l %d0, %d7 | save number of bytes read from host
-
+	
 	move.l done_message, -(%sp)
 	jsr print_if_verbose
 	addq #4, %sp
-
-	andi #0xDFFF, %sr
+	
+	| stack should be the same as when we booted up
+	
+	move.l #0x37000, %a5 | set user stack pointer to 0x3700, can change
+	move.l %a5, %usp
+	andi #0xDFFF, %sr | clear supervisor flag
 	jmp ram_addr
 
 ram_cmp_error:

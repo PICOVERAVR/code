@@ -6,10 +6,11 @@ import argparse # for argument processing
 import logging # for simple debug logger
 from time import sleep # for timing
 
+# TODO: add more stuff to make this more like a generic EEPROM programmer
+# CRC at the end
+
 # add values to dictionary for different chips
 # TODO: come up with a more robust way of doing this, values will collide eventually.
-# TODO: split more stuff into functions, make this script more readable
-
 eeprom_id_values = {0x7: "GLS29EE010", 0x8: "GLS29VE010"}
 eeprom_manufactuerer_values = {0xBF: "Greenliant"} # TODO: use this
 
