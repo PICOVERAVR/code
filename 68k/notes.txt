@@ -5,6 +5,10 @@ freerun asm is ori.b #0, D0
 bad ideas:
 	letting the MMU handle illegal accesses to low 128K of memory - MMU has to sit between processor and memory
 	remove pullup on AS - there to prevent spurious memory acceses once bus master is done and CPU has not relinquished control of the bus yet
+	having the bootloader print stuff without host initiating communication - bootloader will hang waiting on tx buffer to drain
+	
+possible ideas:
+	ACIA does interrupts - would have to add extra hardware to assert proper interrupt vector on data bus
 
 ideas for add-on boards:
 	
@@ -14,16 +18,20 @@ ideas for add-on boards:
 	UART (in progress)
 	Teensy board (audio)
 	Graphics (on a screen)
-		FPGA used as graphics card
+		FPGA used as graphics card?
 	Expansion card
 		DIP holes for prototyping
 	RAM expansions
-		has to include >= 1MB of ram to be helpful...
+		has to include >= 1MB of ram to be helpful... there are 512kx16 5v 55ns SRAM chips out there, but annoying package.
 	Timer / interrupt controller
 		use the 68k chip I already have
 	SD support
 		should be pretty simple, just a parallel to SPI converter and software for host side
-
+		this is just a 'ls595 wired correctly.
+	User board
+		could literally just be some switches and (buffered) LEDs
+		switches can be pulled high or low, so a read to unimplemented memory can read in values (drive DTACK high until done)
+	
 what everything does:
 	eeprom-config: python tool for writing and reading data to/from EEPROMs
 	split: splits a binary file in two

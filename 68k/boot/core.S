@@ -4,11 +4,23 @@
 .text
 
 | copy memory
+| @param: src
+| @param: dest
 memcpy:
 	rts
 
-| xor method
+| xor all bytes in a block
+| @param: length of block - 1
+| @param: start address
+| @returns: checksum
 checksum:
+	move.l 4(%sp), %d1 | len
+	move.l 8(%sp), %a0 | addr
+	clr %d0 | running checksum
+	
+	| xor_byte ^= arr[i];
+	
+	dbf %d1, 1b
 	rts
 
 | delay a bit
