@@ -51,3 +51,4 @@ MANIFESTO:
 	
 	UART needs to be included.  A bare CPU board is useless. 6800 vs 68k?
 		needs to be interrupt driven. figure out 68k interrupt architecture.
+
