@@ -22,7 +22,7 @@
 .space 4 | UNINITIALIZED_INTERRUPT
 .space 32 | -
 .space 4 | SPURIOUS_INTERRUPT
-.space 4 | LEVEL_1_INTERRUPT
+.space 4 | LEVEL_1_INTERRUPT | note: only 6800 peripherals are autovectored
 .space 4 | LEVEL_2_INTERRUPT
 .space 4 | LEVEL_3_INTERRUPT
 .space 4 | LEVEL_4_INTERRUPT
@@ -31,7 +31,23 @@
 .space 4 | LEVEL_7_INTERRUPT
 .space 64 | TRAP vectors
 .space 64 | -
-.space 768 | user interrupt vectors
+.long MFP_GPIO_0
+.long MFP_GPIO_1
+.long MFP_GPIO_2
+.long MFP_GPIO_3
+.long MFP_TIMER_D
+.long MFP_TIMER_C
+.long MFP_GPIO_4
+.long MFP_GPIO_5
+.long MFP_TIMER_B
+.long MFP_UART_TXERR
+.long MFP_UART_TXBUFE
+.long MFP_UART_RXERR
+.long MFP_UART_RXBUFF
+.long MFP_TIMER_A
+.long MFP_GPIO_6
+.long MFP_GPIO_7
+.space 704 | rest of user interrupt vectors
 
 | configs for booting 68k system
 .set RESET_SSP_PTR, 0x40000 | stack is pre-decrement
@@ -44,11 +60,12 @@
 	.text
 	.global _start
 
-| TODO: add R/W line back to processor, can be executing code out of RAM when EEPROM is being written to
 | TODO: avoid using d0 and d1 and a0 and a1 because they could be trashed by subroutines
 _start:
-| test the RAM by reading and writing to all memory locations
-| jump to ram_cmp_error if problems occur.
+	or.i #0x700, %sr | set IPL to 7
+	
+	| test the RAM by reading and writing to all memory locations
+	| jump to ram_cmp_error if problems occur.
 	
 	move.l #0x20000, %a0
 	move.l #0x40000, %a1
@@ -63,6 +80,8 @@ _start:
 	cmpa %a0, %a1
 	subq.b #2, %a0
 	bne 2b
+	
+	| reset and test MFP, once lib code is written
 	
 	| bootloader format:
 	| want this to be small, not feature-packed.
@@ -98,7 +117,7 @@ _start:
 	
 	move.l #0x37000, %a5 | set user stack pointer to 0x3700, can change
 	move.l %a5, %usp
-	andi #0xDFFF, %sr | clear supervisor flag
+	andi #0xD8FF, %sr | clear supervisor flag and set IPL to 0
 	jmp ram_addr
 
 ram_cmp_error:

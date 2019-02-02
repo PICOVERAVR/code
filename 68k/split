@@ -3,6 +3,11 @@ import sys # for exit
 import os # for checking file existance
 
 if __name__ == "__main__":
+	""" split a binary into two files, one with even bytes and one with odd bytes. 
+	
+	Both files are called <original file>.lsb and <original file>.msb.
+	
+	"""
 	print("binary file splitter, by Kyle Neil (1/19)")
 	print("for use with 68k EEPROM programmer")
 	if (len(sys.argv) < 2):

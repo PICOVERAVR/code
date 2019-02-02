@@ -1,9 +1,9 @@
 0x00000 -> 0x1FFFF: EEPROM
 	0x0 -> 0x400: EVT
-	0x400 -> 0x1FFFF: Bootloader and lib code
-0x20000 -> 0x3FFFF: SRAM
-	(application defines how RAM is used)
-0x40000 -> 0x40001: ACIA Peripheral
+	0x400 -> 0x1FFFF: Bootloader and lib code - write-protected as this sets up the MMU.
+0x20000 -> 0x3FFFF: "common" SRAM - accessible to all programs. don't put secure stuff here.
+	0x20000 -> 200FF: MFP interrupt space
+0x40000 -> 0x4????: MFP
 
 EEPROM booloader code starts at 0x400, application code starts at 0x1000.
 
@@ -13,4 +13,3 @@ cannot load anything into SRAM at assemble time, all has to be done by bootloade
 calling convention:
 	everything is callee-saved except for a0, a1, d0, and d1
 	pass everything on the stack as a long, eliminates alignment issues and we have the space for it
-	

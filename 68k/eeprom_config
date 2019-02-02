@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+
 import sys # for exit
 import os # for checking file existance
 from math import ceil # for arithmetic
@@ -8,14 +9,16 @@ from time import sleep # for timing
 
 # TODO: add more stuff to make this more like a generic EEPROM programmer
 # CRC at the end
+# this is becoming a generic python frontend for the specific arduino code for the chip...
 
 # add values to dictionary for different chips
 # TODO: come up with a more robust way of doing this, values will collide eventually.
 eeprom_id_values = {0x7: "GLS29EE010", 0x8: "GLS29VE010"}
-eeprom_manufactuerer_values = {0xBF: "Greenliant"} # TODO: use this
+eeprom_manufactuerer_values = {0xBF: "Greenliant"}
 
 def eeprom_erase():
-	print("Erasing EEPROM chips...", end='')
+	""" erase the eeprom chip, likely using the built-in erase functionality """
+	print("Erasing EEPROM chip...", end='')
 	serport.write("ER;".encode('ascii', 'encode'))
 	temp = serport.readline()
 	while temp != b'done.\r\n':
@@ -23,15 +26,33 @@ def eeprom_erase():
 	print("done.")
 
 def eeprom_id():
+	""" get version info from eeprom and check against the table of known ids """
 	print("Version info:")
 	serport.write("VE;".encode('ascii', 'encode'))
 	print(serport.readline().decode('ascii').strip('\n')) # reader version
-	print(serport.readline().decode('ascii').strip('\n')) # manufacturer ID
+	mf = serport.readline().decode('ascii').strip('\n') # manufacturer ID
 	num = serport.readline().decode('ascii').strip('\n') # device ID
 	print("Device: ", end='')
-	print(eeprom_id_values[int(num[11:14], 16)])
-
+	
+	# try to print a friendlier name, if one exists in the table
+	if num[11:14] in eeprom_id_values:
+		print(eeprom_id_values[int(num[11:14], 16)])
+	else:
+		print(num[11:14])
+	
+	if mf[17:20] in eeprom_manufacturer_values:
+		print(eeprom_manufacturer_values[int(mf[17:20], 16)])
+	else:
+		print(mf[17:20])
+	
 def eeprom_write():
+	""" write a binary to the eeprom in 128-byte blocks
+	
+	Block sizes of 128 bytes are used since that's the size of the page buffer of the eeprom.
+	Sent in 32-byte segments because the Arduino has a maximum serial buffer of 64 bytes, and we can't be sure the buffer is fully drained...
+	Another solution is to modify the boards.txt file for the Arduino, but this is a lot easier for everyone
+
+	"""
 	try:
 		with open(args.binary, "rb") as binfile:
 			bindata = binfile.read(EEPROM_SIZE)
@@ -75,6 +96,7 @@ def eeprom_write():
 	print("done.")
 
 def eeprom_read():
+	""" read out the eeprom, directing binary to an output file. """
 	print("Reading ", end='')
 	print(str(EEPROM_SIZE), end='')
 	print(" bytes out of EEPROM... ")

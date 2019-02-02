@@ -18,12 +18,12 @@ checksum:
 	move.l 8(%sp), %a0 | addr
 	clr %d0 | running checksum
 	
-	| xor_byte ^= arr[i];
+	| TODO: xor_byte ^= arr[i];
 	
-	dbf %d1, 1b
+	dbf %d1, 1b | TODO: find out if this is even supported on the OG 68k
 	rts
 
-| delay a bit
+| software delay subroutine
 | ((ms * 1000) / 22) loops required
 | @param: ms to delay for
 delay:

@@ -4,7 +4,9 @@ bad ideas:
 	letting the MMU handle illegal accesses to low 128K of memory - MMU has to sit between processor and memory
 	remove pullup on AS - there to prevent spurious memory acceses once bus master is done and CPU has not relinquished control of the bus yet
 	having the bootloader print stuff without host initiating communication - bootloader will hang waiting on tx buffer to drain if no host is there
-	
+	putting a r/w line on the EEPROMs: won't immediately break anything, but I'm not sure how this will affect system security...
+	malicious user can re-write eeprom pages and wait for reset...?
+
 ideas for add-on boards:
 	
 	NOTE: all add-on boards have to have space for a board to be stacked on top of them, PC104 style
@@ -13,8 +15,8 @@ ideas for add-on boards:
 	Debug card
 		all the blinkenlights
 		7-seg displays?
-	UART (in progress)
-	Teensy board (audio) or raw audio chip, would be cooler - use C64 SID?
+	MFP ideas:
+		Sound! (timers have waveform capability?)
 	Graphics (on a screen)
 		FPGA used as graphics card
 	Expansion card
@@ -51,4 +53,6 @@ MANIFESTO:
 	
 	UART needs to be included.  A bare CPU board is useless. 6800 vs 68k?
 		needs to be interrupt driven. figure out 68k interrupt architecture.
+		could honestly replace this with a 68901 peripheral chip, would give the 68k a lot of microcontroller functionality and replace a lot of add-on boards!!
+		do it
 

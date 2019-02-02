@@ -1,7 +1,10 @@
 |  UART interfacing code, written to work with the MC6850 ACIA
-|  should be enough to load an image into RAM over UART
+|  should be enough to load an image into RAM over UART, as well as figure out any errors that pop up.
 
-| NOTE: None of these functions require any stack space!
+| TODO: get interrupts working. way better than polling and maybe missing something.
+| Is the 6850 ACIA autovectored?  Can be by asserting VPA instead of DTACK. Should NEVER be asserted at the same time!
+| This means that something special has to happen with DTACK.
+| IRQ line on ACIA is cleared by reading or writing to it
 
 .text
 |  Set up the ACIA on reset

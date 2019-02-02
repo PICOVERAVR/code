@@ -3,6 +3,11 @@ import argparse
 import sys
 
 if __name__ == "__main__":
+	""" uploads code to the 68k board, which is different than uploading code to the EEPROMs on the board itself. 
+	
+	This depends heavily on the construction of the bootloader, so this is a work in progress until the bootloader for the device itself is done.
+	
+	"""
 	parser = argparse.ArgumentParser(description='Python script to upload code to a 68k board with a UART attached.')
 	parser.add_argument('--version', action='version', version='Code upload tool v0.1')
 	parser.add_argument('-d', '--device', type=str, help='UART device path')
