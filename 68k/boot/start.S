@@ -31,22 +31,22 @@
 .space 4 | LEVEL_7_INTERRUPT
 .space 64 | TRAP vectors
 .space 64 | -
-.long MFP_GPIO_0
-.long MFP_GPIO_1
-.long MFP_GPIO_2
-.long MFP_GPIO_3
-.long MFP_TIMER_D
-.long MFP_TIMER_C
-.long MFP_GPIO_4
-.long MFP_GPIO_5
-.long MFP_TIMER_B
-.long MFP_UART_TXERR
-.long MFP_UART_TXBUFE
-.long MFP_UART_RXERR
-.long MFP_UART_RXBUFF
-.long MFP_TIMER_A
-.long MFP_GPIO_6
-.long MFP_GPIO_7
+.space 4 | MFP_GPIO_0
+.space 4 | MFP_GPIO_1
+.space 4 | MFP_GPIO_2
+.space 4 |  MFP_GPIO_3
+.space 4 | MFP_TIMER_D
+.space 4 | MFP_TIMER_C
+.space 4 | MFP_GPIO_4
+.space 4 | MFP_GPIO_5
+.space 4 | MFP_TIMER_B
+.space 4 | MFP_UART_TXERR
+.space 4 | MFP_UART_TXBUFE
+.space 4 | MFP_UART_RXERR
+.space 4 | MFP_UART_RXBUFF
+.space 4 | MFP_TIMER_A
+.space 4 | MFP_GPIO_6
+.space 4 | MFP_GPIO_7
 .space 704 | rest of user interrupt vectors
 
 | configs for booting 68k system
@@ -110,8 +110,8 @@ _start:
 	lsl.l %d2, %d0
 	or.l %d0, %d1
 	
-	pea %d0 | len
-	pea #0x20000 | start
+	move.l %d0, -(%sp) | len
+	move.l #0x20000, -(%sp) | start
 	jsr uart_readblock
 	addq #8, %sp
 	

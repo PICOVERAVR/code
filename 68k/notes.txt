@@ -15,20 +15,17 @@ ideas for add-on boards:
 	Debug card
 		all the blinkenlights
 		7-seg displays?
-	MFP ideas:
-		Sound! (timers have waveform capability?)
 	Graphics (on a screen)
 		FPGA used as graphics card
 	Expansion card
 		DIP holes for prototyping
 	RAM expansions
 		keep everything DIP, has to be >1MB to be helpful
+		throw a MMU on this thing as well.
 	Timer / interrupt controller
 		use the 68k chip I already have
 	SD support
-		should be pretty simple, just a parallel to SPI converter and software for host side
-		this is just a 'ls595 wired correctly.
-			not sure if the chip is fully bidirectional though
+		using IO pins on MFP
 	User board
 		could literally just be some switches and (buffered) LEDs
 		switches can be pulled high or low, so a read to unimplemented memory can read in values (drive DTACK high until done)
@@ -39,20 +36,16 @@ what everything does:
 	upload: application code upload to 68k baseboard + uart board
 
 MANIFESTO:
-	68000 / 68010 compatible board designed for high extensibility without sacrificing too much on features
-	ideally clocked faster than a regular 8MHz part, 16MHz should be possible
-	I should probably drop the 6850 for something better... check all periph chips for stuff to include
+	Fast.  Or at least faster than most other 68000 boards out there.
+	Modern (interface).  If something needs to be connected, do it with modern parts.
+	Extensible.  The board should contain enough to get started, but not enough that it hinders expansion
+	
+	68000 / 68010 compatible
+	Aim for 16MHz clock speed
 	actual C compiler should be working for this, not BASIC or Forth or anything.  If not C, then only ASM
-	higher than 9600 baud rates should be possible
-	no legacy interfaces, SD or USB support would be really cool
 
 	new stuff:
 		FIFO chips
 		dual port RAM chips
-		terminal color support!
+		terminal color support - not that hard
 	
-	UART needs to be included.  A bare CPU board is useless. 6800 vs 68k?
-		needs to be interrupt driven. figure out 68k interrupt architecture.
-		could honestly replace this with a 68901 peripheral chip, would give the 68k a lot of microcontroller functionality and replace a lot of add-on boards!!
-		do it
-
