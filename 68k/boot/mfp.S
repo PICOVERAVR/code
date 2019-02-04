@@ -80,7 +80,6 @@ mfp_writeblock:
 	move.b (%a0)+, (MFP_UART_DATA)
 3:	rts
 
-
 | pop character off stack and write it to the MFP
 | @param: byte character to write
 mfp_writec:

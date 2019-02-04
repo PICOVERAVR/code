@@ -3,9 +3,9 @@ freerun asm is ori.b #0, D0
 bad ideas:
 	letting the MMU handle illegal accesses to low 128K of memory - MMU has to sit between processor and memory
 	remove pullup on AS - there to prevent spurious memory acceses once bus master is done and CPU has not relinquished control of the bus yet
-	having the bootloader print stuff without host initiating communication - bootloader will hang waiting on tx buffer to drain if no host is there
-	putting a r/w line on the EEPROMs: won't immediately break anything, but I'm not sure how this will affect system security...
-	malicious user can re-write eeprom pages and wait for reset...?
+	having the bootloader print stuff without host initiating communication - bootloader will hang waiting on tx buffer to drain if no host is there? Is this true?
+	putting a r/w line on the EEPROMs: won't immediately break anything, but will destroy system security
+	malicious user can re-write eeprom pages and wait for reset.
 
 ideas for add-on boards:
 	
@@ -38,7 +38,7 @@ what everything does:
 MANIFESTO:
 	Fast.  Or at least faster than most other 68000 boards out there.
 	Modern (interface).  If something needs to be connected, do it with modern parts.
-	Extensible.  The board should contain enough to get started, but not enough that it hinders expansion
+	Extensible.  The board should contain enough to get started, but not enough that it hinders expansion.
 	
 	68000 / 68010 compatible
 	Aim for 16MHz clock speed

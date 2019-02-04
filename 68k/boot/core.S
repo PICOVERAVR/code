@@ -1,13 +1,14 @@
-| Core lib stuff that should be helpful for application programs...
+| Core lib and kernel stuff that should be helpful for application programs...
 | thisis going to be smaller than any kind of actual *utils library
 | and worse
 .text
 
-| copy memory
-| @param: src
-| @param: dest
-memcpy:
-	rts
+trap_handler:
+	move.l 4(%sp), %d0
+	movem %d0-%d2/%a0-%a2, -(%sp)
+	| execute the proper kernel function
+	movem (%sp)+, %d0-%d2/%a0-%a2
+	rte
 
 | xor all bytes in a block
 | @param: length of block - 1
@@ -20,7 +21,7 @@ checksum:
 	
 	| TODO: xor_byte ^= arr[i];
 	
-	dbf %d1, 1b | TODO: find out if this is even supported on the OG 68k
+	| dbf %d1, 1b | TODO: find out if this is even supported on the OG 68k
 	rts
 
 | software delay subroutine
@@ -39,3 +40,13 @@ delay:
 	| 22 cc total
 	rts
 
+.data
+kernel_func_table:
+.long mfp_write
+.long mfp_read
+.long mfp_writeblock
+.long mfp_readblock
+.long mfp_readc
+.long mfp_writec
+.long mfp_setdir
+.long mfp_setpin
