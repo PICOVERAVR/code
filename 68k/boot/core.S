@@ -1,27 +1,45 @@
 | Core lib and kernel stuff that should be helpful for application programs...
-| thisis going to be smaller than any kind of actual *utils library
+| this is going to be smaller than any kind of actual *utils library
 | and worse
 .text
 
+| generic exception handler for unrecoverable system events
+bad_exception:
+	move.l #0x20100, %sp | reset possibly corrupted stack pointer
+	or.i #0x700, %sr | disable interrupts
+	reset | try to bring the MFP back online - also clears interrupt sources
+    move.l system_error_message, %a0 | code copied from mfp_write.
+    clr %d0
+    clr %d1
+1:  cmp.b (%a0), %d1 | test for null character
+    beq 3f
+2:  btst #7, (MFP_TX_STS) | wait until buffer is ready
+    beq 2b
+    move.b (%a0)+, (MFP_UART_DATA) | write byte to MFP
+    addq #1, %d0
+    bra 1b
+3:	jmp .
+
+| incomplete trap handler
 trap_handler:
 	move.l 4(%sp), %d0
 	movem %d0-%d2/%a0-%a2, -(%sp)
-	| execute the proper kernel function
 	movem (%sp)+, %d0-%d2/%a0-%a2
 	rte
 
-| xor all bytes in a block
+| xor all words in a block
 | @param: length of block - 1
 | @param: start address
 | @returns: checksum
 checksum:
+	move.l %d2, -(%sp) | save d2
 	move.l 4(%sp), %d1 | len
 	move.l 8(%sp), %a0 | addr
 	clr %d0 | running checksum
-	
-	| TODO: xor_byte ^= arr[i];
-	
-	| dbf %d1, 1b | TODO: find out if this is even supported on the OG 68k
+1:	move.w (%a0), %d2
+	eor %d2, %d0
+	dbf %d1, 1b
+	move.l (%sp)+, %d2 | restore d2
 	rts
 
 | software delay subroutine
@@ -41,12 +59,4 @@ delay:
 	rts
 
 .data
-kernel_func_table:
-.long mfp_write
-.long mfp_read
-.long mfp_writeblock
-.long mfp_readblock
-.long mfp_readc
-.long mfp_writec
-.long mfp_setdir
-.long mfp_setpin
+system_error_message: .asciz "System crash - no longer nomadic!\n"

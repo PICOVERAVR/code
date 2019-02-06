@@ -4,8 +4,7 @@ bad ideas:
 	letting the MMU handle illegal accesses to low 128K of memory - MMU has to sit between processor and memory
 	remove pullup on AS - there to prevent spurious memory acceses once bus master is done and CPU has not relinquished control of the bus yet
 	having the bootloader print stuff without host initiating communication - bootloader will hang waiting on tx buffer to drain if no host is there? Is this true?
-	putting a r/w line on the EEPROMs: won't immediately break anything, but will destroy system security
-	malicious user can re-write eeprom pages and wait for reset.
+	supervisor access only to EEPROM - prevents user from using hardware libs, initial supervisor -> user jump is awkward at best
 
 ideas for add-on boards:
 	
@@ -47,5 +46,5 @@ MANIFESTO:
 	new stuff:
 		FIFO chips
 		dual port RAM chips
-		terminal color support - not that hard
+		terminal color support - not that hard!
 	

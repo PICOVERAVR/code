@@ -10,4 +10,7 @@
 	.global test_start
 
 test_start:
+	reset
+	nop
+	nop
 	jmp .

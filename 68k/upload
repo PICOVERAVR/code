@@ -3,7 +3,7 @@ import argparse
 import sys
 
 if __name__ == "__main__":
-	""" uploads code to the 68k board, which is different than uploading code to the EEPROMs on the board itself. 
+	""" uploads code to the 68k board, which may or may not go into the EEPROMs.  Self-updating is not currently supported.
 	
 	This depends heavily on the construction of the bootloader, so this is a work in progress until the bootloader for the device itself is done.
 	
@@ -42,8 +42,7 @@ if __name__ == "__main__":
 		sys.exit(3)
 	
 	serport.write(str(len(bindata)))
-	serport.write(";".encode("ascii", "encode"))
-	serport.write(bindata) # TODO: not sure if the device can read this fast, do we need delays?
+	serport.write(bindata)
 	
 	# TODO: read the data back out to verify it
 	

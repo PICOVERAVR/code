@@ -11,7 +11,7 @@
 
 | reset and configure the MFP for basic operation
 mfp_init:
-	bset #6, (0x40017) | interrupts occur right after end of mandatory section of EVT
+	bset #6, (0x40017) | set vector register so interrupts occur right after end of mandatory section of EVT
 	bset #3, (0x40029) | mfp: 1 start bit, 1 stop bit, async
 	
 	bset #0, (MFP_RX_STS) | mfp: enable RX
@@ -26,7 +26,7 @@ mfp_write:
 	move.l 4(%sp), %a0
 	clr %d0
 	clr %d1
-1:	cmp.b -1(%a0), %d1 | test for null character
+1:	cmp.b (%a0), %d1 | test for null character
 	beq 3f
 2:	btst #7, (MFP_TX_STS) | wait until buffer is ready
 	beq 2b
@@ -43,7 +43,7 @@ mfp_read:
 	move.l 4(%sp), %a0 | addr
 	move.l 8(%sp), %d1 | char
 	clr %d0
-1:	cmp.b -1(%a0), %d1 | test last character written for end character
+1:	cmp.b (%a0), %d1 | test last character written for end character
 	beq 3f
 2:	btst #7, (MFP_RX_STS) | wait until characters are available to read
 	beq 2b
@@ -123,4 +123,10 @@ mfp_setdir:
 mfp_setpin:
 	move.b -4(%sp), (MFP_IO_GPDR)
 	rts
+
+mfp_rx_isr:
+	rte
+
+mfp_tx_isr:
+	rte
 

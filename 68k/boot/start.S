@@ -1,8 +1,6 @@
 | Bootloader section of 68k device
 | TODO: review all this code once it's fully written
-
-| make rom/mfp priviliged - safer, slower
-| traditional OS vs unikernel approach
+| TODO: verify 68k memory layout.
 
 	.text
 	.global _start
@@ -31,16 +29,21 @@ _start:
 	
 	| bootloader format:
 	| want this to be small, not feature-packed.
-	| <config>(lsb)<8b><8b><8b><8b><actual memory>
-	| application config byte layout:
-	| (msb)????_????
-	
+	| <config byte> (lsb) <32b length> <actual memory>
+	| application config byte layout: none yet
 	clr %d0
 	clr %d2
 	jsr mfp_readc
 	
+	| TODO: if no UART is connected, this will hang waiting for the host to write data.
+	| - set timer interrupt once, in ISR clear it and disable interrupts again
+	| - have the timer just be incrementing a register
+	
+	| TODO: write code to update the bootloader itself
+	| bootloader code can't load all 128K at once, since bootloader has to be executing from RAM when updating
+	| and there needs to be a little space to pull in more code and poll the EEPROM until complete.
+
 	| no config options to parse yet
-	| TODO: go to app code if no response (nothing needs to be uploaded)
 	
 	jsr mfp_readc | read a 32-bit value out of the mfp, one byte at a time
 	move.b %d0, %d1 | the instruction "movep" could also be used here, but doc is sparse on how it works.
@@ -61,10 +64,10 @@ _start:
 	jsr mfp_readblock
 	addq #8, %sp
 	
-	move.l #0x37000, %a5 | set user stack pointer to 0x3700, can change
+	move.l #0x37000, %a5 | set user stack pointer to 0x3700
 	move.l %a5, %usp
 	andi #0xD8FF, %sr | clear supervisor flag and set IPL to 0
-	jmp ram_addr
+	jmp #0x20000 | jump to user program
 
 ram_cmp_error:
 	reset

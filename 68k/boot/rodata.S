@@ -50,5 +50,3 @@
 
 .set version, 0x1 
 
-.set ram_addr, 0x20000
-

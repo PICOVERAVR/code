@@ -3,8 +3,7 @@
 	.text
 	.global user_start
 
-user_start:
-	| starts in user mode
+user_start: | user-mode at startup
 	nop
 	
 	.section .bss
