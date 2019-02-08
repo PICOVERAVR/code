@@ -1,5 +1,8 @@
-| stuff to deal with the MFP
-| timer set, clear
+| basic library code to interface with the 68901 MFP
+| Note: interrupt enable is sets if the MFP will note an interrupt at all. If 0, MFP will not change state for interrupt.
+| Interrupt pending is for when interrupt is recognized
+| Interrupt mask register is for controlling if an interrupt is triggered.  ISR bit in interrupt pending register still set regardless.
+| Interrupt in service states whether ISR is being serviced.
 
 	.text
 
@@ -14,9 +17,13 @@ mfp_init:
 	bset #6, (0x40017) | set vector register so interrupts occur right after end of mandatory section of EVT
 	bset #3, (0x40029) | mfp: 1 start bit, 1 stop bit, async
 	
-	bset #0, (MFP_RX_STS) | mfp: enable RX
-	bset #0, (MFP_TX_STS) | mfp: enable TX
+	| automatic ISR bit clearing by default
+
+	bset #2, (MFP_TX_STS) | transmitter idles high
 	
+	bset #0, (MFP_RX_STS) | enable rx
+	bset #0, (MFP_TX_STS) | enable tx
+
 	rts
 
 | write a null-terminated string to output
@@ -113,15 +120,34 @@ mfp_errcount:
 	rts
 
 | set data direction
+| @param: IO pin direction state
 | 0 is Hi-Z input, 1 is output
 mfp_setdir:
 	move.b -4(%sp), (MFP_IO_DDR)
 	rts
 
 | set pin state
+| @param: IO pin direction state
 | 0 is off, 1 is on
 mfp_setpin:
 	move.b -4(%sp), (MFP_IO_GPDR)
+	rts
+
+| set timer to which mode?
+| load timer counter
+| count events
+| waveform generation - using timer outputs to drive a speaker or something
+
+| set timer parameters
+| @param: long 0-4 (0 = timer A, 1 = timer B, etc)
+| @param: (msb) timer settings, and (lsb) timer data
+mfp_configtimer:
+	rts
+
+| reset timer counter
+| @param: long 0-4
+| @param: value to set timer to
+mfp_resettimer:
 	rts
 
 mfp_rx_isr:

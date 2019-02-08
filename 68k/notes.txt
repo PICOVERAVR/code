@@ -5,6 +5,7 @@ bad ideas:
 	remove pullup on AS - there to prevent spurious memory acceses once bus master is done and CPU has not relinquished control of the bus yet
 	having the bootloader print stuff without host initiating communication - bootloader will hang waiting on tx buffer to drain if no host is there? Is this true?
 	supervisor access only to EEPROM - prevents user from using hardware libs, initial supervisor -> user jump is awkward at best
+	having MFP drive IRQ lines directly - if a priority level 2 interrupt and level 1 interrupt fire at the same time, the processor will register a leve 3 interrupt.
 
 ideas for add-on boards:
 	
