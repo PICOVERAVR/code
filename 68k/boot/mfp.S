@@ -123,14 +123,14 @@ mfp_errcount:
 | @param: IO pin direction state
 | 0 is Hi-Z input, 1 is output
 mfp_setdir:
-	move.b -4(%sp), (MFP_IO_DDR)
+	move.b 4(%sp), (MFP_IO_DDR)
 	rts
 
 | set pin state
 | @param: IO pin direction state
 | 0 is off, 1 is on
 mfp_setpin:
-	move.b -4(%sp), (MFP_IO_GPDR)
+	move.b 4(%sp), (MFP_IO_GPDR)
 	rts
 
 | set timer to which mode?
@@ -148,11 +148,21 @@ mfp_configtimer:
 | @param: long 0-4
 | @param: value to set timer to
 mfp_resettimer:
+	move 4(%sp), %d0
+	
 	rts
 
+| Note: MFP uart space is from 0x20000 -> 0x2003F
+| TODO: need a way to keep track of where in the buffer we should write the character
+
+| triggers when byte is received by MFP
+| @returns: last position in buffer
 mfp_rx_isr:
 	rte
 
+| triggers when byte is sent by MFP
+| @returns: last position in buffer
 mfp_tx_isr:
+	
 	rte
 

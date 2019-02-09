@@ -2,6 +2,9 @@
 | TODO: review all this code once it's fully written
 | TODO: verify 68k memory layout.
 
+| defined because a straight jump is illegal for some reason
+.set ram_start, 0x20000
+
 	.text
 	.global _start
 
@@ -67,7 +70,7 @@ _start:
 	move.l #0x37000, %a5 | set user stack pointer to 0x3700
 	move.l %a5, %usp
 	andi #0xD8FF, %sr | clear supervisor flag and set IPL to 0
-	jmp #0x20000 | jump to user program
+	jmp ram_start | jump to user program
 
 ram_cmp_error:
 	reset
