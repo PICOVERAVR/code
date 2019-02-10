@@ -42,6 +42,27 @@ checksum:
 	move.l (%sp)+, %d2 | restore d2
 	rts
 
+| itoa, implemented in assembly
+| all numbers are considered unsigned, printed in hex
+| @param: number to convert to int
+| @param: space to write int to (max space needed is 8 chars for hex)
+asm_itoa:
+	move.l %d2, -(%sp) | save d2
+	move 4(%sp), %d0 | space
+	move 8(%sp), %d1 | num
+	
+	| get lower 4 bits
+	| add '0'
+	| write to buffer
+	| lsr num >> 4
+	| loop until 0
+	| TODO: byte-write capabilities are bad.
+	
+2:	move #0, (%d2) | add a null byte
+	move.l (%sp)+, %d2 | restore d2
+	rts
+
+| TODO: mul and div are expensive, replace with bit shifts
 | software delay subroutine
 | ((ms * 1000) / 22) loops required
 | @param: ms to delay for

@@ -4,6 +4,8 @@
 | Interrupt mask register is for controlling if an interrupt is triggered.  ISR bit in interrupt pending register still set regardless.
 | Interrupt in service states whether ISR is being serviced.
 
+| TODO: byte-write not really a possiblity here...
+
 	.text
 
 .set MFP_UART_DATA, 0x4002F
@@ -149,7 +151,6 @@ mfp_configtimer:
 | @param: value to set timer to
 mfp_resettimer:
 	move 4(%sp), %d0
-	
 	rts
 
 | Note: MFP uart space is from 0x20000 -> 0x2003F
@@ -163,6 +164,5 @@ mfp_rx_isr:
 | triggers when byte is sent by MFP
 | @returns: last position in buffer
 mfp_tx_isr:
-	
 	rte
 

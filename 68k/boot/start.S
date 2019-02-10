@@ -2,6 +2,9 @@
 | TODO: review all this code once it's fully written
 | TODO: verify 68k memory layout.
 
+| TODO: final goal is to have the bootloader get data from the host if data is available, and if not boot something from EEPROM...
+| don't need to worry about loading new program vs executing existing one until we can load a stored program from EEPROM
+
 | defined because a straight jump is illegal for some reason
 .set ram_start, 0x20000
 
@@ -28,23 +31,20 @@ _start:
 	subq.b #2, %a0
 	bne 2b
 	
-	| reset and test MFP, once lib code is written
+	jsr mfp_init
 	
 	| bootloader format:
-	| want this to be small, not feature-packed.
 	| <config byte> (lsb) <32b length> <actual memory>
-	| application config byte layout: none yet
+	| application config byte layout: 0b0000_00VE
+	| E: write program to EEPROM instead of RAM
+	| V: verbose output
+
 	clr %d0
 	clr %d2
 	jsr mfp_readc
 	
-	| TODO: if no UART is connected, this will hang waiting for the host to write data.
-	| - set timer interrupt once, in ISR clear it and disable interrupts again
-	| - have the timer just be incrementing a register
-	
-	| TODO: write code to update the bootloader itself
-	| bootloader code can't load all 128K at once, since bootloader has to be executing from RAM when updating
-	| and there needs to be a little space to pull in more code and poll the EEPROM until complete.
+	| TODO: write code to update the bootloader itself or load app into ROM
+	| this is going to be complicated...
 
 	| no config options to parse yet
 	
