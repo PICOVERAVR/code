@@ -12,7 +12,7 @@ if __name__ == "__main__":
 	parser.add_argument('--version', action='version', version='Code upload tool v0.1')
 	parser.add_argument('-d', '--device', type=str, help='UART device path')
 	parser.add_argument('-b', '--binary', type=str, help='binary path')
-	parser.add_argument('-s', '--speed', type=int, help='baud rate to communicate at')
+	parser.add_argument('-s', '--speed', type=int, default=115200, help='baud rate to communicate at, defaulting to 115200')
 
 	args = parser.parse_args()
 
@@ -25,13 +25,13 @@ if __name__ == "__main__":
 	try:
 		if args.device == None:
 			raise IOError
-		with open(args.device) as file:
-			pass
+		#with open(args.device) as file:
+		#	pass
 	except IOError as bad_file:
 		print("cannot open device file!")
 		sys.exit(2)
 	
-	print("Opening serial port with 8N1 " + args.speed + " baud settings...")
+	print("Opening serial port with 8N1 " + str(args.speed) + " baud settings...")
 	serport = serial.Serial(args.device, args.speed, timeout=5)
 
 	try:
@@ -41,10 +41,18 @@ if __name__ == "__main__":
 		print("binary cannot be opened!")
 		sys.exit(3)
 	
-	serport.write(str(len(bindata)))
-	serport.write(bindata)
+	serport.write(0) # config byte, nothing to send yet
+
+	bin_length = len(bindata)
+	print("writing " + str(bin_length) + " bytes...", end='')
+	for i in range(0, 4): # write the length of the incoming binary, one byte at a time, doing this manually since bootloader expects 4 bytes regardless of value
+		if bin_length == 0:
+			serport.write(0)
+		else:
+			serport.write(bin_length & 0xFF)
+			bin_length = bin_length >> 8
 	
-	# TODO: read the data back out to verify it
+	serport.write(bindata)
 	
 	print("done.")
 

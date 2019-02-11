@@ -12,9 +12,8 @@ from time import sleep # for timing
 # this is becoming a generic python frontend for the specific arduino code for the chip...
 
 # add values to dictionary for different chips
-# TODO: come up with a more robust way of doing this, values will collide eventually.
 eeprom_id_values = {0x7: "GLS29EE010", 0x8: "GLS29VE010"}
-eeprom_manufactuerer_values = {0xBF: "Greenliant"}
+eeprom_manufacturer_values = {0xBF: "Greenliant"}
 
 def eeprom_erase():
 	""" erase the eeprom chip, likely using the built-in erase functionality """
@@ -35,22 +34,23 @@ def eeprom_id():
 	print("Device: ", end='')
 	
 	# try to print a friendlier name, if one exists in the table
-	if num[11:14] in eeprom_id_values:
+	if int(num[11:14], 16) in eeprom_id_values:
 		print(eeprom_id_values[int(num[11:14], 16)])
 	else:
 		print(num[11:14])
 	
-	if mf[17:20] in eeprom_manufacturer_values:
-		print(eeprom_manufacturer_values[int(mf[17:20], 16)])
+	print("Manufacturer: ", end='')
+
+	if int(mf[17:21], 16) in eeprom_manufacturer_values:
+		print(eeprom_manufacturer_values[int(mf[17:21], 16)])
 	else:
-		print(mf[17:20])
+		print(mf[17:21])
 	
 def eeprom_write():
 	""" write a binary to the eeprom in 128-byte blocks
 	
 	Block sizes of 128 bytes are used since that's the size of the page buffer of the eeprom.
-	Sent in 32-byte segments because the Arduino has a maximum serial buffer of 64 bytes, and we can't be sure the buffer is fully drained...
-	Another solution is to modify the boards.txt file for the Arduino, but this is a lot easier for everyone
+	Sent in 32-byte segments because the Arduino has a maximum serial buffer of 64 bytes, and making sure the buffer is fully drained is a pain
 
 	"""
 	try:
@@ -96,14 +96,19 @@ def eeprom_write():
 	print("done.")
 
 def eeprom_read():
-	""" read out the eeprom, directing binary to an output file. """
+	""" read out the eeprom, directing binary to an output file. 
+	
+	A binary will be created if the file passed by the '-b' option doesn't exist yet.
+	File contents are in hex, for ease of use.
+	
+	"""
 	print("Reading ", end='')
 	print(str(EEPROM_SIZE), end='')
 	print(" bytes out of EEPROM... ")
 	
 	try:
 		with open(args.binary, "wb") as readfile:
-			logger.info("binary located.")
+			logger.info("binary opened.")
 
 			for page in range(0, EEPROM_SIZE, 128):
 				page_str = "RP:" + str(page) + ";"
@@ -151,8 +156,8 @@ if __name__ == "__main__":
 	try:
 		if args.device == None:
 			raise IOError
-		with open(args.device) as file:
-			pass
+		#with open(args.device) as file: # TODO: this hangs for some reason now. fix this.
+		#	pass
 	except IOError as bad_file:
 		logger.error('Device file cannot be opened.')
 		sys.exit(1)
@@ -168,7 +173,6 @@ if __name__ == "__main__":
 	elif args.action == 'write':
 		eeprom_write()
 	# takes ~6 seconds with 2M baud, 128K EEPROM
-	# TODO: file is not checked at the same time as "write" function. fix this.
 	elif args.action == 'read':
 		eeprom_read()
 	else:

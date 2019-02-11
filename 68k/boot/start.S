@@ -1,5 +1,4 @@
 | Bootloader section of 68k device
-| TODO: review all this code once it's fully written
 | TODO: verify 68k memory layout.
 
 | TODO: final goal is to have the bootloader get data from the host if data is available, and if not boot something from EEPROM...
@@ -48,8 +47,9 @@ _start:
 
 	| no config options to parse yet
 	
+	| not sure about "movec" instruction for reading value out of MFP since checking for data also needs to happen
 	jsr mfp_readc | read a 32-bit value out of the mfp, one byte at a time
-	move.b %d0, %d1 | the instruction "movep" could also be used here, but doc is sparse on how it works.
+	move.b %d0, %d1 
 	jsr mfp_readc
 	lsl.l #8, %d0
 	or.l %d0, %d1
