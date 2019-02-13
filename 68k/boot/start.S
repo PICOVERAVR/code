@@ -1,4 +1,5 @@
 | Bootloader section of 68k device
+| TODO: verify this by looking up each instruction in the manual and verifying that the output is correct.
 | TODO: verify 68k memory layout.
 
 | TODO: final goal is to have the bootloader get data from the host if data is available, and if not boot something from EEPROM...
@@ -16,6 +17,8 @@ _start:
 	| test the RAM by reading and writing to all memory locations
 	| jump to ram_cmp_error if problems occur.
 	
+	clr %d0
+
 	move.l #0x20000, %a0
 	move.l #0x40000, %a1
 1:	move.w #0xCAFE, (%a0)
@@ -27,7 +30,7 @@ _start:
 	cmpi.w #0xCAFE, %d0
 	bne ram_cmp_error
 	cmpa %a0, %a1
-	subq.b #2, %a0
+	subq #2, %a0
 	bne 2b
 	
 	jsr mfp_init
@@ -47,7 +50,6 @@ _start:
 
 	| no config options to parse yet
 	
-	| not sure about "movec" instruction for reading value out of MFP since checking for data also needs to happen
 	jsr mfp_readc | read a 32-bit value out of the mfp, one byte at a time
 	move.b %d0, %d1 
 	jsr mfp_readc
@@ -73,9 +75,8 @@ _start:
 	jmp ram_start | jump to user program
 
 ram_cmp_error:
-	reset
-	jmp .
-	
+	stop #0x700 | set IPL to max
+
 	.section .data
 .align 4
 .byte version

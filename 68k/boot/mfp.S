@@ -4,15 +4,18 @@
 | Interrupt mask register is for controlling if an interrupt is triggered.  ISR bit in interrupt pending register still set regardless.
 | Interrupt in service states whether ISR is being serviced.
 
-| TODO: byte-write not really a possiblity here...
+| indirect literal is a thing! (assembler converts it into a pc-relative address!)
+| NOTE: this would be a ~bit~ easier if the MFP addresses are even, but I'm afraid to do that...
 
 	.text
-
+| Note: raw addresses, not addresses listed in datasheet
 .set MFP_UART_DATA, 0x4002F
 .set MFP_TX_STS, 0x4002D
 .set MFP_RX_STS, 0x4002B
 .set MFP_IO_DDR, 0x40005
 .set MFP_IO_GPDR, 0x40001
+
+.set MFP_UART_ISR_POS, 0x20060
 
 | reset and configure the MFP for basic operation
 mfp_init:
@@ -25,39 +28,40 @@ mfp_init:
 	
 	bset #0, (MFP_RX_STS) | enable rx
 	bset #0, (MFP_TX_STS) | enable tx
-
+	
+	move #0, (MFP_UART_ISR_POS) | set index to start of buffer (relative)
+	
 	rts
 
-| write a null-terminated string to output
+| write a word-aligned null-terminated string to output
 | @param: address of string to print
-| @returns: number of characters printed
 mfp_write:
 	move.l 4(%sp), %a0
-	clr %d0
 	clr %d1
-1:	cmp.b (%a0), %d1 | test for null character
+1:	cmp.b (%a0), %d1 | check for null char
 	beq 3f
-2:	btst #7, (MFP_TX_STS) | wait until buffer is ready
+2:	btst #7, (MFP_TX_STS)
 	beq 2b
-	move.b (%a0)+, (MFP_UART_DATA) | write byte to MFP
-	addq #1, %d0
-	bra 1b
+	move.w (%a0)+, %d0
+	move.b %d0, (MFP_UART_DATA)
+	lsr #8, %d0
+	move.b %d0, (MFP_UART_DATA)
 3:	rts
 
 | read a null-terminated string from input
 | @param: address of string to print
 | @param: character to stop at
-| @returns: number of characters read (not including stop character)
 mfp_read:
 	move.l 4(%sp), %a0 | addr
 	move.l 8(%sp), %d1 | char
-	clr %d0
 1:	cmp.b (%a0), %d1 | test last character written for end character
 	beq 3f
 2:	btst #7, (MFP_RX_STS) | wait until characters are available to read
 	beq 2b
-	move.b (MFP_UART_DATA), (%a0)+ | read character
-	addq #1, %d0
+	move.b (MFP_UART_DATA), %d0
+	lsl #8, %d0
+	move.b (MFP_UART_DATA), %d0
+	move.w %d0, (%a0)+
 	bra 1b
 3:	rts
 
@@ -66,27 +70,36 @@ mfp_read:
 | @param: length of block to read
 mfp_readblock:
 	move.l 4(%sp), %a0 | start
-	move.l 8(%sp), %a1 | len
-	add.l %a1, %a0
-1:	cmp.l %a0, %a1
+	move.l 8(%sp), %d1 | len
+	move.l MFP_UART_DATA, %a1
+	add.l %d1, %a0 | contains stop addr
+1:	cmp.l %a0, %d1
 	beq 3f
 2:	btst #7, (MFP_RX_STS)
 	bne 2b
-	move.b (MFP_UART_DATA), (%a0)+
+	move.b (MFP_UART_DATA), %d0
+	lsl #8, %d0
+	move.b (MFP_UART_DATA), %d0
+	move.w %d0, (%a0)+
+	bra 1b
 3:	rts
 
 | write memory contents into mfp
 | @param: address to write
 | @param: length of block to write
 mfp_writeblock:
-	move.l 4(%sp), %a0 | start
-	move.l 8(%sp), %a1 | len
-	add.l %a1, %a0
-1:	cmp.l %a0, %a1
+	move.l 4(%sp), %d0 | start
+	move.l 8(%sp), %d1 | len
+	add.l %d1, %d0
+1:	cmp.l %d0, %d1
 	beq 3f
 2:	btst #7, (MFP_TX_STS)
 	bne 2b
-	move.b (%a0)+, (MFP_UART_DATA)
+	move.w (%a0)+, %d0
+	move.b %d0, (MFP_UART_DATA)
+	lsr #8, %d0
+	move.b %d0, (MFP_UART_DATA)
+	bra 1b
 3:	rts
 
 | pop character off stack and write it to the MFP
@@ -94,6 +107,9 @@ mfp_writeblock:
 mfp_writec:
 1:	btst #7, (MFP_TX_STS)
 	bne 1b
+	move.w (%a0)+, %d0
+	move.b %d0, (MFP_UART_DATA)
+	lsr #8, %d0
 	move.b %d0, (MFP_UART_DATA)
 	rts
 
@@ -103,6 +119,9 @@ mfp_readc:
 1:	btst #7, (MFP_RX_STS)
 	bne 1b
 	move.b (MFP_UART_DATA), %d0
+	lsl #8, %d0
+	move.b (MFP_UART_DATA), %d0
+	move.w %d0, (%a0)+
 	rts
 
 | check for MFP errors
@@ -125,20 +144,21 @@ mfp_errcount:
 | @param: IO pin direction state
 | 0 is Hi-Z input, 1 is output
 mfp_setdir:
-	move.b 4(%sp), (MFP_IO_DDR)
+	move.l 4(%sp), %d0
+	move.b %d0, (MFP_IO_DDR)
 	rts
 
 | set pin state
 | @param: IO pin direction state
 | 0 is off, 1 is on
 mfp_setpin:
-	move.b 4(%sp), (MFP_IO_GPDR)
+	move.l 4(%sp), %d0
+	move.b %d0, (MFP_IO_DDR)
 	rts
 
 | set timer to which mode?
 | load timer counter
 | count events
-| waveform generation - using timer outputs to drive a speaker or something
 
 | set timer parameters
 | @param: long 0-4 (0 = timer A, 1 = timer B, etc)
@@ -150,15 +170,16 @@ mfp_configtimer:
 | @param: long 0-4
 | @param: value to set timer to
 mfp_resettimer:
-	move 4(%sp), %d0
 	rts
 
 | Note: MFP uart space is from 0x20000 -> 0x2003F
-| TODO: need a way to keep track of where in the buffer we should write the character
+| configured for auto-clearing of correct ISR bit
 
 | triggers when byte is received by MFP
 | @returns: last position in buffer
 mfp_rx_isr:
+	move.b (MFP_UART_DATA), %d0
+	| use a complex addressing mode here
 	rte
 
 | triggers when byte is sent by MFP

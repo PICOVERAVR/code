@@ -18,7 +18,7 @@ bad_exception:
     move.b (%a0)+, (MFP_UART_DATA) | write byte to MFP
     addq #1, %d0
     bra 1b
-3:	jmp .
+3:	stop #0x700
 
 | incomplete trap handler
 trap_handler:
@@ -58,7 +58,7 @@ asm_itoa:
 	| loop until 0
 	| TODO: byte-write capabilities are bad.
 	
-2:	move #0, (%d2) | add a null byte
+2:	| move #0, (%d2) | add a null byte
 	move.l (%sp)+, %d2 | restore d2
 	rts
 
@@ -80,4 +80,5 @@ delay:
 	rts
 
 .data
+.align 4
 system_error_message: .asciz "System crash - no longer nomadic!\n"

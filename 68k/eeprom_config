@@ -7,10 +7,6 @@ import argparse # for argument processing
 import logging # for simple debug logger
 from time import sleep # for timing
 
-# TODO: add more stuff to make this more like a generic EEPROM programmer
-# CRC at the end
-# this is becoming a generic python frontend for the specific arduino code for the chip...
-
 # add values to dictionary for different chips
 eeprom_id_values = {0x7: "GLS29EE010", 0x8: "GLS29VE010"}
 eeprom_manufacturer_values = {0xBF: "Greenliant"}
@@ -132,6 +128,7 @@ if __name__ == "__main__":
 	parser.add_argument('-v', '--verbose', type=str, default='', help='enable more verbose output, options are \'info\' and \'debug\'.')
 	parser.add_argument('-b', '--binary', type=str, default='', help='binary to manipulate.')
 	parser.add_argument('-s', '--size', type=int, default=0x20000, help='EEPROM size, defaults to 128K.')
+	parser.add_argument('-p', '--speed', type=int, default=250000, help='speed at which to communicate with the arduino, defaults to 250k')
 	args = parser.parse_args()
 
 	EEPROM_SIZE = args.size
@@ -162,9 +159,9 @@ if __name__ == "__main__":
 		logger.error('Device file cannot be opened.')
 		sys.exit(1)
 	
-	logger.info("Opening serial port with 8N1 250k baud settings...")
+	logger.info("Opening serial port with 8N1 " + str(args.speed) + " baud settings...")
 	serport = serial.Serial(args.device, 250000, timeout=5)
-	serport.readline()
+	serport.readline() # swallow greeting message from arduino, remove this?
 
 	if args.action == 'erase':
 		eeprom_erase()
