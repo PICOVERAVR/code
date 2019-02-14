@@ -41,7 +41,8 @@ if __name__ == "__main__":
 		print("binary cannot be opened!")
 		sys.exit(3)
 	
-	serport.write(0) # config byte, nothing to send yet
+	config_byte = 0
+	serport.write(config_byte)
 
 	bin_length = len(bindata)
 	print("writing " + str(bin_length) + " bytes...", end='')

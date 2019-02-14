@@ -24,7 +24,7 @@ def eeprom_id():
 	""" get version info from eeprom and check against the table of known ids """
 	print("Version info:")
 	serport.write("VE;".encode('ascii', 'encode'))
-	print(serport.readline().decode('ascii').strip('\n')) # reader version
+	print(serport.readline().decode('ascii').strip('\n')) # hardware programmer version
 	mf = serport.readline().decode('ascii').strip('\n') # manufacturer ID
 	num = serport.readline().decode('ascii').strip('\n') # device ID
 	print("Device: ", end='')
@@ -169,7 +169,7 @@ if __name__ == "__main__":
 		eeprom_id()
 	elif args.action == 'write':
 		eeprom_write()
-	# takes ~6 seconds with 2M baud, 128K EEPROM
+	# takes ~6 seconds with 2M baud, full 128K EEPROM
 	elif args.action == 'read':
 		eeprom_read()
 	else:
