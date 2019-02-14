@@ -2,11 +2,13 @@
 | TODO: verify this by looking up each instruction in the manual and verifying that the output is correct.
 | TODO: verify 68k memory layout.
 
-| TODO: final goal is to have the bootloader get data from the host if data is available, and if not boot something from EEPROM...
-| don't need to worry about loading new program vs executing existing one until we can load a stored program from EEPROM
+| TODO: adjust memory map to be above user stack pointer - application can't trash memory used by UART or kernel possibly.
 
 | defined because a straight jump is illegal for some reason
 .set ram_start, 0x20000
+.set ram_end, 0x40000
+| what to set the user stack pointer to
+.set user_stack_pointer, 0x37000
 
 	.text
 	.global _start
@@ -19,8 +21,8 @@ _start:
 	
 	clr %d0
 
-	move.l #0x20000, %a0
-	move.l #0x40000, %a1
+	move.l #ram_start, %a0
+	move.l #ram_end, %a1
 1:	move.w #0xCAFE, (%a0)
 	cmpa.l %a0, %a1
 	addq #2, %a0
@@ -43,6 +45,7 @@ _start:
 
 	clr %d0
 	clr %d2
+
 	jsr mfp_readc
 	
 	| TODO: write code to update the bootloader itself or load app into ROM
@@ -56,7 +59,7 @@ _start:
 	lsl.l #8, %d0
 	or.l %d0, %d1
 	jsr mfp_readc
-	move.b #16, %d2
+	moveq #16, %d2
 	lsl.l %d2, %d0
 	or.l %d0, %d1
 	jsr mfp_readc
@@ -65,11 +68,11 @@ _start:
 	or.l %d0, %d1
 	
 	move.l %d0, -(%sp) | len
-	move.l #0x20000, -(%sp) | start
+	move.l #ram_start, -(%sp) | start
 	jsr mfp_readblock
 	addq #8, %sp
 	
-	move.l #0x37000, %a5 | set user stack pointer to 0x3700
+	move.l #user_stack_pointer, %a5
 	move.l %a5, %usp
 	andi #0xD8FF, %sr | clear supervisor flag and set IPL to 0
 	jmp ram_start | jump to user program

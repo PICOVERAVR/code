@@ -1,3 +1,5 @@
+| NOTE: code here is old and may or may not work.
+
 |  UART interfacing code, written to work with the MC6850 ACIA
 |  should be enough to load an image into RAM over UART, as well as figure out any errors that pop up.
 

@@ -7,6 +7,10 @@
 | indirect literal is a thing! (assembler converts it into a pc-relative address!)
 | NOTE: this would be a ~bit~ easier if the MFP addresses are even, but I'm afraid to do that...
 
+| TODO: read the finer points of the datasheet, especially all the stuff about reading and writing the data
+| Note: reading the status register after reading the data register means the status register could be referring to a different byte than the data register.
+| also interrupts related to TX and RX errors exist, use them?
+
 	.text
 | Note: raw addresses, not addresses listed in datasheet
 .set MFP_UART_DATA, 0x4002F
@@ -15,7 +19,11 @@
 .set MFP_IO_DDR, 0x40005
 .set MFP_IO_GPDR, 0x40001
 
-.set MFP_UART_ISR_POS, 0x20060
+| 32-byte UART buffer should be circular, would make things easy to work with
+| word index of the front of the UART buffer
+.set UART_START_POS, 0x20000
+.set UART_BUFFER_START, 0x20062
+.set UART_BUFFER_END, 0x20064
 
 | reset and configure the MFP for basic operation
 mfp_init:
@@ -29,7 +37,8 @@ mfp_init:
 	bset #0, (MFP_RX_STS) | enable rx
 	bset #0, (MFP_TX_STS) | enable tx
 	
-	move #0, (MFP_UART_ISR_POS) | set index to start of buffer (relative)
+	move #0, (UART_BUFFER_START)
+	move #0, (UART_BUFFER_END)
 	
 	rts
 
@@ -71,7 +80,7 @@ mfp_read:
 mfp_readblock:
 	move.l 4(%sp), %a0 | start
 	move.l 8(%sp), %d1 | len
-	move.l MFP_UART_DATA, %a1
+	move.l #MFP_UART_DATA, %a1
 	add.l %d1, %a0 | contains stop addr
 1:	cmp.l %a0, %d1
 	beq 3f
@@ -102,26 +111,20 @@ mfp_writeblock:
 	bra 1b
 3:	rts
 
-| pop character off stack and write it to the MFP
+| write d0 (byte) into MFP
 | @param: byte character to write
 mfp_writec:
 1:	btst #7, (MFP_TX_STS)
 	bne 1b
-	move.w (%a0)+, %d0
-	move.b %d0, (MFP_UART_DATA)
-	lsr #8, %d0
 	move.b %d0, (MFP_UART_DATA)
 	rts
 
-| read a character from the MFP and pushes it on stack
+| read a character from the MFP into d0
 | @returns: byte character read
 mfp_readc:
 1:	btst #7, (MFP_RX_STS)
 	bne 1b
 	move.b (MFP_UART_DATA), %d0
-	lsl #8, %d0
-	move.b (MFP_UART_DATA), %d0
-	move.w %d0, (%a0)+
 	rts
 
 | check for MFP errors
@@ -176,14 +179,19 @@ mfp_resettimer:
 | configured for auto-clearing of correct ISR bit
 
 | triggers when byte is received by MFP
-| @returns: last position in buffer
 mfp_rx_isr:
-	move.b (MFP_UART_DATA), %d0
-	| use a complex addressing mode here
+	move.l #UART_START_POS, %a0
+	| move.b (UART_BUFFER_POS), %d1
+	
+	| move.b (MFP_UART_DATA), %d0 | load in data
+	| move.b %d0, (0,%a0,%d1) | move byte to current position in buffer
+	| addq #1, (UART_BUFFER_POS) | increment buffer counter
 	rte
 
 | triggers when byte is sent by MFP
-| @returns: last position in buffer
 mfp_tx_isr:
+
+	| TODO: move
+	
 	rte
 
