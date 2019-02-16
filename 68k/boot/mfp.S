@@ -11,6 +11,8 @@
 | Note: reading the status register after reading the data register means the status register could be referring to a different byte than the data register.
 | also interrupts related to TX and RX errors exist, use them?
 
+| TODO: update addresses to reflect new memory map
+
 	.text
 | Note: raw addresses, not addresses listed in datasheet
 .set MFP_UART_DATA, 0x4002F

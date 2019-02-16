@@ -16,7 +16,7 @@ boot: pre # assemble files
 	@m68k-elf-objcopy -O binary boot.out boot.bin
 	@m68k-elf-readelf -a boot.out
 
-asm: pre boot
+asm:
 	@m68k-elf-objdump -d boot.out
 
 test: pre

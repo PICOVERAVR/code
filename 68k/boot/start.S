@@ -2,8 +2,6 @@
 | TODO: verify this by looking up each instruction in the manual and verifying that the output is correct.
 | TODO: verify 68k memory layout.
 
-| TODO: adjust memory map to be above user stack pointer - application can't trash memory used by UART or kernel possibly.
-
 | defined because a straight jump is illegal for some reason
 .set ram_start, 0x20000
 .set ram_end, 0x40000
