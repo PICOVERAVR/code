@@ -1,6 +1,7 @@
 | Bootloader section of 68k device
-| TODO: verify this by looking up each instruction in the manual and verifying that the output is correct.
-| TODO: verify 68k memory layout.
+| Currently waits for host to send code and data to load into RAM
+| TODO: Future goals is to eventually fall back to executing some code out of ROM, have to have some sort of out-of-band signal to
+| processor to indicate that the host is present.
 
 | defined because a straight jump is illegal for some reason
 .set ram_start, 0x20000
@@ -46,10 +47,12 @@ _start:
 
 	jsr mfp_readc
 	
-	| TODO: write code to update the bootloader itself or load app into ROM
-	| this is going to be complicated...
-
+	| some sort of ACK here?
 	| no config options to parse yet
+	| Ideas: 
+	| S - set if the processor should stay in supervisor mode when jumping to RAM - insecure but possibly helpful?
+	| E - upload code to EEPROM instead of SRAM
+	| 
 	
 	jsr mfp_readc | read a 32-bit value out of the mfp, one byte at a time
 	move.b %d0, %d1 
@@ -76,7 +79,8 @@ _start:
 	jmp ram_start | jump to user program
 
 ram_cmp_error:
-	stop #0x700 | set IPL to max
+	stop #0x700 | wait for either a reset or NMI, nothing to do if base RAM is broken.
+	| could also cause a double bus fault and halt the processor here...
 
 	.section .data
 .align 4

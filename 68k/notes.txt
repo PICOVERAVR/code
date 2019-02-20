@@ -5,7 +5,7 @@ bad ideas:
 	remove pullup on AS - there to prevent spurious memory acceses once bus master is done and CPU has not relinquished control of the bus yet
 	having the bootloader print stuff without host initiating communication - bootloader will hang waiting on tx buffer to drain if no host is there? Is this true?
 	supervisor access only to EEPROM - prevents user from using hardware libs, initial supervisor -> user jump is awkward at best
-	having MFP drive IRQ lines directly - if a priority level 2 interrupt and level 1 interrupt fire at the same time, the processor will register a leve 3 interrupt.
+	having MFP drive IRQ lines directly - if a priority level 2 interrupt and level 1 interrupt fire at the same time, the processor will register a level 3 interrupt.
 
 ideas for add-on boards:
 	
@@ -40,12 +40,16 @@ MANIFESTO:
 	Modern (interface).  If something needs to be connected, do it with modern parts.
 	Extensible.  The board should contain enough to get started, but not enough that it hinders expansion.
 	
-	68000 / 68010 compatible
+	68000 / 68010 compatible, technically. 7805 only supplies 1.5A, and 68010 may exceed this limit. 68HC000 won't.
 	Aim for 16MHz clock speed
-	actual C compiler should be working for this, not BASIC or Forth or anything.  If not C, then only ASM
+	actual C compiler should be working for this, not BASIC or Forth or anything.  If not C, then only ASM.
 
 	new stuff:
-		FIFO chips
-		dual port RAM chips
+		FIFO chips for ingesting data quickly
+		dual port RAM chips for graphics support - FPGA on the other side controlling the screen
 		terminal color support - not that hard!
 	
+	goals:
+		get it working
+		write more support code
+		write a game!

@@ -27,7 +27,7 @@ trap_handler:
 	movem (%sp)+, %d0-%d2/%a0-%a2
 	rte
 
-| xor all words in a block
+| xor all words in a block, returning a checksum
 | @param: length of block - 1
 | @param: start address
 | @returns: checksum
@@ -67,7 +67,7 @@ asm_itoa:
 delay:
 	move.l 4(%sp), %d0
 	mulu.w #1000, %d0 | convert ms -> us
-	move.w %d0, %d1
+	move.w %d0, %d1 | move into seperate register to avoid loading in remainder?
 	divu.w #22, %d1 | divide by loop execution time
 	move.w %d1, %d0 | move quotient into d0
 	clr %d1
