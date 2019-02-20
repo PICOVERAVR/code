@@ -21,9 +21,10 @@ asm:
 
 test: pre
 	@m68k-elf-as $(FLAGS) $(TEST) -o test.o
-	@m68k-elf-ld -T $(APP_LINK) test.o -o test.out # shouldn't matter where we link stuff to, just that it works properly
+	@m68k-elf-ld -T $(BOOT_LINK) test.o -o test.out # shouldn't matter where we link stuff to, just that it works properly
 	@m68k-elf-objcopy -O binary test.out test.bin
 	@echo "Test build completed."
+	@m68k-elf-readelf -S boot.out
 
 app: pre
 	@m68k-elf-as $(FLAGS) $(APP) -o app.o
