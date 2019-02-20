@@ -13,7 +13,7 @@ bad_exception:
     clr %d1
 1:  cmp.b (%a0), %d1 | test for null character
     beq 3f
-2:  btst #7, (MFP_TX_STS) | wait until buffer is ready
+2:  btst #7, (0x4002D) | wait until buffer is ready
     beq 2b
     move.b (%a0)+, (MFP_UART_DATA) | write byte to MFP
     addq #1, %d0
@@ -51,24 +51,23 @@ asm_itoa:
 	move 4(%sp), %d0 | space
 	move 8(%sp), %d1 | num
 	
-	| get lower 4 bits
+	| TODO: get lower 4 bits
 	| add '0'
 	| write to buffer
 	| lsr num >> 4
 	| loop until 0
-	| TODO: byte-write capabilities are bad.
 	
 2:	| move #0, (%d2) | add a null byte
 	move.l (%sp)+, %d2 | restore d2
 	rts
 
-| TODO: mul and div are expensive, replace with bit shifts
 | software delay subroutine
 | ((ms * 1000) / 22) loops required
 | @param: ms to delay for
 delay:
 	move.l 4(%sp), %d0
-	mulu.w #1000, %d0 | ms -> us
+	mulu.w #1000, %d0 | convert ms -> us
+	move.w %d0, %d1
 	divu.w #22, %d1 | divide by loop execution time
 	move.w %d1, %d0 | move quotient into d0
 	clr %d1

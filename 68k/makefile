@@ -14,7 +14,7 @@ boot: pre # assemble files
 	@echo $(BOOT_LINK)
 	@m68k-elf-ld -T $(BOOT_LINK) boot.o -o boot.out
 	@m68k-elf-objcopy -O binary boot.out boot.bin
-	@m68k-elf-readelf -a boot.out
+	@m68k-elf-readelf -S boot.out
 
 asm:
 	@m68k-elf-objdump -d boot.out
@@ -29,7 +29,7 @@ app: pre
 	@m68k-elf-as $(FLAGS) $(APP) -o app.o
 	@m68k-elf-ld -T $(APP_LINK) app.o -o app.out
 	@m68k-elf-objcopy -O binary app.out app.bin
-	@m68k-elf-readelf -a app.out
+	@m68k-elf-readelf -S app.out
 
 pre:
 	@echo "Building on: $(UNAME)"

@@ -14,12 +14,32 @@
 | TODO: update addresses to reflect new memory map
 
 	.text
+| MFP register addresses and functions
 | Note: raw addresses, not addresses listed in datasheet
-.set MFP_UART_DATA, 0x4002F
-.set MFP_TX_STS, 0x4002D
-.set MFP_RX_STS, 0x4002B
-.set MFP_IO_DDR, 0x40005
 .set MFP_IO_GPDR, 0x40001
+.set MFP_IO_AER, 0x40003
+.set MFP_IO_DDR, 0x40005
+.set MFP_IPT_IERA, 0x40007
+.set MFP_IPT_IERB, 0x40009
+.set MFP_IPT_IPRA, 0x4000B
+.set MFP_IPT_IPRB, 0x4000D
+.set MFP_IPT_ISRA, 0x4000F
+.set MFP_IPT_ISRB, 0x40011
+.set MFP_IPT_IMRA, 0x40013
+.set MFP_IPT_IMRB, 0x40015
+.set MFP_VR, 0x40017
+.set MFP_TMR_TACR, 0x40019
+.set MFP_TMR_TBCR, 0x4001B
+.set MFP_TMR_TCDCR, 0x4001D
+.set MFP_TMR_TADR, 0x4001F
+.set MFP_TMR_TBDR, 0x40021
+.set MFP_TMR_TCDR, 0x40023
+.set MFP_TMR_TDDR, 0x40025
+.set MFP_UART_SCR, 0x40027
+.set MFP_UART_UCR, 0x40029
+.set MFP_UART_RSR, 0x4002B
+.set MFP_UART_TSR, 0x4002D
+.set MFP_UART_DATA, 0x4002F
 
 | 32-byte UART buffer should be circular, would make things easy to work with
 | word index of the front of the UART buffer
@@ -29,15 +49,15 @@
 
 | reset and configure the MFP for basic operation
 mfp_init:
-	bset #6, (0x40017) | set vector register so interrupts occur right after end of mandatory section of EVT
-	bset #3, (0x40029) | mfp: 1 start bit, 1 stop bit, async
+	bset #6, (MFP_VR) | set vector register so interrupts occur right after end of mandatory section of EVT
+	bset #3, (MFP_UART_UCR) | mfp: 1 start bit, 1 stop bit, async
 	
 	| automatic ISR bit clearing by default
 
-	bset #2, (MFP_TX_STS) | transmitter idles high
+	bset #2, (MFP_UART_TSR) | transmitter idles high
 	
-	bset #0, (MFP_RX_STS) | enable rx
-	bset #0, (MFP_TX_STS) | enable tx
+	bset #0, (MFP_UART_RSR) | enable rx
+	bset #0, (MFP_UART_TSR) | enable tx
 	
 	move #0, (UART_BUFFER_START)
 	move #0, (UART_BUFFER_END)
@@ -51,7 +71,7 @@ mfp_write:
 	clr %d1
 1:	cmp.b (%a0), %d1 | check for null char
 	beq 3f
-2:	btst #7, (MFP_TX_STS)
+2:	btst #7, (MFP_UART_TSR)
 	beq 2b
 	move.w (%a0)+, %d0
 	move.b %d0, (MFP_UART_DATA)
@@ -67,7 +87,7 @@ mfp_read:
 	move.l 8(%sp), %d1 | char
 1:	cmp.b (%a0), %d1 | test last character written for end character
 	beq 3f
-2:	btst #7, (MFP_RX_STS) | wait until characters are available to read
+2:	btst #7, (MFP_UART_RSR) | wait until characters are available to read
 	beq 2b
 	move.b (MFP_UART_DATA), %d0
 	lsl #8, %d0
@@ -86,7 +106,7 @@ mfp_readblock:
 	add.l %d1, %a0 | contains stop addr
 1:	cmp.l %a0, %d1
 	beq 3f
-2:	btst #7, (MFP_RX_STS)
+2:	btst #7, (MFP_UART_RSR)
 	bne 2b
 	move.b (MFP_UART_DATA), %d0
 	lsl #8, %d0
@@ -104,7 +124,7 @@ mfp_writeblock:
 	add.l %d1, %d0
 1:	cmp.l %d0, %d1
 	beq 3f
-2:	btst #7, (MFP_TX_STS)
+2:	btst #7, (MFP_UART_TSR)
 	bne 2b
 	move.w (%a0)+, %d0
 	move.b %d0, (MFP_UART_DATA)
@@ -116,7 +136,7 @@ mfp_writeblock:
 | write d0 (byte) into MFP
 | @param: byte character to write
 mfp_writec:
-1:	btst #7, (MFP_TX_STS)
+1:	btst #7, (MFP_UART_TSR)
 	bne 1b
 	move.b %d0, (MFP_UART_DATA)
 	rts
@@ -124,7 +144,7 @@ mfp_writec:
 | read a character from the MFP into d0
 | @returns: byte character read
 mfp_readc:
-1:	btst #7, (MFP_RX_STS)
+1:	btst #7, (MFP_UART_RSR)
 	bne 1b
 	move.b (MFP_UART_DATA), %d0
 	rts
@@ -136,10 +156,10 @@ mfp_readc:
 | bit 2: overrun error
 | bit 3: underrun error
 mfp_errcount:
-	move.b (MFP_RX_STS), %d0
+	move.b (MFP_UART_RSR), %d0
 	and.b #0x70, %d0
 	lsr.b #4, %d0
-	move.b (MFP_TX_STS), %d1
+	move.b (MFP_UART_TSR), %d1
 	and.b #0x40, %d1
 	lsr.b #3, %d1
 	or.b %d1, %d0
