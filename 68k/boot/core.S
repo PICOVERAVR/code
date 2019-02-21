@@ -78,6 +78,10 @@ delay:
 	| 22 cc total
 	rts
 
+	| EEPROM writing works, since you need to de-assert CS every time you write a byte and you have to wait 200us (way longer than 68k instruction fetches) in order to write a page
+	| SDP can still be enabled, since even if you enable SDP on both chips, you're only actually writing to one chip, and the other is idle and deselected.
+	| SDP should really be disabled for everything once write is completed.
+
 .data
 .align 4
 system_error_message: .asciz "System crash - no longer nomadic!\n"
