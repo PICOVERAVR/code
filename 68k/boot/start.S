@@ -3,6 +3,8 @@
 | TODO: Future goals is to eventually fall back to executing some code out of ROM, have to have some sort of out-of-band signal to
 | processor to indicate that the host is present.
 
+| TODO: update Arduino programmer to diable SDP after writing the chips, else self-updates won't work.
+
 | defined because a straight jump is illegal for some reason
 .set ram_start, 0x20000
 .set ram_end, 0x40000

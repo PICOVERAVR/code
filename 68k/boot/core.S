@@ -1,6 +1,9 @@
 | Core lib and kernel stuff that should be helpful for application programs...
 | this is going to be smaller than any kind of actual *utils library
 | and worse
+
+.set ram_function, 0x3FC40
+
 .text
 
 | generic exception handler for unrecoverable system events
@@ -78,9 +81,37 @@ delay:
 	| 22 cc total
 	rts
 
-	| EEPROM writing works, since you need to de-assert CS every time you write a byte and you have to wait 200us (way longer than 68k instruction fetches) in order to write a page
-	| SDP can still be enabled, since even if you enable SDP on both chips, you're only actually writing to one chip, and the other is idle and deselected.
-	| SDP should really be disabled for everything once write is completed.
+| EEPROM writing works, since you need to de-assert CS every time you write a byte and you have to wait 200us (way longer than 68k instruction fetches) in order to write a page
+| SDP needs to be disabled since the SDP enable sequence is part of the page-write sequence, as well as the fact that the SDP enable sequence would be written to neither chip
+| since it has both odd and even addresses.
+
+| TODO: check the heck out of this
+
+| write a 128-byte page of memory to one of two EEPROM chips, blocking until the write is complete.
+| @param: address of block to write
+| @param: EEPROM address to write block to (128-byte aligned)
+eeprom_write_page:
+	move.l %d2, -(%sp)
+	move.l 4(%sp), %d0 | memory address
+	move.l 8(%sp), %d1 | EEPROM address
+	
+	move.b #128, %d2 | length of block, TODO: should this be adjusted by 1?
+	
+	| get length of RAM program, write into ram - length is a constant here
+	jmp ram_function | start of kernel memory and where we dumped the RAM function
+
+1:	move.l (%sp)+, %d2
+	rts
+
+| program to run in RAM to write a page of EEPROM memory
+ewp_ram_prog:
+	
+	| dbf ?
+	jmp 1b
+	
+| end of program in RAM
+ewp_ram_prog_end:
+
 
 .data
 .align 4
