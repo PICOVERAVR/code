@@ -4,14 +4,9 @@
 | Interrupt mask register is for controlling if an interrupt is triggered.  ISR bit in interrupt pending register still set regardless.
 | Interrupt in service states whether ISR is being serviced.
 
-| indirect literal is a thing! (assembler converts it into a pc-relative address!)
-| NOTE: this would be a ~bit~ easier if the MFP addresses are even, but I'm afraid to do that...
-
 | TODO: read the finer points of the datasheet, especially all the stuff about reading and writing the data
 | Note: reading the status register after reading the data register means the status register could be referring to a different byte than the data register.
 | also interrupts related to TX and RX errors exist, use them?
-
-| TODO: update addresses to reflect new memory map
 
 	.text
 | MFP register addresses and functions
@@ -203,10 +198,10 @@ mfp_resettimer:
 | triggers when byte is received by MFP
 mfp_rx_isr:
 	move.l #UART_START_POS, %a0
-	| move.b (UART_BUFFER_POS), %d1
+	| move.b UART_BUFFER_POS, %d1
 	
 	| move.b (MFP_UART_DATA), %d0 | load in data
-	| move.b %d0, (0,%a0,%d1) | move byte to current position in buffer
+	| move.b %d0, (0,%a0,%d1) | move byte to current position in buffer, using d1 is indirect
 	| addq #1, (UART_BUFFER_POS) | increment buffer counter
 	rte
 

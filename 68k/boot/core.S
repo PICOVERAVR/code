@@ -2,6 +2,8 @@
 | this is going to be smaller than any kind of actual *utils library
 | and worse
 
+| Good News! Address registers can be odd, only the stack pointer has to be even.  With byte ops, odd addresses don't generate exceptions!
+
 .set ram_function, 0x3FC40
 
 .text
@@ -45,22 +47,26 @@ checksum:
 	move.l (%sp)+, %d2 | restore d2
 	rts
 
+| TODO: finish
 | itoa, implemented in assembly
 | all numbers are considered unsigned, printed in hex
 | @param: number to convert to int
 | @param: space to write int to (max space needed is 8 chars for hex)
 asm_itoa:
 	move.l %d2, -(%sp) | save d2
-	move 4(%sp), %d0 | space
+	move 4(%sp), %a0 | space
 	move 8(%sp), %d1 | num
+
+1:	move.l %d1, %d2
+	andi.b #0x0F, %d2
+	cmpi.b #0xA, %d2 | if greater than 2, add from 'A', not '0'
+	bgt 2f
+	add #0x30, %d2 | add '0'
+	bra 3f
+2:	add #0x41, %d2 | add 'A'
+3:	| move.b %d2, ??? | write to next byte
 	
-	| TODO: get lower 4 bits
-	| add '0'
-	| write to buffer
-	| lsr num >> 4
-	| loop until 0
-	
-2:	| move #0, (%d2) | add a null byte
+	| add a null byte
 	move.l (%sp)+, %d2 | restore d2
 	rts
 
@@ -85,34 +91,56 @@ delay:
 | SDP needs to be disabled since the SDP enable sequence is part of the page-write sequence, as well as the fact that the SDP enable sequence would be written to neither chip
 | since it has both odd and even addresses.
 
-| TODO: check the heck out of this
+| TODO: check the heck out of this against the EEPROM write spec
 
 | write a 128-byte page of memory to one of two EEPROM chips, blocking until the write is complete.
-| @param: address of block to write
+| @param: address of block to write (word-aligned)
 | @param: EEPROM address to write block to (128-byte aligned)
 eeprom_write_page:
-	move.l %d2, -(%sp)
-	move.l 4(%sp), %d0 | memory address
-	move.l 8(%sp), %d1 | EEPROM address
+
+	.set ram_prog_size, ewp_ram_prog_end-ewp_ram_prog
+	moveq #ram_prog_size, %d0 | probably less than 255 bytes
 	
-	move.b #128, %d2 | length of block, TODO: should this be adjusted by 1?
-	
-	| get length of RAM program, write into ram - length is a constant here
+	move.l #ewp_ram_prog, %a0 | load EEPROM write program into RAM, since EEPROM memory will be unavailable during write.
+	move.l #0x3FC40, %a1
+1:	cmpi #0, %d0
+	beq 2f
+	move.b (%a0)+, (%a1)+
+	subq #1, %d0
+	bra 1b
+
+2:	moveq #128, %d0
+	clr %d1
+	move.l 4(%sp), %a0 | memory address
+	move.l 8(%sp), %a1 | EEPROM address
+
 	jmp ram_function | start of kernel memory and where we dumped the RAM function
 
-1:	move.l (%sp)+, %d2
-	rts
+3:	rts
 
 | program to run in RAM to write a page of EEPROM memory
 ewp_ram_prog:
+	move.b (%a0)+, (%a1)
+	addq #2, %a1 | has to be same EEPROM chip
+	| can't be a dbcc since it jumps to the wrong address, possibly a bug in binutils.
+	cmp #0, %a1
+	bne ram_function
 	
-	| dbf ?
-	jmp 1b
+	| TODO: wait 200 us
+	
+	| use toggle bit method to check for write completion
+	btst #6, (%a1)
+	move %sr, %d0
+	btst #6, (%a1)
+	move %sr, %d1
+	cmp.b %d0, %d1
+	| bne to proper RAM address
+
+	jmp 3b
 	
 | end of program in RAM
 ewp_ram_prog_end:
-
-
+	nop | has to be at least one instruction here or it will alias the next label
 .data
 .align 4
 system_error_message: .asciz "System crash - no longer nomadic!\n"
