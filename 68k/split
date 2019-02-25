@@ -30,8 +30,10 @@ if __name__ == "__main__":
 	for byte in bindata:
 		if even == 0:
 			lsbdata.append(byte)
+			msbdata.append(0x00) # append a dummy byte to other EEPROM chip to keep even
 		else:
 			msbdata.append(byte)
+			lsbdata.append(0x00)
 		even ^= 1
 
 #	print("lsb data: ", end='')

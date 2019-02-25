@@ -121,7 +121,7 @@ def eeprom_read():
 if __name__ == "__main__":
 	logger = logging.getLogger('eeprom_parse_logger')
 	
-	parser = argparse.ArgumentParser(description='Python script to interface with EEPROMs.')
+	parser = argparse.ArgumentParser(description='Python script to interface with an Arduino EEPROM-writing interpreter.')
 	parser.add_argument('--version', action='version', version='EEPROM flasher tool v0.2')
 	parser.add_argument('-a', '--action', type=str, default='nop', help='action to perform: id, read, write, and erase.')
 	parser.add_argument('-d', '--device', type=str, help='device to communicate with, usually something like \'/dev/ttyUSB0\'.')

@@ -2,7 +2,7 @@
 | this is going to be smaller than any kind of actual *utils library
 | and worse
 
-| Good News! Address registers can be odd, only the stack pointer has to be even.  With byte ops, odd addresses don't generate exceptions!
+| check all dbcc ops for correct labels...
 
 .set ram_function, 0x3FC40
 
@@ -47,7 +47,6 @@ checksum:
 	move.l (%sp)+, %d2 | restore d2
 	rts
 
-| TODO: finish
 | itoa, implemented in assembly
 | all numbers are considered unsigned, printed in hex
 | @param: number to convert to int
@@ -57,18 +56,23 @@ asm_itoa:
 	move 4(%sp), %a0 | space
 	move 8(%sp), %d1 | num
 
-1:	move.l %d1, %d2
+1:	cmp #0, %a0
+	beq 4f | done?
+	move.l %d1, %d2
 	andi.b #0x0F, %d2
 	cmpi.b #0xA, %d2 | if greater than 2, add from 'A', not '0'
-	bgt 2f
+	bge 2f
 	add #0x30, %d2 | add '0'
 	bra 3f
 2:	add #0x41, %d2 | add 'A'
-3:	| move.b %d2, ??? | write to next byte
-	
-	| add a null byte
+3:	move.b %d2, (%a0)+ | write to next byte
+	bra 1b
+4:	move.b #0, (%a0)+ | add a null byte	
 	move.l (%sp)+, %d2 | restore d2
 	rts
+
+| NOTE: loop overhead is 10us for delay_us and 15us for delay!
+| calculations done for a 16MHz clock
 
 | software delay subroutine
 | ((ms * 1000) / 22) loops required
@@ -85,6 +89,21 @@ delay:
 	cmp.l %d1, %d0 | 6 cc
 	beq.b 1b | 8 cc when not taken
 	| 22 cc total
+	rts
+
+| same as delay but in microseconds
+| (us / 22) loops required
+| @param: us to delay for
+delay_us:
+	move.l 4(%sp), %d0 | 16 cc 
+	move.w %d0, %d1 | 4 cc
+	divu.w #22, %d1 | 140 cc
+	move.w %d1, %d0 | 4 cc
+	clr %d1 | 6 cc
+
+1:	addq.l #1, %d1 | 8 cc
+	cmp.l %d1, %d0 | 6 cc
+	beq.b 1b | 8 cc when not taken
 	rts
 
 | EEPROM writing works, since you need to de-assert CS every time you write a byte and you have to wait 200us (way longer than 68k instruction fetches) in order to write a page
@@ -109,7 +128,7 @@ eeprom_write_page:
 	subq #1, %d0
 	bra 1b
 
-2:	moveq #128, %d0
+2:	move #128, %d0
 	clr %d1
 	move.l 4(%sp), %a0 | memory address
 	move.l 8(%sp), %a1 | EEPROM address
@@ -124,10 +143,12 @@ ewp_ram_prog:
 	addq #2, %a1 | has to be same EEPROM chip
 	| can't be a dbcc since it jumps to the wrong address, possibly a bug in binutils.
 	cmp #0, %a1
-	bne ram_function
+	jmp ram_function
 	
-	| TODO: wait 200 us
-	
+	move.l #200, -(%sp)
+	jsr delay_us
+	addq #4, %sp
+
 	| use toggle bit method to check for write completion
 	btst #6, (%a1)
 	move %sr, %d0

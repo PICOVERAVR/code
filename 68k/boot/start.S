@@ -4,6 +4,7 @@
 | processor to indicate that the host is present.
 
 | TODO: update Arduino programmer to diable SDP after writing the chips, else self-updates won't work.
+| TODO: re-think the split utility. Not going to work in current form - code starts at address 0x200 instead of 0x400
 
 | defined because a straight jump is illegal for some reason
 .set ram_start, 0x20000
