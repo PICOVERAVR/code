@@ -2,6 +2,8 @@
 import sys # for exit
 import os # for checking file existance
 
+debug = False # turn on for printing of odd and even data streams
+
 if __name__ == "__main__":
 	""" split a binary into two files, one with even bytes and one with odd bytes. 
 	
@@ -27,24 +29,28 @@ if __name__ == "__main__":
 	
 	even = 1
 	
-	for byte in bindata:
-		if even == 0:
-			lsbdata.append(byte)
-			msbdata.append(0x00) # append a dummy byte to other EEPROM chip to keep even
+	# TODO: fix and verify that bytes line up with 68k memory addressing
+	
+	# line everything up on even memory addresses, since odd ones are never accessed
+	# inverted A0, so ~UDS or ~LDS = 0
+	for byte in range(0, len(bindata), 2):
+		if byte % 2 == 0:
+			lsbdata.append(bindata[byte])
+			msbdata.append(bindata[byte + 1])
 		else:
-			msbdata.append(byte)
+			msbdata.append(0x00) # odd addresses are unused.
 			lsbdata.append(0x00)
-		even ^= 1
 
-#	print("lsb data: ", end='')
-#	for i in range(0, len(lsbdata)):
-#		print(hex(lsbdata[i]), end=' ')
-#	print("")
-#	
-#	print("msb data: ", end='')
-#	for i in range(0, len(msbdata)):
-#		print(hex(msbdata[i]), end=' ')
-#	print("")
+	if debug:
+		print("lsb data: ", end='')
+		for i in range(0, len(lsbdata)):
+			print(hex(lsbdata[i]), end=' ')
+		print("")
+		
+		print("msb data: ", end='')
+		for i in range(0, len(msbdata)):
+			print(hex(msbdata[i]), end=' ')
+		print("")
 	
 	with open(sys.argv[1] + ".lsb", "wb") as lsb_bin:
 		lsb_bin.write(bytes(lsbdata))

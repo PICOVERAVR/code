@@ -112,6 +112,7 @@ delay_us:
 
 | TODO: check the heck out of this against the EEPROM write spec
 
+| the holy grail of bootloaders - writing a block of flash to EEPROM
 | write a 128-byte page of memory to one of two EEPROM chips, blocking until the write is complete.
 | @param: address of block to write (word-aligned)
 | @param: EEPROM address to write block to (128-byte aligned)
@@ -149,13 +150,14 @@ ewp_ram_prog:
 	jsr delay_us
 	addq #4, %sp
 
-	| use toggle bit method to check for write completion
+1:	| use toggle bit method to check for write completion
 	btst #6, (%a1)
 	move %sr, %d0
 	btst #6, (%a1)
 	move %sr, %d1
 	cmp.b %d0, %d1
-	| bne to proper RAM address
+	.set ram_bne_add, 0x3FC40 + 0x1A
+	jmp ram_bne_add
 
 	jmp 3b
 	
