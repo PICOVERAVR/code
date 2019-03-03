@@ -27,31 +27,20 @@ if __name__ == "__main__":
 	lsbdata = []
 	msbdata = []
 	
-	even = 1
-	
 	# TODO: fix and verify that bytes line up with 68k memory addressing
 	
 	# line everything up on even memory addresses, since odd ones are never accessed
 	# inverted A0, so ~UDS or ~LDS = 0
-	for byte in range(0, len(bindata), 2):
+	for byte in range(0, len(bindata)):
 		if byte % 2 == 0:
-			lsbdata.append(bindata[byte])
-			msbdata.append(bindata[byte + 1])
+			lsbdata.append(bindata[byte + 1]) # 68000 is a big endian machine
+			msbdata.append(bindata[byte])
 		else:
 			msbdata.append(0x00) # odd addresses are unused.
 			lsbdata.append(0x00)
+		if debug:
+			print("word " + str(hex(byte)) + ": (LSB, MSB) (" + str(hex(lsbdata[-1])) + ", " + str(hex(msbdata[-1])) + ")")
 
-	if debug:
-		print("lsb data: ", end='')
-		for i in range(0, len(lsbdata)):
-			print(hex(lsbdata[i]), end=' ')
-		print("")
-		
-		print("msb data: ", end='')
-		for i in range(0, len(msbdata)):
-			print(hex(msbdata[i]), end=' ')
-		print("")
-	
 	with open(sys.argv[1] + ".lsb", "wb") as lsb_bin:
 		lsb_bin.write(bytes(lsbdata))
 	with open(sys.argv[1] + ".msb", "wb") as msb_bin:

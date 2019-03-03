@@ -1,10 +1,9 @@
-| Bootloader section of 68k device
+| Bootloader for 68k device
 | Currently waits for host to send code and data to load into RAM
 | TODO: Future goals is to eventually fall back to executing some code out of ROM, have to have some sort of out-of-band signal to
 | processor to indicate that the host is present.
 
-| TODO: update Arduino programmer to diable SDP after writing the chips, else self-updates won't work.
-| TODO: re-think the split utility. Not going to work in current form - code starts at address 0x200 instead of 0x400
+| TODO: update Arduino programmer to diable SDP after writing the chips once self-update code is all ready
 
 | defined because a straight jump is illegal for some reason
 .set ram_start, 0x20000
@@ -21,8 +20,6 @@ _start:
 	| test the RAM by reading and writing to all memory locations
 	| jump to ram_cmp_error if problems occur.
 	
-	clr %d0
-
 	move.l #ram_start, %a0
 	move.l #ram_end, %a1
 1:	move.w #0xCAFE, (%a0)
@@ -41,9 +38,10 @@ _start:
 	
 	| bootloader format:
 	| <config byte> (lsb) <32b length> <actual memory>
-	| application config byte layout: 0b0000_00VE
-	| E: write program to EEPROM instead of RAM
-	| V: verbose output
+	| application config byte layout: 0b0000_0SVE
+	| S: jump to code in supervisor mode instead of user mode - allows for a more microcontroller-like system
+	| V: verbose output through MFP
+	| E: write program to EEPROM instead of RAM, has to be <128K since bootloader needs room as well.
 
 	clr %d0
 	clr %d2
@@ -52,10 +50,6 @@ _start:
 	
 	| some sort of ACK here?
 	| no config options to parse yet
-	| Ideas: 
-	| S - set if the processor should stay in supervisor mode when jumping to RAM - insecure but possibly helpful?
-	| E - upload code to EEPROM instead of SRAM
-	| 
 	
 	jsr mfp_readc | read a 32-bit value out of the mfp, one byte at a time
 	move.b %d0, %d1 

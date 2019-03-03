@@ -1,7 +1,7 @@
 	.section .rodata
 .long RESET_SSP_PTR
 .long RESET_PC
-.space 0x3FC
+.space 0x3F8
 
 .set RESET_SSP_PTR, 0x40000 | stack is pre-decrement
 .set RESET_PC, 0x400

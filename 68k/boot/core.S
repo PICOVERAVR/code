@@ -1,8 +1,5 @@
-| Core lib and kernel stuff that should be helpful for application programs...
-| this is going to be smaller than any kind of actual *utils library
-| and worse
-
-| check all dbcc ops for correct labels...
+| misc core lib and kernel stuff that should be helpful for application programs...
+| TODO: write trap handlers that at least try to recover from errors, if not too serious
 
 .set ram_function, 0x3FC40
 
@@ -24,13 +21,6 @@ bad_exception:
     addq #1, %d0
     bra 1b
 3:	stop #0x700
-
-| incomplete trap handler
-trap_handler:
-	move.l 4(%sp), %d0
-	movem %d0-%d2/%a0-%a2, -(%sp)
-	movem (%sp)+, %d0-%d2/%a0-%a2
-	rte
 
 | xor all words in a block, returning a checksum
 | @param: length of block - 1
@@ -70,6 +60,38 @@ asm_itoa:
 4:	move.b #0, (%a0)+ | add a null byte	
 	move.l (%sp)+, %d2 | restore d2
 	rts
+
+| interactive dump of registers
+dumpir:
+	| push all registers on the stack using movem
+	| pop each one off, turn to an ascii-encoded string, and print it in hex
+	| TODO: check if stack has enough space for this?
+	movem %d0-%d7/%a0-%a7, -(%sp)
+	sub #8, %sp | space for asm_itoa to work
+	move %sp, %d1
+
+	moveq #16, %d0
+
+1:	move.l (%sp), -(%sp)
+	move.l %d1, -(%sp)
+	jsr asm_itoa 
+	add #8, %sp
+
+	| jsr uart_write | TODO: not sure about parameters here?
+	
+	subq #1, %d0
+	cmpi #0, %d0
+	bne 1b
+
+	rts
+
+| interactive dump of memory contents
+| @param: address to dump
+| @param: length of memory block to dump
+dumpim:
+	| mostly the same as above
+	rts
+
 
 | NOTE: loop overhead is 10us for delay_us and 15us for delay!
 | calculations done for a 16MHz clock

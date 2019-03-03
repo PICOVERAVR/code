@@ -1,5 +1,4 @@
 /* boot m68k link script */
-/* ppssibly buggy, check test script */
 
 MEMORY
 {

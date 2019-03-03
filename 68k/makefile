@@ -11,7 +11,6 @@ UNAME := $(shell uname)
 
 boot: pre # assemble files
 	@m68k-elf-as $(FLAGS) $(SRC) -o boot.o
-	@echo $(BOOT_LINK)
 	@m68k-elf-ld -T $(BOOT_LINK) boot.o -o boot.out
 	@m68k-elf-objcopy -O binary boot.out boot.bin
 	@m68k-elf-readelf -S boot.out
@@ -24,8 +23,8 @@ test: pre
 	@m68k-elf-ld -T $(BOOT_LINK) test.o -o test.out # shouldn't matter where we link stuff to, just that it works properly
 	@m68k-elf-objcopy -O binary test.out test.bin
 	@echo "Test build completed."
-	@m68k-elf-readelf -S boot.out
-
+	@m68k-elf-readelf -S test.out
+	@m68k-elf-objdump -d test.out
 app: pre
 	@m68k-elf-as $(FLAGS) $(APP) -o app.o
 	@m68k-elf-ld -T $(APP_LINK) app.o -o app.out
@@ -36,4 +35,4 @@ pre:
 	@echo "Building on: $(UNAME)"
 
 clean:
-	@rm -f	{*.out,*.o,*.bin}
+	@rm -f	{*.out,*.o,*.bin,*.lsb,*.msb}
