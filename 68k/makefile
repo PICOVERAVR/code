@@ -1,4 +1,5 @@
-SRC := $(wildcard boot/*.S)
+exclude := boot/start.S
+SRC := $(filter-out $(exclude), $(wildcard boot/*.S))
 APP := $(wildcard app/*.S)
 TEST := test/test.S
 
@@ -10,7 +11,7 @@ FLAGS := -march=68000 -mcpu=68000 -mno-float
 UNAME := $(shell uname)
 
 boot: pre # assemble files
-	@m68k-elf-as $(FLAGS) $(SRC) -o boot.o
+	@m68k-elf-as $(FLAGS) boot/start.S $(SRC) -o boot.o # start.S code always executes first
 	@m68k-elf-ld -T $(BOOT_LINK) boot.o -o boot.out
 	@m68k-elf-objcopy -O binary boot.out boot.bin
 	@m68k-elf-readelf -S boot.out

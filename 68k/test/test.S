@@ -7,9 +7,26 @@
 .space 0x3F8
 
 	.text
-	.global test_start
+	.global start
 
-test_start:
-	bra test_start
+start:
+	ori.w #0x700, %sr | set IPL to 7
+        
+    move.l #0x20000, %a0
+    move.l #0x40000, %a1
+1:  move.w #0xCAFE, (%a0)
+    cmpa.l %a0, %a1 
+    addq #2, %a0
+    bne 1b
+
+2:  move.w (%a0), %d0 
+    cmpi.w #0xCAFE, %d0
+    bne error
+    cmpa %a0, %a1 
+    subq #2, %a0
+    bne 2b
+
+	andi #0xD8FF, %sr | clear supervisor flag and set IPL to 0, obvious indicator that memory check is successful
 	
-
+error:
+	stop #0xFFFF
