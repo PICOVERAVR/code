@@ -9,24 +9,20 @@
 	.text
 	.global start
 
+| do a byte memory test later as well
+| this project is going to be done instantly if I have to calculate branch offsets manually.
+| find another way to do this.
+
 start:
-	ori.w #0x700, %sr | set IPL to 7
-        
-    move.l #0x20000, %a0
-    move.l #0x40000, %a1
-1:  move.w #0xCAFE, (%a0)
-    cmpa.l %a0, %a1 
-    addq #2, %a0
-    bne 1b
+	ori.w #0x700, %sr
 
-2:  move.w (%a0), %d0 
-    cmpi.w #0xCAFE, %d0
-    bne error
-    cmpa %a0, %a1 
-    subq #2, %a0
-    bne 2b
+	move.l #0x20000, %a0
+1:	move.w #0xCAFE, (%a0)
+	move.w (%a0), %d0
+	cmp.w #0xCAFE, %d0
+	bne 6
+	jmp 1b
 
-	andi #0xD8FF, %sr | clear supervisor flag and set IPL to 0, obvious indicator that memory check is successful
-	
+.align 2
 error:
-	stop #0xFFFF
+	stop #0x0700 | set interrupt mask to 7

@@ -1,31 +1,34 @@
-freerun asm is ori.b #0, D0
-
 bad ideas:
 	letting the MMU handle illegal accesses to low 128K of memory - MMU has to sit between processor and memory
 	remove pullup on AS - there to prevent spurious memory acceses once bus master is done and CPU has not relinquished control of the bus yet
-	having the bootloader print stuff without host initiating communication - bootloader will hang waiting on tx buffer to drain if no host is there? Is this true?
+	having the bootloader print stuff without host initiating communication - bootloader will hang waiting on tx buffer to drain if no host is there... not sure if this is true
 	supervisor access only to EEPROM - prevents user from using hardware libs, initial supervisor -> user jump is awkward at best
 	having MFP drive IRQ lines directly - if a priority level 2 interrupt and level 1 interrupt fire at the same time, the processor will register a level 3 interrupt.
+
+maybe ideas:
+	having an MMU board at all - 68451 chip is kinda hard to find on eBay and pretty expensive too, couldn't find a PLCC package for it
 
 ideas for add-on boards:
 	
 	NOTE: all add-on boards have to have space for a board to be stacked on top of them, PC104 style
-	MMU board ONLY is allowed to have two ports so more RAM or hardware can be put on top of it and managed.
 	
+	Interface options:
+		SPI using the MFP I/O pins - slow, but easier to implement
+		External device grabs host memory using DMA (FPGA or CPLD with microcontroller)
+			significantly faster
+			harder to design
+			requires host board modification since the DMA functionality is broken currently
+		Dual-ported RAM
+			a good idea for video stuff, especially 3D applications
+		FIFO chips
+			good for ingesting lots of fast data
+
 	Debug card
 		all the blinkenlights
-		7-seg displays?
-	Graphics (on a screen)
-		FPGA used as graphics card
-	Expansion card
-		DIP holes for prototyping
+		7-seg displays would be cool, have some 4000 series chips driving everything
 	RAM expansions
 		keep everything DIP, has to be >1MB to be helpful
-		throw a MMU on this thing as well.
-	Timer / interrupt controller
-		use the 68k chip I already have
-	SD support
-		using IO pins on MFP
+		use a CPLD the second time around maybe for the practice of doing it that way as well
 	User board
 		could literally just be some switches and (buffered) LEDs
 		switches can be pulled high or low, so a read to unimplemented memory can read in values (drive DTACK high until done)
@@ -33,23 +36,24 @@ ideas for add-on boards:
 what everything does:
 	eeprom-config: python tool for writing and reading data to/from EEPROMs
 	split: splits a binary file in two
-	upload: application code upload to 68k baseboard + uart board
+	upload: application code upload to 68k baseboard
 
 MANIFESTO:
-	Fast.  Or at least faster than most other 68000 boards out there.
-	Modern (interface).  If something needs to be connected, do it with modern parts.
-	Extensible.  The board should contain enough to get started, but not enough that it hinders expansion.
+	1. Fast.  Or at least faster than most other 68000 boards out there.
+	2. Modern (interface).  If something needs to be connected, do it with modern parts.
+	3. Extensible.  The board should contain enough to get started, but not enough that it hinders expansion.
 	
 	68000 / 68010 compatible, technically. 7805 only supplies 1.5A, and 68010 may exceed this limit. 68HC000 won't.
-	Aim for 16MHz clock speed
-	actual C compiler should be working for this, not BASIC or Forth or anything.  If not C, then only ASM.
+	128K SRAM, 128K EEPROM
+	MFP I/O device included
+	actual C compiler should be working for this, not BASIC or Forth or anything.  If not C, then only ASM. (see #1)
 
-	new stuff:
-		FIFO chips for ingesting data quickly
-		dual port RAM chips for graphics support - FPGA on the other side controlling the screen
-		terminal color support - not that hard!
-	
 	goals:
-		get it working
-		write more support code
 		write a game!
+		RC2014 interface?
+		make a wall clock
+		air quality measurement
+		add a GSM module or something - usually UART based!
+		some sort of laser thing - laser servo application!
+		music - dedicated audio board with an actual amp and everything, have the MFP drive it!
+		write some sort of graphics application
