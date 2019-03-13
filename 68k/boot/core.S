@@ -66,6 +66,7 @@ dumpir:
 	| push all registers on the stack using movem
 	| pop each one off, turn to an ascii-encoded string, and print it in hex
 	| TODO: check if stack has enough space for this?
+	| TODO: don't need to push all registers, just the ones we modify (including d0-d2/a0-a2)
 	movem %d0-%d7/%a0-%a7, -(%sp)
 	sub #8, %sp | space for asm_itoa to work
 	move %sp, %d1
@@ -74,9 +75,10 @@ dumpir:
 
 1:	move.l (%sp), -(%sp)
 	move.l %d1, -(%sp)
-	jsr asm_itoa 
+	jsr asm_itoa
 	add #8, %sp
-
+	
+	| move.l %d0, -(%sp)
 	| jsr uart_write | TODO: not sure about parameters here?
 	
 	subq #1, %d0
@@ -85,11 +87,25 @@ dumpir:
 
 	rts
 
+| 00000000:0000 0000 0000 0000 0000 0000 0000 0000
+| 00000010:0010 00FF AAFF 0000 0000 0000 0000 FFAF
+
 | interactive dump of memory contents
 | @param: address to dump
-| @param: length of memory block to dump
+| @param: length of memory block to dump (multiple of 16)
 dumpim:
-	| mostly the same as above
+	move.l 4(%sp), %a0
+	move.l 8(%sp), %a1
+	| PUSH A2
+	| write address, justified to 8 characters
+	move.b #':', %d0
+	jsr mfp_writec
+	move.b (%a0)+, %d0
+	| do a quick itoa here, since %d0 is a byte and 0 <= d0 <= 255
+	| write %d0
+	cmp %a0, %a1
+	| bne ...
+	| POP A2
 	rts
 
 

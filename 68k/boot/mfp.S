@@ -44,7 +44,7 @@
 
 | reset and configure the MFP for basic operation
 mfp_init:
-	bset #6, (MFP_VR) | set vector register so interrupts occur right after end of mandatory section of EVT
+	bset #6, (MFP_VR) | set vector register so interrupt vectors point to right after end of mandatory section of EVT
 	bset #3, (MFP_UART_UCR) | mfp: 1 start bit, 1 stop bit, async
 	
 	| automatic ISR bit clearing by default
@@ -71,7 +71,7 @@ mfp_write:
 	move.w (%a0)+, %d0
 	move.b %d0, (MFP_UART_DATA)
 	lsr #8, %d0
-	move.b %d0, (MFP_UART_DATA)
+	move.b %d0, (MFP_UART_DATA) | TODO: bug here- no jmp, also address registers don't have to be word-aligned.
 3:	rts
 
 | read a null-terminated string from input
