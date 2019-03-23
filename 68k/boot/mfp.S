@@ -57,6 +57,8 @@ mfp_init:
 	move #0, (UART_BUFFER_START)
 	move #0, (UART_BUFFER_END)
 	
+	| TODO: set clock divide bit to 16, should get 115200 baud
+
 	rts
 
 | write a word-aligned null-terminated string to output
@@ -71,7 +73,8 @@ mfp_write:
 	move.w (%a0)+, %d0
 	move.b %d0, (MFP_UART_DATA)
 	lsr #8, %d0
-	move.b %d0, (MFP_UART_DATA) | TODO: bug here- no jmp, also address registers don't have to be word-aligned.
+	move.b %d0, (MFP_UART_DATA) | TODO: bug here - address registers don't have to be word-aligned.
+	bra 1b
 3:	rts
 
 | read a null-terminated string from input
@@ -195,6 +198,8 @@ mfp_resettimer:
 | Note: MFP uart space is from 0x20000 -> 0x2003F
 | configured for auto-clearing of correct ISR bit
 
+| TODO: use modulus operator to calculate next position in the queue
+| back = (back + 1) % q.size
 | triggers when byte is received by MFP
 mfp_rx_isr:
 	move.l #UART_START_POS, %a0

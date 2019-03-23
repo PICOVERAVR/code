@@ -30,7 +30,7 @@ _start:
 2:	move.w (%a0), %d0
 	cmpi.w #0xCAFE, %d0
 	bne ram_cmp_error
-	cmpa %a0, %a1
+	cmpa.l %a0, %a1
 	subq #2, %a0
 	bne 2b
 	

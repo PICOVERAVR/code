@@ -26,13 +26,13 @@ ideas for add-on boards:
 	Debug card
 		all the blinkenlights
 		7-seg displays would be cool, have some 4000 series chips driving everything
-	RAM expansions
-		keep everything DIP, has to be >1MB to be helpful
-		use a CPLD the second time around maybe for the practice of doing it that way as well
 	User board
 		could literally just be some switches and (buffered) LEDs
 		switches can be pulled high or low, so a read to unimplemented memory can read in values (drive DTACK high until done)
-	
+	Audio board
+		could initially just be an op-amp or two connected to a couple lines on the MFP
+		could also add seperate voices - if I were to do this it would require external hardware, MFP is pretty limited
+
 what everything does:
 	eeprom-config: python tool for writing and reading data to/from EEPROMs
 	split: splits a binary file in two
@@ -57,3 +57,8 @@ MANIFESTO:
 		some sort of laser thing - laser servo application!
 		music - dedicated audio board with an actual amp and everything, have the MFP drive it!
 		write some sort of graphics application
+	
+	measurements:
+		board draws ~270mA when active
+		at 14MHz (highest clock freq available that works properly) MFP IO switch time is 10us
+
