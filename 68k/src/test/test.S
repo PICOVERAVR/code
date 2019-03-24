@@ -40,7 +40,6 @@ print:
 	beq 2b
 	move.b (%a0)+, (MFP_UART_DATA)
 	bra 1b
-
 end:
 	stop #0xFFFF
 

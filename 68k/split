@@ -31,7 +31,10 @@ if __name__ == "__main__":
 	# inverted A0, so ~UDS or ~LDS = 0
 	for byte in range(0, len(bindata)):
 		if byte % 2 == 0:
-			lsbdata.append(bindata[byte + 1]) # 68000 is a big endian machine
+			if byte + 1 == len(bindata):
+				lsbdata.append(0)
+			else:
+				lsbdata.append(bindata[byte + 1]) # 68000 is a big endian machine
 			msbdata.append(bindata[byte])
 		else:
 			msbdata.append(0x00) # odd addresses are unused.
