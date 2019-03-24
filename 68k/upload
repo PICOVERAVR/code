@@ -25,7 +25,7 @@ if __name__ == "__main__":
 	try:
 		if args.device == None:
 			raise IOError
-		#with open(args.device) as file:
+		#with open(args.device) as file: # TODO: fix this
 		#	pass
 	except IOError as bad_file:
 		print("cannot open device file!")

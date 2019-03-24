@@ -5,23 +5,6 @@
 
 .text
 
-| generic exception handler for unrecoverable system events
-bad_exception:
-	move.l #0x20100, %sp | reset possibly corrupted stack pointer
-	or.i #0x700, %sr | disable interrupts
-	reset | try to bring the MFP back online - also clears interrupt sources
-    move.l system_error_message, %a0 | code copied from mfp_write.
-    clr %d0
-    clr %d1
-1:  cmp.b (%a0), %d1 | test for null character
-    beq 3f
-2:  btst #7, (0x4002D) | wait until buffer is ready
-    beq 2b
-    move.b (%a0)+, (MFP_UART_DATA) | write byte to MFP
-    addq #1, %d0
-    bra 1b
-3:	stop #0x700
-
 | xor all words in a block, returning a checksum
 | @param: length of block - 1
 | @param: start address
@@ -61,55 +44,7 @@ asm_itoa:
 	move.l (%sp)+, %d2 | restore d2
 	rts
 
-| interactive dump of registers
-dumpir:
-	| push all registers on the stack using movem
-	| pop each one off, turn to an ascii-encoded string, and print it in hex
-	| TODO: check if stack has enough space for this?
-	| TODO: don't need to push all registers, just the ones we modify (including d0-d2/a0-a2)
-	movem %d0-%d7/%a0-%a7, -(%sp)
-	sub #8, %sp | space for asm_itoa to work
-	move %sp, %d1
-
-	moveq #16, %d0
-
-1:	move.l (%sp), -(%sp)
-	move.l %d1, -(%sp)
-	jsr asm_itoa
-	add #8, %sp
-	
-	| move.l %d0, -(%sp)
-	| jsr uart_write | TODO: not sure about parameters here?
-	
-	subq #1, %d0
-	cmpi #0, %d0
-	bne 1b
-
-	rts
-
-| 00000000:0000 0000 0000 0000 0000 0000 0000 0000
-| 00000010:0010 00FF AAFF 0000 0000 0000 0000 FFAF
-
-| interactive dump of memory contents
-| @param: address to dump
-| @param: length of memory block to dump (multiple of 16)
-dumpim:
-	move.l 4(%sp), %a0
-	move.l 8(%sp), %a1
-	| PUSH A2
-	| write address, justified to 8 characters
-	move.b #':', %d0
-	jsr mfp_writec
-	move.b (%a0)+, %d0
-	| do a quick itoa here, since %d0 is a byte and 0 <= d0 <= 255
-	| write %d0
-	cmp %a0, %a1
-	| bne ...
-	| POP A2
-	rts
-
-
-| NOTE: loop overhead is 10us for delay_us and 15us for delay!
+| NOTE: loop overhead is 10us for delay_us and 15us for  regular delay
 | calculations done for a 16MHz clock
 
 | software delay subroutine
@@ -194,7 +129,7 @@ ewp_ram_prog:
 	btst #6, (%a1)
 	move %sr, %d1
 	cmp.b %d0, %d1
-	.set ram_bne_add, 0x3FC40 + 0x1A
+	.set ram_bne_add, 0x3FC40 + 0x1A | cannot jump to any assembler labels since all of those are in ROM
 	jmp ram_bne_add
 
 	jmp 3b
@@ -202,6 +137,72 @@ ewp_ram_prog:
 | end of program in RAM
 ewp_ram_prog_end:
 	nop | has to be at least one instruction here or it will alias the next label
+
+| generic exception handler for unrecoverable system events
+bad_exception:
+	move.l #0x20100, %sp | reset possibly corrupted stack pointer
+	or.i #0x700, %sr | disable interrupts
+	reset | try to bring the MFP back online - also clears interrupt sources
+    move.l system_error_message, %a0 | code copied from mfp_write.
+    clr %d0
+    clr %d1
+1:  cmp.b (%a0), %d1 | test for null character
+    beq 3f
+2:  btst #7, (0x4002D) | wait until buffer is ready
+    beq 2b
+    move.b (%a0)+, (MFP_UART_DATA) | write byte to MFP
+    addq #1, %d0
+    bra 1b
+3:	stop #0x700
+
+| interactive dump of registers
+dumpir:
+	| push all registers on the stack using movem
+	| pop each one off, turn to an ascii-encoded string, and print it in hex
+	| TODO: check if stack has enough space for this?
+	| TODO: don't need to push all registers, just the ones we modify (including d0-d2/a0-a2)
+	movem %d0-%d7/%a0-%a7, -(%sp)
+	sub #8, %sp | space for asm_itoa to work
+	move %sp, %d1
+
+	moveq #16, %d0
+
+1:	move.l (%sp), -(%sp)
+	move.l %d1, -(%sp)
+	jsr asm_itoa
+	add #8, %sp
+	
+	| move.l %d0, -(%sp)
+	| jsr uart_write | TODO: not sure about parameters here?
+	
+	subq #1, %d0
+	cmpi #0, %d0
+	bne 1b
+
+	rts
+
+| 00000000:0000 0000 0000 0000 0000 0000 0000 0000
+| 00000010:0010 00FF AAFF 0000 0000 0000 0000 FFAF
+
+| interactive dump of memory contents
+| @param: address to dump
+| @param: length of memory block to dump (multiple of 16)
+dumpim:
+	move.l 4(%sp), %a0
+	move.l 8(%sp), %a1
+	| TODO: finish this
+	| PUSH A2
+	| write address, justified to 8 characters
+	move.b #':', %d0
+	jsr mfp_writec
+	move.b (%a0)+, %d0
+	| do a quick itoa here, since %d0 is a byte and 0 <= d0 <= 255
+	| write %d0
+	cmp %a0, %a1
+	| bne ...
+	| POP A2
+	rts
+
 .data
 .align 4
 system_error_message: .asciz "System crash - no longer nomadic!\n"

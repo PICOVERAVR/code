@@ -27,8 +27,6 @@ if __name__ == "__main__":
 	lsbdata = []
 	msbdata = []
 	
-	# TODO: fix and verify that bytes line up with 68k memory addressing
-	
 	# line everything up on even memory addresses, since odd ones are never accessed
 	# inverted A0, so ~UDS or ~LDS = 0
 	for byte in range(0, len(bindata)):
