@@ -1,0 +1,10 @@
+Ideas for future expansion:
+	have a plane on which things bounce
+	more complex models than just squares
+		figure out how to import models from somewhere else
+	figure out reflection
+	backgrounds / lighting
+		a night sky would be cool
+	particle effects
+		mist, fire, rain
+	
