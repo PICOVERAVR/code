@@ -22,7 +22,7 @@ START_TEST(nop)
     int code = instr_nop(p2);
 
     ck_assert_int_eq(code, RET_OK);
-    ck_assert_int_eq(memcmp(p2, p, sizeof(p)), 0); // make sure it did nothing
+    ck_assert_int_eq(memcmp(p2, p, sizeof(proc)), 0); // make sure it did nothing
 
 }
 END_TEST
