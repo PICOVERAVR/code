@@ -36,6 +36,5 @@ read dummy
 echo "Connect MSB side of programmer and enter any key to continue."
 read dummy
 ./eeprom_config --device=$dest --action=write --binary=$name.bin.msb
-
 echo "upload completed."
 

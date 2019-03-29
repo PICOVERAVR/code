@@ -85,9 +85,9 @@ def eeprom_write():
 		serport.write(byte_arr[96:128])
 		
 		temp = serport.readline()
+		print("writing page " + str(page // 128) + "/" + str((endpage // 128) - 1) + "...")
 		while temp != b'done.\r\n':
 			temp = serport.readline()
-		print("writing page " + str(page // 128) + "/" + str((endpage // 128) - 1) + "...")
 	print("done.")
 
 def eeprom_read():
