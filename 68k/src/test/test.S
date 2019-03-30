@@ -19,13 +19,13 @@
 | NOTE: MFP doesn't work at 16MHz.  Either implement a DTACK generator circuit or (bad) downclock to <=14MHz
 | baud rate should be 115200, check with bp
 
-| TODO: implement the DTACK generator.  UART is acting up for some reason, and it's hard to interface with because it's so fast.
+| TODO: fix the DTACK problem, but not by creating a seperate DTACK generator!!
 | Can't use the second probe on the function generator, since it only goes to 3v at max.
 | I think the MFP is having a hard time keeping up with the processor's bus stuff since it's being clocked at 1/4th the frequency.
-| Cutting the DTACK trace is possible, but hard.
 
-| UART problem could be caused by master clock running faster than peripheral, DTACK would fix this.
-| Also check on the fact that DTACK isn't firing at all.  If all else is broken, could be a faulty chip.
+
+| TODO: I shouldn't need to create a seperate DTACK generator for this chip, because it has one onboard.  Could be leading to weird UART problems.
+
 
 start:
 	move.b #0xFF, (0x40005) | all IO pins outputs
