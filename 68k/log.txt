@@ -1,0 +1,65 @@
+Official documentation and history for my 68000 project (codename "Nomad")
+
+Design goals:
+	1. Fast.  Or at least faster than most other 68000 boards out there.
+	2. Modern (interface).  If something needs to be connected, do it with modern parts.
+	3. Extensible.  The board should contain enough to get started, but not enough that it hinders expansion.
+	
+	68000 and 68010 compatible
+	128K SRAM, 128K EEPROM
+	MFP I/O device included
+	actual C compiler should be working for this, not BASIC or Forth or anything. If not C, then only ASM. (see #1)
+
+Software tools:
+	flash: a shell script that calls make, then the python scripts below to upload code
+	makefile: assemble and link source code
+	eeprom-config: python tool for writing and reading data to/from EEPROMs
+	split: splits a binary file in two
+	upload: application code upload to 68k baseboard
+
+Project goals:
+	write a game!
+	RC2014 interface?
+	make a wall clock
+	air quality measurement
+	add a GSM module or something - usually UART based!
+	some sort of laser thing - laser servo application!
+	music - dedicated audio board with an actual amp and everything, have the MFP drive it!
+	write some sort of graphics application
+		use my FPGA board to do something fun with this
+	User board
+		could literally just be some switches and (buffered) LEDs
+		switches can be pulled high or low, so a read to unimplemented memory can read in values (drive DTACK high until done)
+	Audio board
+		could initially just be an op-amp or two connected to a couple lines on the MFP
+		could also add seperate voices - if I were to do this it would require external hardware, MFP is pretty limited
+
+Rev 1 board:
+	Things that were broken:
+		Bought a tantulum cap instead of an electrolytic one, didn't notice, and it blew on me
+		RX buffering was inverted, luckily caught it before it broke anything
+		Some of the silkscreens for the expansion IO were off a little, but I knew about that
+		RC values for reset were wrong because I didn't have anything pulling current from it in the simulation
+		10uF caps have the wrong footprint
+		Mounting holes were too small
+		Software Data Protection on the EEPROMs needed to be turned off, but that isn't a huge concern and working around SDP is really hard without things getting a lot more complex
+		MFP is being annoying, DTACK didn't fire correctly
+		Cold solder joint on 4AN1 prevented the MFP from being triggered
+	
+	Things that worked:
+		CPU executed code in a loop, RAM access seemed to be working okay
+		MFP can read data values off the bus and manipulate the IO ports just fine.
+		Board draws 270mA when running at full power.
+	
+	Measurements:
+		board draws ~270mA when active
+		at 14MHz (highest clock freq available that works properly) MFP IO switch time is 10us
+
+Features to add (in a future redesign):
+	Use a later version of the 68000 architecture.
+		Having a MMU and a FPU would be nice
+		Should be able to clock it at the same frequencies, which means no high-speed circuit design.
+	Replace the hard glue logic with a CPLD
+		Should have done this originally, a lot easier to work with and I would have learned way more
+		Custom hardware for peripherals, because finding cheap 68000-compatible peripheral chips is annoying
+		If glue logic is required, use HCT family instead of LS family. Easier to interface with.

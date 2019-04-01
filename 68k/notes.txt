@@ -32,33 +32,8 @@ ideas for add-on boards:
 	Audio board
 		could initially just be an op-amp or two connected to a couple lines on the MFP
 		could also add seperate voices - if I were to do this it would require external hardware, MFP is pretty limited
-
-what everything does:
-	eeprom-config: python tool for writing and reading data to/from EEPROMs
-	split: splits a binary file in two
-	upload: application code upload to 68k baseboard
-
-MANIFESTO:
-	1. Fast.  Or at least faster than most other 68000 boards out there.
-	2. Modern (interface).  If something needs to be connected, do it with modern parts.
-	3. Extensible.  The board should contain enough to get started, but not enough that it hinders expansion.
 	
-	68000 / 68010 compatible, technically. 7805 only supplies 1.5A, and 68010 may exceed this limit. 68HC000 won't.
-	128K SRAM, 128K EEPROM
-	MFP I/O device included
-	actual C compiler should be working for this, not BASIC or Forth or anything.  If not C, then only ASM. (see #1)
-
-	goals:
-		write a game!
-		RC2014 interface?
-		make a wall clock
-		air quality measurement
-		add a GSM module or something - usually UART based!
-		some sort of laser thing - laser servo application!
-		music - dedicated audio board with an actual amp and everything, have the MFP drive it!
-		write some sort of graphics application
-	
-	measurements:
+Measurements:
 		board draws ~270mA when active
 		at 14MHz (highest clock freq available that works properly) MFP IO switch time is 10us
 
