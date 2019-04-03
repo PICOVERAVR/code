@@ -144,7 +144,7 @@ if __name__ == "__main__":
 		import serial
 	except ModuleNotFoundError:
 		logger.error("pyserial module not found!")
-		logger.debug("try \'pip3 install pyserial\'")
+		logger.debug("try \'python -m pip install pyserial\'")
 		sys.exit(2)
 	else:
 		logger.info("pyserial module found.")
