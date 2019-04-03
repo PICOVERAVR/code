@@ -6,6 +6,9 @@ Check the showcase folder!
 - set bashrc location
 - clone repository: `clone https://www.github.com/PICOVERAVR/code`
 - manually point .gitconfig to inside repo: `git config --local include.path ../.gitconfig` in main folder
+- add a new remote in order to pull branches besides the master branch: `git remote origin add <url>`
+	- use `git remote -v` to verify the "origin" branch is detected.
+- pull all other branches into workspace: `git fetch origin`
 - checkout and track individual branches: `git checkout --track origin/<branch>`
 - link .bashrc and .vimrc files to home directory
 
