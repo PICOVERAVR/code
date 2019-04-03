@@ -36,7 +36,7 @@
 
 start:
 	move.b #0xFF, (0x40005) | all IO pins outputs
-	move.b #0x1, (0x40005) | set I1 to on
+	move.b #0x1, (0x40001) | set I0 to high
 	
 	move.b #0x40, (MFP_VR) | point IVR to right after mandatory section of EVT
 	move.b #0x8, (MFP_UART_UCR) | uart: 1 start bit, 1 stop bit, async
@@ -62,11 +62,8 @@ print:
 	| check transmit underrun vs buffer empty!
 	
 1:	btst #7, (MFP_UART_TSR)
-	nop
 	beq 1b | MFP set when ready for byte transfer, Z bit cleared when ready
-	nop
 	move.b #'A', (MFP_UART_DATA) | 0x41
-	nop
 	bra print
 
 |	clr %d1 | use as zero register
