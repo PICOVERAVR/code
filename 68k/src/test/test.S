@@ -18,22 +18,6 @@
 	.text
 	.global start
 
-| NOTE: MFP doesn't work at 16MHz.  Downclock to <=14MHz, use either 12 or 8MHz.
-| Maybe do a DTACK generator, but the chip should generate its own DTACK.  Check up on this, since it's always asserted?
-
-| baud rate should be 115200, check with bp
-
-| TODO: fix the DTACK problem, but not by creating a seperate DTACK generator!!
-| Can't use the second probe on the function generator, since it only goes to 3v at max.
-| TODO: almost definitely not a hardware problem, since the MFP can toggle IO lines in response to the processor.  Check other registers.
-
-| TODO: I shouldn't need to create a seperate DTACK generator for this chip, because it has one onboard.  Could be leading to weird UART problems.
-
-| Things to check:
-| - UART registers
-| - Interrupt registers
-| - Vector registers
-
 start:
 	move.b #0xFF, (0x40005) | all IO pins outputs
 	move.b #0x1, (0x40001) | set I0 to high
@@ -44,8 +28,9 @@ start:
 	move.b #0x0, (MFP_IMRA) | clear mask registers - interrupt bits are recognizable, but cannot trigger an interrupt
 	move.b #0x0, (MFP_IMRB)
 	
-	bset #2, (MFP_UART_TSR) | tx idles high
-	bset #0, (MFP_UART_TSR) | enable tx, has to be last in init routine
+	move.b #0x5, (MFP_UART_TSR)
+	| bset #2, (MFP_UART_TSR) | tx idles high
+	| bset #0, (MFP_UART_TSR) | enable tx, has to be last in init routine
 	
 	|bset #6, (MFP_VR) | interrupt vectors point to right after end of mandatory section of EVT
 	|bset #3, (MFP_UART_UCR) | uart: 1 start bit, 1 stop bit, async
@@ -59,25 +44,37 @@ print:
 	| MFP Buffer Empty bit set when ready, cleared when in the process of transmitting
 	| cleared by writing to UDR
 	
-	| check transmit underrun vs buffer empty!
-	
-1:	btst #7, (MFP_UART_TSR)
-	beq 1b | MFP set when ready for byte transfer, Z bit cleared when ready
-	move.b #'A', (MFP_UART_DATA) | 0x41
-	bra print
-
-|	clr %d1 | use as zero register
-|	move #str, %a0
-|1:	cmp.b (%a0), %d1 | check for null char
-|	beq end
-|2:	btst #7, (MFP_UART_TSR) | MFP set when ready, Z bit cleared when ready
-|	beq 2b
-|	move.b (%a0)+, (MFP_UART_DATA)
-|	bra 1b
-|end:
-|	nop
+|1:	btst #7, (MFP_UART_TSR)
+|	beq 1b | MFP set when ready for byte transfer, Z bit cleared when ready
+|	move.b #'h', (MFP_UART_DATA) | 0x41
+|1:	btst #7, (MFP_UART_TSR)
+|	beq 1b
+|	move.b #'i', (MFP_UART_DATA)
+|1:	btst #7, (MFP_UART_TSR)
+|	beq 1b
+|	move.b #'\n', (MFP_UART_DATA)
 |	bra print
 
+| op src dest
+
+move.l str, %a0
+
+1: btst #7, (MFP_UART_TSR)
+	beq 1b
+	move.b (%a0), (MFP_UART_DATA)
+	bra 1b
+
+|6:	move.l str, %a0
+
+|1:	move.b (%a0)+, %d0
+|	beq 3f
+|2:	btst #7, (MFP_UART_TSR)
+|	beq 2b
+|	move.b %d0, (MFP_UART_DATA)
+|	bra 6b
+	
+|3:	stop #0x700
+
 	.data
-str: .asciz "Hello, World!"
+str: .asciz "Hello, World!\n"
 
