@@ -18,47 +18,52 @@ Software tools:
 	upload: application code upload to 68k baseboard
 
 Project goals:
-	write a game!
-	RC2014 interface?
 	make a wall clock
 	air quality measurement
 	add a GSM module or something - usually UART based!
 	some sort of laser thing - laser servo application!
-	music - dedicated audio board with an actual amp and everything, have the MFP drive it!
-	write some sort of graphics application
-		use my FPGA board to do something fun with this
+	write some sort of graphics application or game
+		controlling the screen over UART isn't a good idea, and the maximum data transfer speed over the IO lines is pretty slow
+		use my FPGA board to perform DMA on the memory (like the Apple Macintosh)
+			DMA would have to work correctly for this to function properly, and 68000 DMA chips are really hard to find
+		reviewing OpenGL code before doing this would be helpful for knowing the features I need
 	User board
 		could literally just be some switches and (buffered) LEDs
 		switches can be pulled high or low, so a read to unimplemented memory can read in values (drive DTACK high until done)
 	Audio board
 		could initially just be an op-amp or two connected to a couple lines on the MFP
+		probably want a seperate power supply for this to avoid noise on the power lines?
 		could also add seperate voices - if I were to do this it would require external hardware, MFP is pretty limited
 
 Rev 1 board:
 	Things that were broken:
 		Bought a tantulum cap instead of an electrolytic one, didn't notice, and it blew on me
 		RX buffering was inverted, luckily caught it before it broke anything
+		Only one inverting buffer was used, so all of the TX and RX signals are inverted.
 		Some of the silkscreens for the expansion IO were off a little, but I knew about that
 		RC values for reset were wrong because I didn't have anything pulling current from it in the simulation
 		10uF caps have the wrong footprint
 		Mounting holes were too small
 		Software Data Protection on the EEPROMs needed to be turned off, but that isn't a huge concern and working around SDP is really hard without things getting a lot more complex
-		MFP is being annoying, DTACK didn't fire correctly
+		MFP DTACK signal is grounded all the time, but MFP still accepts reads and writes.  Not a huge issue since grounded DTACK makes sense from a logical point of view
 		Cold solder joint on 4AN1 prevented the MFP from being triggered
-	
+
 	Things that worked:
 		CPU executed code in a loop, RAM access seemed to be working okay
 		MFP can read data values off the bus and manipulate the IO ports just fine.
-		Board draws 270mA when running at full power.
 	
 	Measurements:
 		board draws ~270mA when active
 		at 14MHz (highest clock freq available that works properly) MFP IO switch time is 10us
+		future board clock speed is 12MHz
 
 Features to add (in a future redesign):
 	Use a later version of the 68000 architecture.
 		Having a MMU and a FPU would be nice
 		Should be able to clock it at the same frequencies, which means no high-speed circuit design.
+		If I go all the way up to the 68040/68060, I get nice features like JTAG and integrated FPU and MMUs
+		Need to worry about heat sink stuff, kinda like a real computer
+		At this point it would be easier to design a raspi clone, which is hard to do.
 	Replace the hard glue logic with a CPLD
 		Should have done this originally, a lot easier to work with and I would have learned way more
 		Custom hardware for peripherals, because finding cheap 68000-compatible peripheral chips is annoying

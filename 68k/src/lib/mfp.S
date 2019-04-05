@@ -44,21 +44,18 @@
 
 | reset and configure the MFP for basic operation
 mfp_init:
-	bset #6, (MFP_VR) | set vector register so interrupt vectors point to right after end of mandatory section of EVT
-	bset #3, (MFP_UART_UCR) | mfp: 1 start bit, 1 stop bit, async
-	
-	| automatic ISR bit clearing by default
+	move.b #0x40, (MFP_VR) | point IVR to right after EVT
+	move.b #0x8, (MFP_UART_UCR) | uart: 1 start bit, 1 stop bit, async
 
-	bset #2, (MFP_UART_TSR) | transmitter idles high
-	
-	bset #0, (MFP_UART_RSR) | enable rx
-	bset #0, (MFP_UART_TSR) | enable tx
+	move.b #0x0, (MFP_IMRA) | clear mask registers, interrupts are pollable but don't trigger actual interrupt
+	move.b #0x0, (MFP_IMRB)
+
+	move.b #0x4, (MFP_UART_TSR) | idle high
+	move.b #0x1, (MFP_UART_TSR) | enable tx
 	
 	move #0, (UART_BUFFER_START)
 	move #0, (UART_BUFFER_END)
 	
-	| TODO: set clock divide bit to 16, should get 115200 baud
-
 	rts
 
 | write a word-aligned null-terminated string to output

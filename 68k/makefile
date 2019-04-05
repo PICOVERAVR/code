@@ -25,7 +25,7 @@ test: pre # assemble a test file only, then dump assembly
 	@m68k-elf-objcopy -O binary test.out test.bin
 	@echo "Test build completed."
 	@m68k-elf-readelf -S test.out
-	@m68k-elf-objdump -d test.out
+	@m68k-elf-objdump -D test.out
 app: pre # assemble an application suitable to be booted into
 	@m68k-elf-as $(FLAGS) $(APP) -o app.o
 	@m68k-elf-ld -T $(APP_LINK) app.o -o app.out

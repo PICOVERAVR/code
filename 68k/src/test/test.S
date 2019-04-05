@@ -28,21 +28,15 @@ start:
 	move.b #0x0, (MFP_IMRA) | clear mask registers - interrupt bits are recognizable, but cannot trigger an interrupt
 	move.b #0x0, (MFP_IMRB)
 	
-	move.b #0x5, (MFP_UART_TSR)
-	| bset #2, (MFP_UART_TSR) | tx idles high
-	| bset #0, (MFP_UART_TSR) | enable tx, has to be last in init routine
+	move.b #0x4, (MFP_UART_TSR) | idle high
+	move.b #0x1, (MFP_UART_TSR) | enable tx
 	
-	|bset #6, (MFP_VR) | interrupt vectors point to right after end of mandatory section of EVT
-	|bset #3, (MFP_UART_UCR) | uart: 1 start bit, 1 stop bit, async
-	
-	|bset #2, (MFP_UART_TSR) | transmitter idles high
-	
-	|bset #0, (MFP_UART_RSR) | enable rx
-	|bset #0, (MFP_UART_TSR) | enable tx
-	
+|	move.b #0x1, (MFP_UART_RSR)
+|	read stuff out with the Buffer Full bit (7)
+| 	eventually check for read / write errors in both registers!
+
 print:
 	| MFP Buffer Empty bit set when ready, cleared when in the process of transmitting
-	| cleared by writing to UDR
 	
 |1:	btst #7, (MFP_UART_TSR)
 |	beq 1b | MFP set when ready for byte transfer, Z bit cleared when ready
@@ -55,16 +49,32 @@ print:
 |	move.b #'\n', (MFP_UART_DATA)
 |	bra print
 
-| op src dest
+	| a moveq probably works too since that is also encoded into the instruction
+	| TODO possibilities:
+	| - hardware is not being selected properly on a byte memory access
+	| - software pointer stuff is wrong (unlikely)
 
-move.l str, %a0
+	| check byte selection stuff (LDS, UDS)
+	|  move a word at a time instead of a byte at a time and see if that works
+	|  will also tell me if the wrong byte is getting sent over the wire
+	|  check the LDS and UDS signals for cold solder joints
+	| run program with %d0 cleared and see what happens
+	| EEPROM write isn't an issue because if EEPROMs are written to with SDP on they are inaccessible for ~300us, which would break stuff
 
-1: btst #7, (MFP_UART_TSR)
+	clr %d0
+	move.b (str), %d0
+
+1:	btst #7, (MFP_UART_TSR)
 	beq 1b
-	move.b (%a0), (MFP_UART_DATA)
-	bra 1b
+	move.b %d0, (MFP_UART_DATA)
+	
+2:	btst #7, (MFP_UART_TSR)
+	beq 2b
+	move.b #'W', (MFP_UART_DATA)
 
-|6:	move.l str, %a0
+	bra print
+
+|6:	move.l #str, %a0
 
 |1:	move.b (%a0)+, %d0
 |	beq 3f
@@ -76,5 +86,4 @@ move.l str, %a0
 |3:	stop #0x700
 
 	.data
-str: .asciz "Hello, World!\n"
-
+str: .asciz "hello\n"
