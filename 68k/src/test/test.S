@@ -37,52 +37,41 @@ start:
 
 print:
 	| MFP Buffer Empty bit set when ready, cleared when in the process of transmitting
+
+	| word addressing is fine, but the byte addressing is backwards.
+	| peripheral is addressed correctly, which is why I can print stuff
+	| I can print literals just fine because they are accessed on word boundaries
 	
-|1:	btst #7, (MFP_UART_TSR)
-|	beq 1b | MFP set when ready for byte transfer, Z bit cleared when ready
-|	move.b #'h', (MFP_UART_DATA) | 0x41
-|1:	btst #7, (MFP_UART_TSR)
-|	beq 1b
-|	move.b #'i', (MFP_UART_DATA)
-|1:	btst #7, (MFP_UART_TSR)
-|	beq 1b
-|	move.b #'\n', (MFP_UART_DATA)
-|	bra print
-
-	| a moveq probably works too since that is also encoded into the instruction
-	| TODO possibilities:
-	| - hardware is not being selected properly on a byte memory access
-	| - software pointer stuff is wrong (unlikely)
-
-	| check byte selection stuff (LDS, UDS)
-	|  move a word at a time instead of a byte at a time and see if that works
-	|  will also tell me if the wrong byte is getting sent over the wire
-	|  check the LDS and UDS signals for cold solder joints
-	| run program with %d0 cleared and see what happens
-	| EEPROM write isn't an issue because if EEPROMs are written to with SDP on they are inaccessible for ~300us, which would break stuff
-
 	clr %d0
-	move.b (str), %d0
-
+	clr %d1
+	move.b (0x440), %d0
+	move.b (0x441), %d1
+	
 1:	btst #7, (MFP_UART_TSR)
 	beq 1b
 	move.b %d0, (MFP_UART_DATA)
-	
+
+7:	btst #7, (MFP_UART_TSR)
+	beq 7b
+	move.b %d1, (MFP_UART_DATA)
+
+| newline is the standard CRLF ('\n' is just CR)
 2:	btst #7, (MFP_UART_TSR)
 	beq 2b
-	move.b #'W', (MFP_UART_DATA)
+	move.b #0xD, (MFP_UART_DATA) | CR
+3:	btst #7, (MFP_UART_DATA)
+	beq 3b
+	move.b #0xA, (MFP_UART_DATA) | LF
 
 	bra print
 
 |6:	move.l #str, %a0
-
 |1:	move.b (%a0)+, %d0
 |	beq 3f
 |2:	btst #7, (MFP_UART_TSR)
 |	beq 2b
 |	move.b %d0, (MFP_UART_DATA)
 |	bra 6b
-	
 |3:	stop #0x700
 
 	.data

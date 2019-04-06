@@ -49,17 +49,18 @@ Rev 1 board:
 		Cold solder joint on 4AN1 prevented the MFP from being triggered
 
 	Things that worked:
-		CPU executed code in a loop, RAM access seemed to be working okay
+		CPU executed code in a loop, RAM word access seemed to be working okay
 		MFP can read data values off the bus and manipulate the IO ports just fine.
+		MFP can print out characters encoded in instruction literals
 	
 	Measurements:
 		board draws ~270mA when active
 		at 14MHz (highest clock freq available that works properly) MFP IO switch time is 10us
-		future board clock speed is 12MHz
+		future board clock speed is 12MHz, 16MHz is too fast for the MFP
 
 Features to add (in a future redesign):
 	Use a later version of the 68000 architecture.
-		Having a MMU and a FPU would be nice
+		Having a MMU and a FPU on-chip would be nice
 		Should be able to clock it at the same frequencies, which means no high-speed circuit design.
 		If I go all the way up to the 68040/68060, I get nice features like JTAG and integrated FPU and MMUs
 		Need to worry about heat sink stuff, kinda like a real computer
