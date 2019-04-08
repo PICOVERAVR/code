@@ -1,13 +1,13 @@
 bad ideas:
 	letting the MMU handle illegal accesses to low 128K of memory - MMU has to sit between processor and memory
 	remove pullup on AS - there to prevent spurious memory acceses once bus master is done and CPU has not relinquished control of the bus yet
-	having the bootloader print stuff without host initiating communication - bootloader will hang waiting on tx buffer to drain if no host is there... not sure if this is true
+	having the processor wait for the UART host to transmit a binary - will hang if the board should be booting from a stored EEPROM program
 	supervisor access only to EEPROM - prevents user from using hardware libs, initial supervisor -> user jump is awkward at best
 	having MFP drive IRQ lines directly - if a priority level 2 interrupt and level 1 interrupt fire at the same time, the processor will register a level 3 interrupt.
 
 maybe ideas:
 	having an MMU board at all - 68451 chip is kinda hard to find on eBay and pretty expensive too, couldn't find a PLCC package for it
-
+	
 ideas for add-on boards:
 	
 	NOTE: all add-on boards have to have space for a board to be stacked on top of them, PC104 style
@@ -22,18 +22,4 @@ ideas for add-on boards:
 			a good idea for video stuff, especially 3D applications
 		FIFO chips
 			good for ingesting lots of fast data
-
-	Debug card
-		all the blinkenlights
-		7-seg displays would be cool, have some 4000 series chips driving everything
-	User board
-		could literally just be some switches and (buffered) LEDs
-		switches can be pulled high or low, so a read to unimplemented memory can read in values (drive DTACK high until done)
-	Audio board
-		could initially just be an op-amp or two connected to a couple lines on the MFP
-		could also add seperate voices - if I were to do this it would require external hardware, MFP is pretty limited
-	
-Measurements:
-		board draws ~270mA when active
-		at 14MHz (highest clock freq available that works properly) MFP IO switch time is 10us
 

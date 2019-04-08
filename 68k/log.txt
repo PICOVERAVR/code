@@ -2,38 +2,50 @@ Official documentation and history for my 68000 project (codename "Nomad")
 
 Design goals:
 	1. Fast.  Or at least faster than most other 68000 boards out there.
-	2. Modern (interface).  If something needs to be connected, do it with modern parts.
-	3. Extensible.  The board should contain enough to get started, but not enough that it hinders expansion.
+	2. Simple.  Easy to program for, and coprocessors don't easily work with anything lower than a 68020 anyways.
+	3. Extensible.  The board should contain enough to do something fun out of the box, but not enough that it hinders future expansion.
 	
 	68000 and 68010 compatible
-	128K SRAM, 128K EEPROM
-	MFP I/O device included
+	128K SRAM, 128K EEPROM, self update capability
+	MFP I/O device included, adds an 8-bit I/O port, timers, and a USART for host communication
 	actual C compiler should be working for this, not BASIC or Forth or anything. If not C, then only ASM. (see #1)
 
 Software tools:
 	flash: a shell script that calls make, then the python scripts below to upload code
-	makefile: assemble and link source code
-	eeprom-config: python tool for writing and reading data to/from EEPROMs
-	split: splits a binary file in two
-	upload: application code upload to 68k baseboard
+	makefile: assemble and link source code using GCC binutils built for the 68000
+	eeprom-config: python tool for writing and reading data to/from EEPROMs using an external Arduino programmer
+	split: splits a binary file into two binaries suitable for upload to an EEPROM chip. (or two)
+	upload: application code upload to 68k baseboard - note that this program is extremely dependant on how the bootloader itself is written and is 
+		not at all complete yet.
 
 Project goals:
-	make a wall clock
-	air quality measurement
+	make a wall clock using cool 7-seg displays
+	air quality measurement using some sort of gas sensor
 	add a GSM module or something - usually UART based!
 	some sort of laser thing - laser servo application!
 	write some sort of graphics application or game
 		controlling the screen over UART isn't a good idea, and the maximum data transfer speed over the IO lines is pretty slow
 		use my FPGA board to perform DMA on the memory (like the Apple Macintosh)
 			DMA would have to work correctly for this to function properly, and 68000 DMA chips are really hard to find
-		reviewing OpenGL code before doing this would be helpful for knowing the features I need
+		write an I2C driver that bit-bangs data off the I/O port to something like an SSD1306
+			simple, and doesn't require special hardware.
+			might be hard to make this fast enough for a fun game
+		reviewing OpenGL code before doing this would be helpful for knowing the features I need if 3D graphics are to be included
 	User board
 		could literally just be some switches and (buffered) LEDs
 		switches can be pulled high or low, so a read to unimplemented memory can read in values (drive DTACK high until done)
+		could also be CPLD-based
+			gives me a chance to put something CPLD-based in here
+			JTAG experience
+			add features like DTACK/BERR generation
+			add IO that can actually source current
 	Audio board
 		could initially just be an op-amp or two connected to a couple lines on the MFP
 		probably want a seperate power supply for this to avoid noise on the power lines?
 		could also add seperate voices - if I were to do this it would require external hardware, MFP is pretty limited
+	Floating point arithmetic
+		don't use the 68k floating point hardware - requires a 68020 or greater for coprocessor support
+		hardware support without the 68020 is kinda dumb
 
 Rev 1 board:
 	Things that were broken:
@@ -44,7 +56,7 @@ Rev 1 board:
 		RC values for reset were wrong because I didn't have anything pulling current from it in the simulation
 		10uF caps have the wrong footprint
 		Mounting holes were too small
-		Software Data Protection on the EEPROMs needed to be turned off, but that isn't a huge concern and working around SDP is really hard without things getting a lot more complex
+		Software Data Protection on the EEPROMs needed to be turned off, but that isn't a huge concern and working around SDP is really annoying with current architecture
 		MFP DTACK signal is grounded all the time, but MFP still accepts reads and writes.  Not a huge issue since grounded DTACK makes sense from a logical point of view
 		Cold solder joint on 4AN1 prevented the MFP from being triggered
 
@@ -58,7 +70,10 @@ Rev 1 board:
 		at 14MHz (highest clock freq available that works properly) MFP IO switch time is 10us
 		future board clock speed is 12MHz, 16MHz is too fast for the MFP
 
-Features to add (in a future redesign):
+Rev 2 board:
+	Schematic created, but revisions have not been checked at all
+
+Major features to add (in a future redesign):
 	Use a later version of the 68000 architecture.
 		Having a MMU and a FPU on-chip would be nice
 		Should be able to clock it at the same frequencies, which means no high-speed circuit design.
