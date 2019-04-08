@@ -1,6 +1,6 @@
 	.section .rodata
 .set RESET_SSP_PTR, 0x40000
-.set RESET_PC, 0x00000400 | start point
+.set RESET_PC, 0x00000400
 
 .long RESET_SSP_PTR
 .long RESET_PC
@@ -34,6 +34,12 @@ start:
 |	move.b #0x1, (MFP_UART_RSR)
 |	read stuff out with the Buffer Full bit (7)
 | 	eventually check for read / write errors in both registers!
+
+|	timer stuff: MFP has 4 timers, 2 are delay only (C and D, both of which just count until done)
+|	A and B timers have pulse width measuring mode - external signal is an enable to the timer, also stuff with the AER
+|	and event counting mode - each pulse on the input bumps the timer
+
+|	GPIO pins also have active edge registers that allow them to trigger interrupts
 
 print:
 	| MFP Buffer Empty bit set when ready, cleared when in the process of transmitting
