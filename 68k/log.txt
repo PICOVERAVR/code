@@ -18,7 +18,7 @@ Software tools:
 	upload: application code upload to 68k baseboard - note that this program is extremely dependant on how the bootloader itself is written and is 
 		not at all complete yet.
 
-Project goals:
+Additional projet ideas:
 	make a wall clock using cool 7-seg displays
 	air quality measurement using some sort of gas sensor
 	add a GSM module or something - usually UART based!
@@ -31,6 +31,7 @@ Project goals:
 			simple, and doesn't require special hardware.
 			might be hard to make this fast enough for a fun game
 		reviewing OpenGL code before doing this would be helpful for knowing the features I need if 3D graphics are to be included
+		screen options are I2C, a simple VGA adapter, or a full on HDMI port
 	User board
 		could literally just be some switches and (buffered) LEDs
 		switches can be pulled high or low, so a read to unimplemented memory can read in values (drive DTACK high until done)
