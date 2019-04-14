@@ -7,4 +7,6 @@ Ideas for future expansion:
 		a night sky would be cool
 	particle effects
 		mist, fire, rain
-	
+
+Note: I deleted the glm library because it's large and needs to be stored somewhere else.
+recover it by downloading it again and putting the "glm" folder in the current directory	
