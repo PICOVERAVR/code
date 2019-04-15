@@ -1,10 +1,10 @@
 /*
   Another EEPROM programmer, implemented on the Arduino Mega.
   This is the hardware side, which receives commands from a python script running on the host and writes the bit pattern into EEPROM.
-  This version targets the GLS29EE010 EEPROM chip, which is special because it implements JEDEC write-protection on all pages.
+  This version targets the GLS29EE010 EEPROM chip, which is special because it implements JEDEC write protection on all pages.
   The code could be made to work with other EEPROMS, as the GLS29EE010 isn't super different than other common EEPROM chips.
 
-  All pin connections below are on the rightmost connector on the board, to ease wiring concerns.
+  All pin connections below are on the rightmost connector on the board, to ease wiring concerns and allow for other things to be connected.
 
   Timing variables are the same as in the GLS29EE010 datasheet.
 
@@ -76,18 +76,20 @@
   
 */
 
-// Command syntax:
-// TODO: implement this stuff
-// Format: <op>: <arg>: <arg>: <arg>;
-// RD: <decaddr>; // read a word out of memory - NOT IMPLEMENTED
-// WR: <decaddr>: <value> // write a word into memory - NOT IMPLEMENTED
-// ER; // erase chip
-// VE; // version information
-// RP: <decaddr>; // read a page out of memory, display as raw data
-// RPI: <decaddr>; // (read page interactive) read a page out of memory, display as decimal. For debugging.
-// WP: <decaddr>: <values> // write a page into memory, use raw data
-// FL: <decaddr>: <len>: <value>; // fill memory with <value> from <decaddr> to <len> - NOT IMPLEMENTED
-// NP; // do nothing
+/*
+  Command syntax:
+Format: <operation>: <arg>: <arg>: <arg>;
+ER; // erase chip
+VE; // version information
+RP: <decaddr>; // read a page out of memory, display as raw data
+RPI: <decaddr>; // (read page interactive) read a page out of memory, display as decimal. For debugging.
+WP: <decaddr>: <values> // write a page into memory, use raw data
+RD: <decaddr>; // read a word out of memory
+WR: <decaddr>: <value> // write a word into memory
+  NOTE: both RD and WR are implemented, but are not included in the interpreter for efficiency reasons
+FL: <decaddr>: <len>: <value>; // fill memory with <value> from <decaddr> to <len> - NOT IMPLEMENTED
+NP; // do nothing
+*/
 
 #include <stdint.h>
 #include <string.h>
@@ -209,13 +211,9 @@ device_info_t eeprom_get_id() {
   device_info_t device;
     
   eeprom_write_cntl(0x5555, 0xAA);
-  delayMicroseconds(1);
   eeprom_write_cntl(0x2AAA, 0x55);
-  delayMicroseconds(1);
   eeprom_write_cntl(0x5555, 0x90);
   
-  delayMicroseconds(10); // Tida
-
   device.manufacturer_id = eeprom_read_cntl(0);
   
   __asm__("nop\n\t");
@@ -223,12 +221,8 @@ device_info_t eeprom_get_id() {
   device.device_id = eeprom_read_cntl(1);
   
   eeprom_write_cntl(0x5555, 0xAA);
-  delayMicroseconds(1);
   eeprom_write_cntl(0x2AAA, 0x55);
-  delayMicroseconds(1);
   eeprom_write_cntl(0x5555, 0xF0);
-  
-  delayMicroseconds(10); // Tida
   
   return device;
 }
@@ -254,7 +248,7 @@ void eeprom_write_page(long page, uint8_t *page_buf) {
     bitSet(PORTA, 5); // CE
   }
   
-  delayMicroseconds(200); // Tblco
+  delayMicroseconds(200); // Tblco, have to wait for the byte load period to expire
 
   bitSet(PORTA, 5); // CE
   bitSet(PORTL, 3); // WE
@@ -388,7 +382,11 @@ void setup() {
 
   pinMode(AST, OUTPUT);
   digitalWrite(AST, LOW); // "Activity" indicator LED
-
+  
+  // using 250k baud for inceased upload speed
+  // ideally, I would profile the Arduino program to see if enough time is being spent on data transfer from host to Arduino to justify such a high baudrate.
+  // however, the Arduino IDE has no good profiling capabilities, and I don't want to spend the time on it.
+  // if I wanted to, I could use the Arduino Serial Timestamp function as a performance counter.  No idea if that would work.
   Serial.begin(250000); // 8N1, 250k Baud, no line ending
   while (!Serial) {
     ; // prevents garbage on the serial line
@@ -397,9 +395,9 @@ void setup() {
 }
 
 void loop() {
-  cmd_get(cmd_buf, ":;");
+  cmd_get(cmd_buf, ":;"); // get the first command
 
-  digitalWrite(AST, HIGH); // doing something
+  digitalWrite(AST, HIGH); // doing something, turn on "activity" led
   if (!strcmp(cmd_buf, "RP")) {
     cmd_get(cmd_buf, ";");
     long page = strtol(cmd_buf, NULL, 10);
@@ -408,7 +406,7 @@ void loop() {
       Serial.write(page_buf[i]); // send data in bin, not ascii
     }
     Serial.write('\n');
-  } else if (!strcmp(cmd_buf, "RPI")) { // read page interactive, used as a debug function mostly
+  } else if (!strcmp(cmd_buf, "RPI")) { // read page interactive, used as a debug function
     cmd_get(cmd_buf, ";");
     long page = strtol(cmd_buf, NULL, 10);
     eeprom_read_page(page * 128, page_buf); // indexed by page, not by byte
@@ -431,14 +429,15 @@ void loop() {
     long page = strtol(cmd_buf, NULL, 10);
     
     // NOTE: this has to be split up into >= 2 writes on the host side as well, since the Arduino rx serial buffer is only 64 bytes long.
+    // I decided to split it into 4 writes instead, and I don't think this hurts transfer speeds too much
     raw_val_get(page_buf);
     raw_val_get(page_buf+32);
     raw_val_get(page_buf+64);
     raw_val_get(page_buf+96);
     
-    eeprom_write_page(page, page_buf);
+    eeprom_write_page(page, page_buf); // write the page once received
     Serial.println("done.");
-  } else if (!strcmp(cmd_buf, "VE")) {
+  } else if (!strcmp(cmd_buf, "VE")) { // get version info from chip and print it, usually used to test if everything is working ok
     device_info_t device_info = eeprom_get_id();
     Serial.println(version_string);
     Serial.print("Manufacturer ID: 0x");
@@ -446,14 +445,14 @@ void loop() {
     Serial.print("Device ID: 0x");
     Serial.println(device_info.device_id, HEX);
     Serial.println("done.");
-  } else if (!strcmp(cmd_buf, "ER")) {
+  } else if (!strcmp(cmd_buf, "ER")) { // erase the chip
     eeprom_erase();
     Serial.println("done.");
-  } else if (!strcmp(cmd_buf, "NP")) {
+  } else if (!strcmp(cmd_buf, "NP")) { // do nothing
     Serial.println("done.");
   } else {
     Serial.print("Unknown command ");
     Serial.println(cmd_buf);
   }
-  digitalWrite(AST, LOW);
+  digitalWrite(AST, LOW); // turn off "activity" led when done with the activity
 }
