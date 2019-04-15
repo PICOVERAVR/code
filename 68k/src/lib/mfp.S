@@ -1,10 +1,10 @@
+| TODO: this file has not been tested against actual hardware.
 | basic library code to interface with the 68901 MFP
 | Note: interrupt enable is sets if the MFP will note an interrupt at all. If 0, MFP will not change state for interrupt.
 | Interrupt pending is for when interrupt is recognized
 | Interrupt mask register is for controlling if an interrupt is triggered.  ISR bit in interrupt pending register still set regardless.
 | Interrupt in service states whether ISR is being serviced.
 
-| TODO: read the finer points of the datasheet, especially all the stuff about reading and writing the data
 | Note: reading the status register after reading the data register means the status register could be referring to a different byte than the data register.
 | also interrupts related to TX and RX errors exist, use them?
 

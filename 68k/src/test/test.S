@@ -71,14 +71,5 @@ print:
 
 	bra print
 
-|6:	move.l #str, %a0
-|1:	move.b (%a0)+, %d0
-|	beq 3f
-|2:	btst #7, (MFP_UART_TSR)
-|	beq 2b
-|	move.b %d0, (MFP_UART_DATA)
-|	bra 6b
-|3:	stop #0x700
-
 	.data
 str: .asciz "hello\n"

@@ -5,7 +5,7 @@
 
 | At startup: user mode, IPL 0, stack is 0x37000, entry point is 0x20000
 user_start: 
-	nop
+	
 	
 	.section .bss
 .align 4
