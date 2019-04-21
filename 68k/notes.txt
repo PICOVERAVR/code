@@ -12,6 +12,12 @@ ideas for add-on boards:
 	
 	NOTE: all add-on boards have to have space for a board to be stacked on top of them, PC104 style
 	
+	Paper tape reader for fun
+		Use a CPLD for interfacing with the board
+		Might teach me something about proper motor control
+		Uses either a cardboard or LEGO structure to read in holes punched into the tape
+		Once that is done, use a solenoid motor to possibly punch holes in a new tape and output it
+	
 	Interface options:
 		SPI using the MFP I/O pins - slow, but easier to implement
 		External device grabs host memory using DMA (FPGA or CPLD with microcontroller)
@@ -22,4 +28,9 @@ ideas for add-on boards:
 			a good idea for video stuff, especially 3D applications
 		FIFO chips
 			good for ingesting lots of fast data
+			could be part of a high-speed 8-bit parallel bus - clocked way higher than the processor itself?
+			if using the AM7202A chip lying around, I could use the 9th bit to do hardware parity checking
 
+misc ideas:
+	put some artwork or something cool on the bottom side if it doesn't add too much to the cost of the board
+	make it so the bootloader program contains a lot of test code, and the board could read an unimplemented area of memory to determine what tests to run.
