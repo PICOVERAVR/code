@@ -15,14 +15,14 @@ if __name__ == "__main__":
 	parser.add_argument('-s', '--speed', type=int, default=115200, help='baud rate to communicate at, defaulting to 115200')
 
 	args = parser.parse_args()
-
+	
 	try:
 		import serial
 	except ModuleNotFoundError:
 		print("pyserial module not found!")
 		sys.exit(1)
 	
-	try:
+	try: # open device file for Arduino
 		if args.device == None:
 			raise IOError
 		#with open(args.device) as file: # TODO: fix this
@@ -34,7 +34,7 @@ if __name__ == "__main__":
 	print("Opening serial port with 8N1 " + str(args.speed) + " baud settings...")
 	serport = serial.Serial(args.device, args.speed, timeout=5)
 
-	try:
+	try: # open binary to write
 		with open(args.binary, "rb") as binfile:
 			bindata = binfile.read()
 	except IOError:
@@ -46,7 +46,12 @@ if __name__ == "__main__":
 
 	bin_length = len(bindata)
 	print("writing " + str(bin_length) + " bytes...", end='')
-	for i in range(0, 4): # write the length of the incoming binary, one byte at a time, doing this manually since bootloader expects 4 bytes regardless of value
+	
+	# write the length of the incoming binary, one byte at a time
+	# doing this manually since bootloader expects 4 bytes regardless of value
+	# least significant byte first
+	# TODO: most significant byte first would be a bit easier...
+	for i in range(0, 4):
 		if bin_length == 0:
 			serport.write(0)
 		else:

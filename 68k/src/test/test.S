@@ -1,4 +1,5 @@
-	.section .rodata
+| Working bootloader for 68k device
+    .section .rodata
 .set RESET_SSP_PTR, 0x40000
 .set RESET_PC, 0x00000400
 
@@ -15,61 +16,97 @@
 .set MFP_UART_TSR, 0x4002D
 .set MFP_UART_DATA, 0x4002F
 
+.set RAM_START, 0x20000
+.set RAM_END, 0x40000
+.set USP_VAL, 0x37000
+
 	.text
-	.global start
+	.global _start
 
-start:
-	move.b #0xFF, (0x40005) | all IO pins outputs
-	move.b #0x1, (0x40001) | set I0 to high
+_start:
+	or.i #0x700, %sr | set IPL to 7
 	
-	move.b #0x40, (MFP_VR) | point IVR to right after mandatory section of EVT
-	move.b #0x8, (MFP_UART_UCR) | uart: 1 start bit, 1 stop bit, async
-	
-	move.b #0x0, (MFP_IMRA) | clear mask registers - interrupt bits are recognizable, but cannot trigger an interrupt
-	move.b #0x0, (MFP_IMRB)
-	
-	move.b #0x4, (MFP_UART_TSR) | idle high
-	move.b #0x1, (MFP_UART_TSR) | enable tx
-	
-|	move.b #0x1, (MFP_UART_RSR)
-|	read stuff out with the Buffer Full bit (7)
-| 	eventually check for read / write errors in both registers!
-
-|	timer stuff: MFP has 4 timers, 2 are delay only (C and D, both of which just count until done)
-|	A and B timers have pulse width measuring mode - external signal is an enable to the timer, also stuff with the AER
-|	and event counting mode - each pulse on the input bumps the timer
-
-|	GPIO pins also have active edge registers that allow them to trigger interrupts
-
-print:
-	| MFP Buffer Empty bit set when ready, cleared when in the process of transmitting
-
-	| word addressing is fine, but the byte addressing is backwards.
-	| peripheral is addressed correctly, which is why I can print stuff
-	| I can print literals just fine because they are accessed on word boundaries
+	jsr mfp_init
 	
 	clr %d0
-	clr %d1
-	move.b (0x440), %d0
-	move.b (0x441), %d1
+	clr %d2
 	
+	jsr mfp_readc | read config byte
+	move.b %d0, %d3
+	
+1:	jsr mfp_readc
+	move.b %d0, %d1
+    jsr mfp_readc
+    lsl.l #8, %d0
+    or.l %d0, %d1
+    jsr mfp_readc
+    moveq #16, %d2
+    lsl.l %d2, %d0
+    or.l %d0, %d1
+    jsr mfp_readc
+    addq #8, %d2
+    lsl.l %d2, %d0
+    or.l %d0, %d1 | 32-bit word in %d1
+	
+	| verified up to here
+	
+	|move.l %d1, -(%sp) | start
+	|move.l #RAM_START, -(%sp) | len
+	|jsr mfp_readblock
+	|addq #8, %sp
+
+	|move.l #USP_VAL, %a5
+	|move.l %a5, %usp
+	|andi #0xD8FF, %sr
+	|jmp (RAM_START)
+
+mfp_readblock:
+	move.l 4(%sp), %a0 | len
+	move.l 8(%sp), %a1 | start
+	| TODO: if len isn't word aligned, align it
+	| TODO: remove this once hardware supports byte-wide memory accesses
+	
+	add.l %a1, %a0 | get end addr, goes in a0
+	
+1:	cmp.l %a1, %a0
+	beq 4f
+2:	btst #7, (MFP_UART_RSR) | inline mfp_readc twice
+	beq 2b
+	move.b (MFP_UART_DATA), %d0
+	lsl.l #8, %d0
+3:	btst #7, (MFP_UART_RSR)
+	beq 3b
+	move.b (MFP_UART_DATA), %d0 | TODO: figure out byte order of python host and check the ordering
+	
+	move.w %d0, (%a1)+
+	
+	bne 1b
+	
+4:	rts
+
+mfp_readc:
+1:	btst #7, (MFP_UART_RSR)
+	beq 1b
+	move.b (MFP_UART_DATA), %d0
+	rts
+
+mfp_writec:
 1:	btst #7, (MFP_UART_TSR)
 	beq 1b
 	move.b %d0, (MFP_UART_DATA)
+	rts
 
-7:	btst #7, (MFP_UART_TSR)
-	beq 7b
-	move.b %d1, (MFP_UART_DATA)
+mfp_init:
+    move.b #0x40, (MFP_VR) | point IVR to right after EVT
+    move.b #0x8, (MFP_UART_UCR) | uart: 1 start bit, 1 stop bit, async
 
-| newline is the standard CRLF ('\n' is just CR)
-2:	btst #7, (MFP_UART_TSR)
-	beq 2b
-	move.b #0xD, (MFP_UART_DATA) | CR
-3:	btst #7, (MFP_UART_DATA)
-	beq 3b
-	move.b #0xA, (MFP_UART_DATA) | LF
+    move.b #0x0, (MFP_IMRA) | clear mask registers, interrupts are pollable but don't trigger actual interrupt
+    move.b #0x0, (MFP_IMRB)
 
-	bra print
+    move.b #0x4, (MFP_UART_TSR) | idle high
+    move.b #0x1, (MFP_UART_TSR) | enable tx
+    
+	move.b #0x1, (MFP_UART_RSR) | enable rx
+	
+    rts
 
-	.data
-str: .asciz "hello\n"

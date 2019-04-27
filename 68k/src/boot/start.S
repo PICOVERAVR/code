@@ -19,20 +19,21 @@ _start:
 	
 	| test the RAM by reading and writing to all memory locations
 	| jump to ram_cmp_error if problems occur.
-	
-	move.l #ram_start, %a0
-	move.l #ram_end, %a1
-1:	move.w #0xCAFE, (%a0)
-	cmpa.l %a0, %a1
-	addq #2, %a0
-	bne 1b
+	| skip the RAM test for now...
 
-2:	move.w (%a0), %d0
-	cmpi.w #0xCAFE, %d0
-	bne ram_cmp_error
-	cmpa.l %a0, %a1
-	subq #2, %a0
-	bne 2b
+|	move.l #ram_start, %a0
+|	move.l #ram_end, %a1
+|1:	move.w #0xCAFE, (%a0)
+|	cmpa.l %a0, %a1
+|	addq #2, %a0
+|	bne 1b
+
+|2:	move.w (%a0), %d0
+|	cmpi.w #0xCAFE, %d0
+|	bne ram_cmp_error
+|	cmpa.l %a0, %a1
+|	subq #2, %a0
+|	bne 2b
 	
 	jsr mfp_init
 	
@@ -46,7 +47,7 @@ _start:
 	clr %d0
 	clr %d2
 
-	jsr mfp_readc
+	jsr mfp_readc | read in config byte
 	
 	| some sort of ACK here?
 	| no config options to parse yet

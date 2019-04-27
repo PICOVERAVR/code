@@ -65,7 +65,8 @@ Rev 1 board:
 		CPU executed code in a loop, RAM word access seemed to be working okay
 		MFP can read data values off the bus and manipulate the IO ports just fine.
 		MFP can print out characters encoded in instruction literals
-	
+		MFP can echo characters off the UART
+
 	Measurements:
 		board draws ~270mA when active
 		at 14MHz (highest clock freq available that works properly) MFP IO switch time is 10us
