@@ -13,6 +13,8 @@ if __name__ == "__main__":
 	parser.add_argument('-d', '--device', type=str, help='UART device path')
 	parser.add_argument('-b', '--binary', type=str, help='binary path')
 	parser.add_argument('-s', '--speed', type=int, default=115200, help='baud rate to communicate at, defaulting to 115200')
+	parser.add_argument('-l', '--load', type=str, help='specify whether to put binary in RAM or EEPROM')
+	# TODO: check for load and add option for booting into supervisor mode instead of user mode
 
 	args = parser.parse_args()
 	
@@ -42,11 +44,19 @@ if __name__ == "__main__":
 		sys.exit(3)
 	
 	config_byte = 0
+	if args.load != "EEPROM" or args.load != "RAM":
+		print("invalid target!")
+		sys.exit(4)
+	else:
+		if args.load == "EEPROM":
+			config_byte |= 0x1
+	
 	serport.write(config_byte)
 
 	bin_length = len(bindata)
-	print("writing " + str(bin_length) + " bytes...", end='')
-	
+
+	print("writing " + str(bin_length) + " bytes to " + args.load, end='')
+
 	# write the length of the incoming binary, one byte at a time
 	# doing this manually since bootloader expects 4 bytes regardless of value
 	# least significant byte first
@@ -58,7 +68,7 @@ if __name__ == "__main__":
 			serport.write(bin_length & 0xFF)
 			bin_length = bin_length >> 8
 	
-	serport.write(bindata)
+	serport.write(bindata) # TODO: I think the order for this is MSB first, but check
 	
 	print("done.")
 

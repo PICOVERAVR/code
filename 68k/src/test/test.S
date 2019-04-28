@@ -23,6 +23,8 @@
 	.text
 	.global _start
 
+| NOTE: loading code into RAM means that altering the IVT isn't possible right now, since we don't have a 68010 to work with
+
 _start:
 	or.i #0x700, %sr | set IPL to 7
 	
@@ -31,6 +33,14 @@ _start:
 	clr %d0
 	clr %d2
 	
+    | bootloader format:
+	| (LSB first)
+    | <config byte> <4 byte length> <binary>
+    | config byte layout: 0b0000_0SVE (1 for enabled)
+    | S: jump to code in supervisor mode instead of user mode - allows for a more microcontroller-like system
+    | V: verbose output through MFP
+    | E: write program to EEPROM instead of RAM, has to be <128K since bootloader needs room as well.
+
 	jsr mfp_readc | read config byte
 	move.b %d0, %d3
 	
@@ -48,24 +58,25 @@ _start:
     lsl.l %d2, %d0
     or.l %d0, %d1 | 32-bit word in %d1
 	
-	| verified up to here
+	| TODO: verified up to here
 	
-	|move.l %d1, -(%sp) | start
-	|move.l #RAM_START, -(%sp) | len
-	|jsr mfp_readblock
-	|addq #8, %sp
+	move.l #RAM_START, -(%sp) | start
+	
+	btst #0, %d1 | word-align if not word-aligned (TODO: remove when hardware supports byte-wide memory accesses)
+	beq 8f
+	addq #1, %d1
+8:	move.l %d1, -(%sp) | len
+	jsr mfp_readblock
+	addq #8, %sp
 
-	|move.l #USP_VAL, %a5
-	|move.l %a5, %usp
-	|andi #0xD8FF, %sr
-	|jmp (RAM_START)
+	move.l #USP_VAL, %a5
+	move.l %a5, %usp
+	andi #0xD8FF, %sr
+	jmp (RAM_START)
 
 mfp_readblock:
 	move.l 4(%sp), %a0 | len
 	move.l 8(%sp), %a1 | start
-	| TODO: if len isn't word aligned, align it
-	| TODO: remove this once hardware supports byte-wide memory accesses
-	
 	add.l %a1, %a0 | get end addr, goes in a0
 	
 1:	cmp.l %a1, %a0
@@ -76,7 +87,9 @@ mfp_readblock:
 	lsl.l #8, %d0
 3:	btst #7, (MFP_UART_RSR)
 	beq 3b
-	move.b (MFP_UART_DATA), %d0 | TODO: figure out byte order of python host and check the ordering
+	move.b (MFP_UART_DATA), %d0
+	
+	| TODO: adjust byte ordering from host, if needed
 	
 	move.w %d0, (%a1)+
 	
