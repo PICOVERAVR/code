@@ -14,7 +14,8 @@ if __name__ == "__main__":
 	parser.add_argument('-b', '--binary', type=str, help='binary path')
 	parser.add_argument('-s', '--speed', type=int, default=115200, help='baud rate to communicate at, defaulting to 115200')
 	parser.add_argument('-l', '--load', type=str, help='specify whether to put binary in RAM or EEPROM')
-	# TODO: check for load and add option for booting into supervisor mode instead of user mode
+	parser.add_argument('-i', '--size', type=int, default=0x1FFFF, help='size of flash memory, script will stop if binary is bigger than this')
+	# TODO: add option for booting into supervisor mode instead of user mode
 
 	args = parser.parse_args()
 	
@@ -42,33 +43,35 @@ if __name__ == "__main__":
 	except IOError:
 		print("binary cannot be opened!")
 		sys.exit(3)
-	
+
 	config_byte = 0
-	if args.load != "EEPROM" or args.load != "RAM":
+	if args.load != "EEPROM" and args.load != "RAM":
 		print("invalid target!")
 		sys.exit(4)
 	else:
 		if args.load == "EEPROM":
 			config_byte |= 0x1
 	
-	serport.write(config_byte)
-
 	bin_length = len(bindata)
+	if (bin_length > args.size):
+		print("binary size is greater than memory will allow!")
+		sys.exit(5)
 
 	print("writing " + str(bin_length) + " bytes to " + args.load, end='')
+	
+	serport.write(config_byte)
 
 	# write the length of the incoming binary, one byte at a time
 	# doing this manually since bootloader expects 4 bytes regardless of value
-	# least significant byte first
-	# TODO: most significant byte first would be a bit easier...
+	
+	# TODO: write this as MSB first.
 	for i in range(0, 4):
 		if bin_length == 0:
 			serport.write(0)
 		else:
-			serport.write(bin_length & 0xFF)
-			bin_length = bin_length >> 8
+			pass
 	
-	serport.write(bindata) # TODO: I think the order for this is MSB first, but check
+	serport.write(bindata)
 	
 	print("done.")
 

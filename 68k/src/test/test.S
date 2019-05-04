@@ -23,7 +23,7 @@
 	.text
 	.global _start
 
-| NOTE: loading code into RAM means that altering the IVT isn't possible right now, since we don't have a 68010 to work with
+| NOTE: loading code into RAM means that altering the IVT isn't possible right now, since we don't have a 68010 to test with
 
 _start:
 	or.i #0x700, %sr | set IPL to 7
@@ -40,47 +40,60 @@ _start:
     | S: jump to code in supervisor mode instead of user mode - allows for a more microcontroller-like system
     | V: verbose output through MFP
     | E: write program to EEPROM instead of RAM, has to be <128K since bootloader needs room as well.
+	| TODO: figure out how much room the bootloader needs.
 
 	jsr mfp_readc | read config byte
 	move.b %d0, %d3
 	
+	| NOTE: this is MSB first.
 1:	jsr mfp_readc
-	move.b %d0, %d1
-    jsr mfp_readc
-    lsl.l #8, %d0
-    or.l %d0, %d1
-    jsr mfp_readc
-    moveq #16, %d2
-    lsl.l %d2, %d0
-    or.l %d0, %d1
-    jsr mfp_readc
-    addq #8, %d2
-    lsl.l %d2, %d0
-    or.l %d0, %d1 | 32-bit word in %d1
+	lsl.l #8, %d0
+	jsr mfp_readc
+	lsl.l #8, %d0
+	jsr mfp_readc
+	lsl.l #8, %d0
+	jsr mfp_readc
 	
-	| TODO: verified up to here
+	move.l %d0, %d1 | 32-bit length in %d1
+	
+	| NOTE: the length of the binary being uploaded has to be word-aligned.
 	
 	move.l #RAM_START, -(%sp) | start
-	
-	btst #0, %d1 | word-align if not word-aligned (TODO: remove when hardware supports byte-wide memory accesses)
-	beq 8f
-	addq #1, %d1
-8:	move.l %d1, -(%sp) | len
-	jsr mfp_readblock
+	move.l %d1, -(%sp) | len
+	jsr mfp_readblock | read in the rest of the binary data
 	addq #8, %sp
+	
+	| write first word back out and halt 
+	move.w (0x20000), %d0
+	jsr mfp_writew
 
-	move.l #USP_VAL, %a5
-	move.l %a5, %usp
-	andi #0xD8FF, %sr
-	jmp (RAM_START)
+	move.b %d3, %d0
+	jsr mfp_writec
+	
+	stop #0x700
+	
+	| move.l #USP_VAL, %a5
+	| move.l %a5, %usp
+	| andi #0xD8FF, %sr
+	| jmp (RAM_START) | jump to uploaded application
 
 mfp_readblock:
 	move.l 4(%sp), %a0 | len
 	move.l 8(%sp), %a1 | start
-	add.l %a1, %a0 | get end addr, goes in a0
+
+	add.l %a1, %a0 | a1 + a0 => a0, get end addr
 	
-1:	cmp.l %a1, %a0
+	| a0 is end addr, a1 is start
+
+1:	cmp.l %a1, %a0 | a0 - a1, sets cc
 	beq 4f
+	
+	|move.l %a0, %d0
+	|jsr mfp_writel
+	
+	|move.l %a1, %d0
+	|jsr mfp_writel
+	
 2:	btst #7, (MFP_UART_RSR) | inline mfp_readc twice
 	beq 2b
 	move.b (MFP_UART_DATA), %d0
@@ -89,11 +102,9 @@ mfp_readblock:
 	beq 3b
 	move.b (MFP_UART_DATA), %d0
 	
-	| TODO: adjust byte ordering from host, if needed
-	
 	move.w %d0, (%a1)+
 	
-	bne 1b
+	bra 1b
 	
 4:	rts
 
@@ -106,6 +117,34 @@ mfp_readc:
 mfp_writec:
 1:	btst #7, (MFP_UART_TSR)
 	beq 1b
+	move.b %d0, (MFP_UART_DATA)
+	rts
+
+mfp_writew:
+1:	btst #7, (MFP_UART_TSR)
+	beq 1b
+	move.b %d0, (MFP_UART_DATA)
+	lsr.w #8, %d0
+2:	btst #7, (MFP_UART_TSR)
+	beq 2b
+	move.b %d0, (MFP_UART_DATA)
+	rts
+
+mfp_writel:
+1:	btst #7, (MFP_UART_TSR)
+	beq 1b
+	move.b %d0, (MFP_UART_DATA)
+	lsr.l #8, %d0
+2:	btst #7, (MFP_UART_TSR)
+	beq 2b
+	move.b %d0, (MFP_UART_DATA)
+	lsr.l #8, %d0
+3:	btst #7, (MFP_UART_TSR)
+	beq 3b
+	move.b %d0, (MFP_UART_DATA)
+	lsr.l #8, %d0
+4:	btst #7, (MFP_UART_TSR)
+	beq 4b
 	move.b %d0, (MFP_UART_DATA)
 	rts
 
