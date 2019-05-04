@@ -26,15 +26,12 @@
 | NOTE: loading code into RAM means that altering the IVT isn't possible right now, since we don't have a 68010 to test with
 
 _start:
-	or.i #0x700, %sr | set IPL to 7
+	or.i #0x700, %sr | set IPL to 7, since interrupt architecture has not been tested.
 	
 	jsr mfp_init
 	
-	clr %d0
-	clr %d2
-	
     | bootloader format:
-	| (LSB first)
+	| (MSB first)
     | <config byte> <4 byte length> <binary>
     | config byte layout: 0b0000_0SVE (1 for enabled)
     | S: jump to code in supervisor mode instead of user mode - allows for a more microcontroller-like system
@@ -45,25 +42,22 @@ _start:
 	jsr mfp_readc | read config byte
 	move.b %d0, %d3
 	
-	| NOTE: this is MSB first.
-1:	jsr mfp_readc
-	lsl.l #8, %d0
+	| read in a 32-bit length byte representing the size of the incoming binary
+	| NOTE: this value has to be word-aligned.
 	jsr mfp_readc
 	lsl.l #8, %d0
 	jsr mfp_readc
 	lsl.l #8, %d0
 	jsr mfp_readc
-	
-	move.l %d0, %d1 | 32-bit length in %d1
-	
-	| NOTE: the length of the binary being uploaded has to be word-aligned.
+	lsl.l #8, %d0
+	jsr mfp_readc
 	
 	move.l #RAM_START, -(%sp) | start
-	move.l %d1, -(%sp) | len
+	move.l %d0, -(%sp) | len
 	jsr mfp_readblock | read in the rest of the binary data
 	addq #8, %sp
 	
-	| write first word back out and halt 
+	| to verify correct loading of code, echo back the first value in RAM and the config byte.
 	move.w (0x20000), %d0
 	jsr mfp_writew
 
@@ -87,12 +81,6 @@ mfp_readblock:
 
 1:	cmp.l %a1, %a0 | a0 - a1, sets cc
 	beq 4f
-	
-	|move.l %a0, %d0
-	|jsr mfp_writel
-	
-	|move.l %a1, %d0
-	|jsr mfp_writel
 	
 2:	btst #7, (MFP_UART_RSR) | inline mfp_readc twice
 	beq 2b

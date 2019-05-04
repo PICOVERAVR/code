@@ -42,6 +42,7 @@
 .set UART_BUFFER_START, 0x20062
 .set UART_BUFFER_END, 0x20064
 
+| CHECKED
 | reset and configure the MFP for basic operation
 mfp_init:
 	move.b #0x40, (MFP_VR) | point IVR to right after EVT
@@ -52,6 +53,8 @@ mfp_init:
 
 	move.b #0x4, (MFP_UART_TSR) | idle high
 	move.b #0x1, (MFP_UART_TSR) | enable tx
+	
+	move.b #0x1, (MFP_UART_RSR) | enable rx
 	
 	move #0, (UART_BUFFER_START)
 	move #0, (UART_BUFFER_END)
@@ -91,58 +94,86 @@ mfp_read:
 	bra 1b
 3:	rts
 
+| CHECKED
 | read memory contents out of mfp
 | @param: address to read
 | @param: length of block to read
 mfp_readblock:
-	move.l 4(%sp), %a0 | start
-	move.l 8(%sp), %d1 | len
-	move.l #MFP_UART_DATA, %a1
-	add.l %d1, %a0 | contains stop addr
-1:	cmp.l %a0, %d1
-	beq 3f
-2:	btst #7, (MFP_UART_RSR)
-	bne 2b
-	move.b (MFP_UART_DATA), %d0
-	lsl #8, %d0
-	move.b (MFP_UART_DATA), %d0
-	move.w %d0, (%a0)+
-	bra 1b
-3:	rts
+    move.l 4(%sp), %a0 | len
+    move.l 8(%sp), %a1 | start
+
+    add.l %a1, %a0
+
+1:  cmp.l %a1, %a0 | a0 - a1, sets cc
+    beq 4f
+
+2:  btst #7, (MFP_UART_RSR) | inline mfp_readc twice
+    beq 2b
+    move.b (MFP_UART_DATA), %d0
+    lsl.l #8, %d0
+3:  btst #7, (MFP_UART_RSR)
+    beq 3b
+    move.b (MFP_UART_DATA), %d0
+
+    move.w %d0, (%a1)+
+
+    bra 1b
+    
+4:  rts 	
 
 | write memory contents into mfp
 | @param: address to write
 | @param: length of block to write
 mfp_writeblock:
-	move.l 4(%sp), %d0 | start
-	move.l 8(%sp), %d1 | len
-	add.l %d1, %d0
-1:	cmp.l %d0, %d1
-	beq 3f
-2:	btst #7, (MFP_UART_TSR)
-	bne 2b
-	move.w (%a0)+, %d0
-	move.b %d0, (MFP_UART_DATA)
-	lsr #8, %d0
-	move.b %d0, (MFP_UART_DATA)
-	bra 1b
-3:	rts
+	rts
 
+| CHECKED
 | write d0 (byte) into MFP
 | @param: byte character to write
 mfp_writec:
 1:	btst #7, (MFP_UART_TSR)
-	bne 1b
+	beq 1b
 	move.b %d0, (MFP_UART_DATA)
 	rts
 
+| CHECKED
 | read a character from the MFP into d0
 | @returns: byte character read
 mfp_readc:
 1:	btst #7, (MFP_UART_RSR)
-	bne 1b
+	beq 1b
 	move.b (MFP_UART_DATA), %d0
 	rts
+
+| BOTH W and L CHECKED
+| write words or longwords to output, LSB first.
+mfp_writew:
+1:  btst #7, (MFP_UART_TSR)
+    beq 1b
+    move.b %d0, (MFP_UART_DATA)
+    lsr.w #8, %d0
+2:  btst #7, (MFP_UART_TSR)
+    beq 2b
+    move.b %d0, (MFP_UART_DATA)
+    rts
+
+mfp_writel:
+1:  btst #7, (MFP_UART_TSR)
+    beq 1b
+    move.b %d0, (MFP_UART_DATA)
+    lsr.l #8, %d0
+2:  btst #7, (MFP_UART_TSR)
+    beq 2b
+    move.b %d0, (MFP_UART_DATA)
+    lsr.l #8, %d0
+3:  btst #7, (MFP_UART_TSR)
+    beq 3b
+    move.b %d0, (MFP_UART_DATA)
+    lsr.l #8, %d0
+4:  btst #7, (MFP_UART_TSR)
+    beq 4b
+    move.b %d0, (MFP_UART_DATA)
+    rts
 
 | check for MFP errors
 | @returns: error bits in d0
@@ -173,7 +204,7 @@ mfp_setdir:
 | 0 is off, 1 is on
 mfp_setpin:
 	move.l 4(%sp), %d0
-	move.b %d0, (MFP_IO_DDR)
+	move.b %d0, (MFP_IO_GPDR)
 	rts
 
 | set timer to which mode?
