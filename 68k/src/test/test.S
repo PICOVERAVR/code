@@ -66,6 +66,8 @@ _start:
 	
 	stop #0x700
 	
+	| TODO: verified up to here.
+	
 	| move.l #USP_VAL, %a5
 	| move.l %a5, %usp
 	| andi #0xD8FF, %sr

@@ -12,7 +12,7 @@ eeprom_id_values = {0x7: "GLS29EE010", 0x8: "GLS29VE010"}
 eeprom_manufacturer_values = {0xBF: "Greenliant"}
 
 def eeprom_erase():
-	""" erase the eeprom chip, likely using the built-in erase functionality """
+	""" erase the eeprom chip to its default state """
 	print("Erasing EEPROM chip...", end='')
 	serport.write("ER;".encode('ascii', 'encode'))
 	temp = serport.readline()
@@ -80,7 +80,7 @@ def eeprom_write():
 		serport.write(byte_arr[0:32]) # split up for timing reasons, because the Arduino Mega only has a 64-byte serial buffer
 		serport.write(byte_arr[32:64])
 		serport.write(byte_arr[64:96])
-		if page == endpage - 1 and byte_arr[127] == 0xa:
+		if page == endpage - 1 and byte_arr[127] == 0xA:
 			byte_arr[127] = 0 # take out EOF
 		serport.write(byte_arr[96:128])
 		
@@ -93,7 +93,7 @@ def eeprom_write():
 def eeprom_read():
 	""" read out the eeprom, directing binary to an output file. 
 	
-	A binary will be created if the file passed by the '-b' option doesn't exist yet.
+	A binary will be created if the file passed by the '-b' option doesn't exist.
 	File contents are in hex, for ease of use.
 	
 	"""
@@ -127,7 +127,7 @@ if __name__ == "__main__":
 	parser.add_argument('-v', '--verbose', type=str, default='', help='enable more verbose output, options are \'info\' and \'debug\'.')
 	parser.add_argument('-b', '--binary', type=str, default='', help='binary to manipulate.')
 	parser.add_argument('-s', '--size', type=int, default=0x20000, help='EEPROM size, defaults to 128K.')
-	parser.add_argument('-p', '--speed', type=int, default=250000, help='speed at which to communicate with the arduino, defaults to 250k')
+	parser.add_argument('-p', '--speed', type=int, default=250000, help='speed at which to communicate with the arduino, defaults to 250k baud')
 	args = parser.parse_args()
 
 	EEPROM_SIZE = args.size
@@ -149,12 +149,7 @@ if __name__ == "__main__":
 	else:
 		logger.info("pyserial module found.")
 	
-	try:
-		if args.device == None:
-			raise IOError
-		#with open(args.device) as file: # TODO: this hangs for some reason now. fix this.
-		#	pass
-	except IOError as bad_file:
+	if args.device == None:
 		logger.error('Device file cannot be opened.')
 		sys.exit(1)
 	
@@ -168,9 +163,11 @@ if __name__ == "__main__":
 		eeprom_id()
 	elif args.action == 'write':
 		eeprom_write()
-	# takes ~6 seconds with 2M baud, full 128K EEPROM
+	# note - this function reads out the whole 128K of EEPROM memory by default.  This might take a while.
 	elif args.action == 'read':
 		eeprom_read()
+	elif args.action == 'nop':
+		print("No action given, doing nothing.")
 	else:
 		logger.error("unknown action!")
 		sys.exit(1)

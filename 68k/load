@@ -13,9 +13,9 @@ if __name__ == "__main__":
 	parser.add_argument('-d', '--device', type=str, help='UART device path')
 	parser.add_argument('-b', '--binary', type=str, help='binary path')
 	parser.add_argument('-s', '--speed', type=int, default=115200, help='baud rate to communicate at, defaulting to 115200')
-	parser.add_argument('-l', '--load', type=str, help='specify whether to put binary in RAM or EEPROM')
 	parser.add_argument('-i', '--size', type=int, default=0x1FFFF, help='size of flash memory, script will stop if binary is bigger than this')
 	# TODO: add option for booting into supervisor mode instead of user mode
+	# TODO: find a good way to specify a list of options for the config byte without a bunch of options
 
 	args = parser.parse_args()
 	
@@ -23,6 +23,7 @@ if __name__ == "__main__":
 		import serial
 	except ModuleNotFoundError:
 		print("pyserial module not found!")
+		print("try installing pip, and then running 'python -m pip install pyserial'.")
 		sys.exit(1)
 	
 	try: # open device file for Arduino
@@ -50,11 +51,15 @@ if __name__ == "__main__":
 		sys.exit(4)
 	else:
 		if args.load == "EEPROM":
-			config_byte |= 0x1
-	
+			config_byte |= 0x1 # NOTE: this is not supported in the bootloader yet
+
 	bin_length = len(bindata)
+
+	if bin_length % 2 == 1: # word align if not word-aligned already
+		bin_length += 1
+	
 	if (bin_length > args.size):
-		print("binary size is greater than memory will allow!")
+		print("binary size is greater than target will allow!")
 		sys.exit(5)
 
 	print("writing " + str(bin_length) + " bytes to " + args.load, end='')
@@ -64,12 +69,12 @@ if __name__ == "__main__":
 	# write the length of the incoming binary, one byte at a time
 	# doing this manually since bootloader expects 4 bytes regardless of value
 	
-	# TODO: write this as MSB first.
-	for i in range(0, 4):
+	for i in range(4, 0):
 		if bin_length == 0:
 			serport.write(0)
 		else:
-			pass
+			serport.write((bin_length >> (8 * i)) & 0xff)
+			bin_length = bin_length >> 8
 	
 	serport.write(bindata)
 	
