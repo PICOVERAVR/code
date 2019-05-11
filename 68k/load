@@ -14,7 +14,6 @@ if __name__ == "__main__":
 	parser.add_argument('-b', '--binary', type=str, help='binary path')
 	parser.add_argument('-s', '--speed', type=int, default=115200, help='baud rate to communicate at, defaulting to 115200')
 	parser.add_argument('-i', '--size', type=int, default=0x1FFFF, help='size of flash memory, script will stop if binary is bigger than this')
-	# TODO: add option for booting into supervisor mode instead of user mode
 	# TODO: find a good way to specify a list of options for the config byte without a bunch of options
 
 	args = parser.parse_args()
@@ -26,12 +25,7 @@ if __name__ == "__main__":
 		print("try installing pip, and then running 'python -m pip install pyserial'.")
 		sys.exit(1)
 	
-	try: # open device file for Arduino
-		if args.device == None:
-			raise IOError
-		#with open(args.device) as file: # TODO: fix this
-		#	pass
-	except IOError as bad_file:
+	if args.device == None:
 		print("cannot open device file!")
 		sys.exit(2)
 	
@@ -46,12 +40,7 @@ if __name__ == "__main__":
 		sys.exit(3)
 
 	config_byte = 0
-	if args.load != "EEPROM" and args.load != "RAM":
-		print("invalid target!")
-		sys.exit(4)
-	else:
-		if args.load == "EEPROM":
-			config_byte |= 0x1 # NOTE: this is not supported in the bootloader yet
+	# note: configuration bits here are not supported in the bootloader yet, but we still need to write a byte
 
 	bin_length = len(bindata)
 
@@ -78,5 +67,16 @@ if __name__ == "__main__":
 	
 	serport.write(bindata)
 	
+	# bootloader echoes back the first word of RAM and the config byte to ack the binary transmission, check them for validity
+	ram_word = serport.read(2)
+	if ram_word != bindata[0:2]:
+		print("first word of RAM does not match!")
+		sys.exit(1)
+
+	config_byte_read = serport.read(1)
+	if config_byte_read != config_byte:
+		print("config bytes do not match!")
+		sys.exit(1)
+
 	print("done.")
 

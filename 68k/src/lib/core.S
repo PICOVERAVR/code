@@ -29,7 +29,7 @@ asm_itoa:
 	move 4(%sp), %a0 | space
 	move 8(%sp), %d1 | num
 
-1:	cmp #0, %a0
+1:	cmpi #0, %a0
 	beq 4f | done?
 	move.l %d1, %d2
 	andi.b #0x0F, %d2
@@ -91,7 +91,7 @@ delay_us:
 | @param: EEPROM address to write block to (128-byte aligned)
 eeprom_write_page:
 
-	.set ram_prog_size, ewp_ram_prog_end-ewp_ram_prog
+	.set ram_prog_size, ewp_ram_prog_end-ewp_ram_prog | calculate size of RAM part of bootloader and put it into a constant
 	moveq #ram_prog_size, %d0 | probably less than 255 bytes
 	
 	move.l #ewp_ram_prog, %a0 | load EEPROM write program into RAM, since EEPROM memory will be unavailable during write.
@@ -128,13 +128,13 @@ ewp_ram_prog:
 	move %sr, %d0
 	btst #6, (%a1)
 	move %sr, %d1
-	cmp.b %d0, %d1
+	cmp.b %d0, %d1 | TODO: make sure these are the same in every other bit but Z.
 	.set ram_bne_add, 0x3FC40 + 0x1A | cannot jump to any assembler labels since all of those are in ROM
 	jmp ram_bne_add
 
-	jmp 3b
+	jmp 3b | done, jump back to kernel portion
 	
-| end of program in RAM
+| end of program in RAM, for assembler use only.
 ewp_ram_prog_end:
 	nop | has to be at least one instruction here or it will alias the next label
 

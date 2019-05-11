@@ -18,12 +18,14 @@
 
 .set RAM_START, 0x20000
 .set RAM_END, 0x40000
-.set USP_VAL, 0x37000
+.set USP_VAL, 0x37000 # value of user stack pointer when loaded into %usp
 
 	.text
 	.global _start
 
 | NOTE: loading code into RAM means that altering the IVT isn't possible right now, since we don't have a 68010 to test with
+| TODO: disable SDP on Arduino programmers so self-updating is possible
+| TODO: fall back on executing code out of ROM if no host is available instead of hanging waiting for input
 
 _start:
 	or.i #0x700, %sr | set IPL to 7, since interrupt architecture has not been tested.
@@ -69,19 +71,17 @@ _start:
 	| TODO: verified up to here.
 	
 	| move.l #USP_VAL, %a5
-	| move.l %a5, %usp
-	| andi #0xD8FF, %sr
+	| move.l %a5, %usp | set up user stack
+	| clr.w %sr | tracing off, user mode, CCR cleared
 	| jmp (RAM_START) | jump to uploaded application
 
 mfp_readblock:
 	move.l 4(%sp), %a0 | len
 	move.l 8(%sp), %a1 | start
 
-	add.l %a1, %a0 | a1 + a0 => a0, get end addr
+	add.l %a1, %a0 | get end addr
 	
-	| a0 is end addr, a1 is start
-
-1:	cmp.l %a1, %a0 | a0 - a1, sets cc
+1:	cmp.l %a1, %a0
 	beq 4f
 	
 2:	btst #7, (MFP_UART_RSR) | inline mfp_readc twice
@@ -98,18 +98,21 @@ mfp_readblock:
 	
 4:	rts
 
+| read a character from the MFP into %d0
 mfp_readc:
 1:	btst #7, (MFP_UART_RSR)
 	beq 1b
 	move.b (MFP_UART_DATA), %d0
 	rts
 
+| write a byte from %d0 to MFP
 mfp_writec:
 1:	btst #7, (MFP_UART_TSR)
 	beq 1b
 	move.b %d0, (MFP_UART_DATA)
 	rts
 
+| write a word from %d0 to MFP
 mfp_writew:
 1:	btst #7, (MFP_UART_TSR)
 	beq 1b
@@ -120,6 +123,7 @@ mfp_writew:
 	move.b %d0, (MFP_UART_DATA)
 	rts
 
+| write a longword from %d0 to MFP
 mfp_writel:
 1:	btst #7, (MFP_UART_TSR)
 	beq 1b
@@ -138,6 +142,7 @@ mfp_writel:
 	move.b %d0, (MFP_UART_DATA)
 	rts
 
+| init function
 mfp_init:
     move.b #0x40, (MFP_VR) | point IVR to right after EVT
     move.b #0x8, (MFP_UART_UCR) | uart: 1 start bit, 1 stop bit, async

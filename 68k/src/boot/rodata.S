@@ -1,3 +1,4 @@
+| read-only section including all interrupt vectors in the table
 .section .rodata
 
 .long RESET_SSP_PTR

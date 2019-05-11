@@ -104,7 +104,7 @@ mfp_readblock:
 
     add.l %a1, %a0
 
-1:  cmp.l %a1, %a0 | a0 - a1, sets cc
+1:  cmp.l %a1, %a0
     beq 4f
 
 2:  btst #7, (MFP_UART_RSR) | inline mfp_readc twice
@@ -145,8 +145,8 @@ mfp_readc:
 	move.b (MFP_UART_DATA), %d0
 	rts
 
-| BOTH W and L CHECKED
-| write words or longwords to output, LSB first.
+| CHECKED
+| write word to output, LSB first.
 mfp_writew:
 1:  btst #7, (MFP_UART_TSR)
     beq 1b
@@ -157,6 +157,8 @@ mfp_writew:
     move.b %d0, (MFP_UART_DATA)
     rts
 
+| CHECKED
+| write longword to output, LSB first.
 mfp_writel:
 1:  btst #7, (MFP_UART_TSR)
     beq 1b
