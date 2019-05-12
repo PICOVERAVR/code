@@ -13,41 +13,34 @@ Check the showcase folder!
 - link .bashrc and .vimrc files to home directory
 
 ## To try:
-(product ideas excluded)
 ### Major Topics:
 - 3D graphics/rendering in C (OpenGL)
-	- Graphics hardware (OpenGL book has this?)
+	- Graphics hardware
 	- Simple graphics API
-	- Graphics software (OpenGL book)
+	- Graphics software
 - TCP/IP
+	- Networking basics (token ring, RR, etc)
 	- Raw sockets
 	- HTTP/HTTPS using ESP32
 	- Embedded HTML
+### Major Projects:
 - Learning Scheme (similar to forth!)
 - FPGA project that actually benefits from using an FPGA
-	- Fives currently in progress
+	- Fives is kind of a waste of time - work on RISC-V instead.
 	- Cache behavior / IO
-	- Networking basics (token ring, RR, etc)
-### Major Projects:
-- 68000 system with MMU and DMA, write custom OS for this obviously
-	- Need to skip the breadboarding, processor has too many pins.  Use the simplest working computer in the datasheet and modify for my needs
-	- Processor, RAM, and boot ROM all need to be socketed, ROM should either be in a removable card or a ZIF socket (maybe both?)
-	- Order to add things: Processor, ROM, RAM, IO (UART), DMA, MMU
-	- Find a C compiler that supports the 68000 (gcc?) and use it
-	- Find a Forth implementation that works on the 68000 and use it (use something existing already!)
-- Graphical program in Python
+- Graphical program in Python - maybe use PyGame?
 - Doing something major with Go
+- RISC-V study / possibly extending it somehow at the simulator level if I have a good idea for new instructions
 ### Minor Projects:
 - Examine features of C++ at asm level
 - UART in Verilog
 - Low level C / asm with GDB
-- Using more modern C
+- Using more modern C/C++ (std::anything in detail)
 - Learn sed
 ### Refresher:
 - OpenGL
-- OpenMP / OpenCL / Pthread
+- OpenMP / Pthreads
 - Git (always more to learn...)
 - Anything EE
 ## Things to fix:
-- Fix makefile softlinks everywhere
-	- constantly breaking all the time
+- Nothing major
