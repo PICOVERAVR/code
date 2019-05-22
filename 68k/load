@@ -40,7 +40,7 @@ if __name__ == "__main__":
 		sys.exit(3)
 
 	config_byte = 0
-	# note: configuration bits here are not supported in the bootloader yet, but we still need to write a byte
+	# NOTE: configuration bits here are not supported in the bootloader yet, but we still need to write a byte
 
 	bin_length = len(bindata)
 
