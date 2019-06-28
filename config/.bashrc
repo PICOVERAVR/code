@@ -3,8 +3,8 @@
 export SHELL=/bin/bash
 export EDITOR=/usr/bin/vim
 
-# include .filename in pathname expansion
-shopt -s dotglob
+shopt -s dotglob # include .filename in pathname expansion
+shopt -s cdspell # allow correction of misspelled directories
 
 export HISTCONTROL=ignoredups
 export DIR_STACK=""
