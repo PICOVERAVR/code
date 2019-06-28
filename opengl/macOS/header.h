@@ -9,6 +9,8 @@
 #include <ctime> //for seeding the random number generator
 #include <cstdlib> //for random floats for testing shaders
 
+#define GL_SILENCE_DEPRECATION // since Apple is using Metal now
+
 #include <OpenGL/gl3.h> //for recent OpenGL calls
 
 #define GLFW_INCLUDE_GLCOREARB

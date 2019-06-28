@@ -61,8 +61,8 @@ int main(int argc, char **argv) {
     
     //start GLFW section for actually drawing things
     glfwInit();
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3); //set the opengl version to 3.3 (version used by doc)
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4); //set the opengl version to 3.3 (version used by doc)
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE); //necesary on osx for some reason?
