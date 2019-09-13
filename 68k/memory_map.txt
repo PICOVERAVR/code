@@ -5,9 +5,9 @@
 	0x3FC00 -> 0x3FFFF: Program data (1024 bytes)
 		0x3FC00 -> 0x3FC3F: MFP UART buffer (64 bytes)
 		0x3FC40 -> 0x3FCFF: Reserved kernel space (used for EEPROM updates)
-0x40000 -> 0x400??: MFP
+0x40000 -> 0x400FF?: MFP
 
-EEPROM booloader code starts at 0x400, application code starts at 0x2000.
+EEPROM booloader code starts at 0x400, application code starts at 0x20000.
 
 still need to do housekeeping such as zeroing out .bss section because no OS will do it for us
 cannot load anything into SRAM at assemble time, all has to be done by bootloader.

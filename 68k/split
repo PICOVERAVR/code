@@ -31,17 +31,18 @@ if __name__ == "__main__":
 	# inverted A0, so ~UDS or ~LDS = 0
 	for byte in range(0, len(bindata)):
 		if byte % 2 == 0:
-			if byte + 1 == len(bindata):
+			if byte + 1 == len(bindata): # if the binary is of an odd size, pad it
 				lsbdata.append(0)
 			else:
 				lsbdata.append(bindata[byte + 1]) # 68000 is a big endian machine
 			msbdata.append(bindata[byte])
 		else:
-			msbdata.append(0x00) # odd addresses are unused.
+			msbdata.append(0x00) # 68000 accesses things on even bounderies I think
 			lsbdata.append(0x00)
 		if debug:
 			print("word " + str(hex(byte)) + ": (LSB, MSB) (" + str(hex(lsbdata[-1])) + ", " + str(hex(msbdata[-1])) + ")")
-
+	
+	# write out split files
 	with open(sys.argv[1] + ".lsb", "wb") as lsb_bin:
 		lsb_bin.write(bytes(lsbdata))
 	with open(sys.argv[1] + ".msb", "wb") as msb_bin:
