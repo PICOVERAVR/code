@@ -1,8 +1,0 @@
-1. doesn't work for a regular helloworld.c
-	no support for PIC executables, recompile with -no-pie flag
-2. set watchpoints
-3. disable breakpoints
-
-4. Use libdwarf!
-	got it to work, but code relies on compiler generating dwarf2
-	apparently still decently popular...
