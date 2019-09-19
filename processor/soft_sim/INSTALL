@@ -1,7 +1,0 @@
-installation is pretty simple:
-$ ./configure && make && make install
-
-packages required:
-	check: unit testing framework, only required for 'make check'
-	
-

@@ -1,2 +1,0 @@
-This program requires objdump in order to dump executables.
-This program also requires x64 Linux.
