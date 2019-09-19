@@ -32,7 +32,10 @@ app: pre # assemble an application suitable to be booted into
 	@m68k-elf-objcopy -O binary app.out app.bin
 	@m68k-elf-readelf -S app.out
 
-pre: # announce host
+pre: # announce host and check that binutils exists
+	ifeq (, $(shell which m68k-elf-as))
+	$(error "m68k binutils not found in PATH!")
+	endif
 	@echo "Building on: $(UNAME)"
 
 clean:
