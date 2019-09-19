@@ -1,1 +1,0 @@
-/root/main/common/makefiles/makefile_asm

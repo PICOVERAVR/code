@@ -1,5 +1,0 @@
-To interface:
-	set bashrc properly
-	enable color
-	point .gitconfig to inside repo
-	
