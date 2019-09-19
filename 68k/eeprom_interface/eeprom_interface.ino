@@ -5,7 +5,8 @@
   The code could be made to work with other EEPROMS, as the GLS29EE010 isn't super different than other common EEPROM chips.
 
   All pin connections below are on the rightmost connector on the board, to ease wiring concerns and allow for other things to be connected.
-
+  (Arduino Mega layout)
+  
   Timing variables are the same as in the GLS29EE010 datasheet.
 
   Pinout:
@@ -74,28 +75,27 @@
   WE = L3
   OE = B0
   
-*/
-
-/*
   Command syntax:
+
 Format: <operation>: <arg>: <arg>: <arg>;
-ER; // erase chip
-VE; // version information
-RP: <decaddr>; // read a page out of memory, display as raw data
-RPI: <decaddr>; // (read page interactive) read a page out of memory, display as decimal. For debugging.
-WP: <decaddr>: <values> // write a page into memory, use raw data
-RD: <decaddr>; // read a word out of memory
-WR: <decaddr>: <value> // write a word into memory
-  NOTE: both RD and WR are implemented, but are not included in the interpreter for efficiency reasons
-FL: <decaddr>: <len>: <value>; // fill memory with <value> from <decaddr> to <len> - NOT IMPLEMENTED
-NP; // do nothing
+ER;  erase the chip, which in this case sets all memory locations to 0xFF
+VE;  get version information about the interface code and the chip connected
+RP: <decaddr>;  read a page out of memory, display as raw data
+RPI: <decaddr>;  read a page out of memory, display as decimal and in a pretty format for debugging
+WP: <decaddr>: <values>  write a page into memory, use raw data
+RD: <decaddr>;  read a word out of memory
+WR: <decaddr>: <value>  write a word into memory
+  NOTE: neither RD and WR are actually implemented since the chip works on 128-byte pages and writing and reading words is wildly inefficient.
+FL: <decaddr>: <len>: <value>;  fill memory with <value> from <decaddr> to <len> - NOT IMPLEMENTED
+NP;  do nothing
+
 */
 
 #include <stdint.h>
 #include <string.h>
 #include <stdlib.h>
 
-#define AST 24
+const int AST = 24; // status LED pin
 
 const char *version_string = "EEPROM Flasher v0.3";
 
@@ -109,6 +109,7 @@ typedef struct {
   uint8_t device_id;
 } device_info_t;
 
+// set the data direction of the data bus directly
 void set_data_pin_mode(bool dir) {
   if (dir) { // out
     DDRC |= 0b11111000;
@@ -119,6 +120,7 @@ void set_data_pin_mode(bool dir) {
   }
 }
 
+// set the address bus to a specific value directly
 void set_addr_bus(long addr) {
   bitWrite(PORTC, 0, (addr >> 3) & 1L);
   bitWrite(PORTC, 1, addr & 1L);
@@ -196,7 +198,7 @@ inline void check_write_complete() {
 }
 
 void eeprom_erase() {
-  eeprom_write_cntl(0x5555, 0xAA);
+  eeprom_write_cntl(0x5555, 0xAA); // EEPROM erase sequence in datasheet
   eeprom_write_cntl(0x2AAA, 0x55);
   eeprom_write_cntl(0x5555, 0x80);
   eeprom_write_cntl(0x5555, 0xAA);
@@ -209,7 +211,7 @@ void eeprom_erase() {
 // returns struct containing device info
 device_info_t eeprom_get_id() {
   device_info_t device;
-    
+  
   eeprom_write_cntl(0x5555, 0xAA);
   eeprom_write_cntl(0x2AAA, 0x55);
   eeprom_write_cntl(0x5555, 0x90);
@@ -230,7 +232,7 @@ device_info_t eeprom_get_id() {
 // write a page (128 bytes) into EEPROM
 // page has to start on a 128-byte page boundary
 void eeprom_write_page(long page, uint8_t *page_buf) {
-  eeprom_write_cntl(0x5555, 0xAA);
+  eeprom_write_cntl(0x5555, 0xAA); // unlock?
   eeprom_write_cntl(0x2AAA, 0x55);
   eeprom_write_cntl(0x5555, 0xA0);
   
@@ -248,12 +250,12 @@ void eeprom_write_page(long page, uint8_t *page_buf) {
     bitSet(PORTA, 5); // CE
   }
   
-  delayMicroseconds(200); // Tblco, have to wait for the byte load period to expire
-
+  delayMicroseconds(200); // Tblco, have to wait for the byte load period to expire once the page load is done
+  
   bitSet(PORTA, 5); // CE
   bitSet(PORTL, 3); // WE
   bitSet(PORTB, 0); // OE
-
+  
   check_write_complete();
 }
 

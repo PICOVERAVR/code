@@ -1,22 +1,4 @@
-Official documentation and history for my 68000 project (codename "Nomad")
-
-Design goals:
-	1. Fast.  Or at least faster than most other 68000 boards out there.
-	2. Simple.  Easy to program for, and coprocessors don't easily work with anything lower than a 68020 anyways.
-	3. Extensible.  The board should contain enough to do something fun out of the box, but not enough that it hinders future expansion.
-	
-	68000 and 68010 compatible
-	128K SRAM, 128K EEPROM, self update capability
-	MFP I/O device included, adds an 8-bit I/O port, timers, and a USART for host communication
-	actual C compiler should be working for this, not BASIC or Forth or anything. If not C, then only ASM. (see #1)
-
-Software tools:
-	flash: a shell script that calls make, then the python scripts below to upload code
-	makefile: assemble and link source code using GCC binutils built for the 68000
-	eeprom-config: python tool for writing and reading data to/from EEPROMs using an external Arduino programmer
-	split: splits a binary file into two binaries suitable for upload to an EEPROM chip. (or two)
-	upload: application code upload to 68k baseboard - note that this program is extremely dependant on how the bootloader itself is written and is 
-		not at all complete yet.
+See private hackaday post for relavant project info
 
 Additional projet ideas:
 	make a wall clock using cool 7-seg displays
