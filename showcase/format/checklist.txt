@@ -1,4 +1,0 @@
-1. Make sure that non-counter loops are while or do_while loops
-	for loops without the inc variable in the center will get marked off
-	(sec 5.2)
-
