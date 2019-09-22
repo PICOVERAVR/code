@@ -18,7 +18,7 @@
 
 .set RAM_START, 0x20000
 .set RAM_END, 0x40000
-.set USP_VAL, 0x37000 # value of user stack pointer when loaded into %usp
+.set USP_VAL, 0x37000 | value of user stack pointer when loaded into %usp
 
 	.text
 	.global _start
