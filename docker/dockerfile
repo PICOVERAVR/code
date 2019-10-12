@@ -11,13 +11,15 @@ RUN apt-get update && apt-get install -y \
 	check \
 	gcc \
 	g++ \
+	gdb \
+	clang \
+	lldb \
 	golang-go \
 	python3 \
 	libglib2.0-dev \
 	strace \
 	valgrind \
 	vim \
-	gdb \
 	make \
 	git \
 	binutils \
