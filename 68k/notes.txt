@@ -39,3 +39,4 @@ toolchain todo:
 	decide how much stuff I want to write in C vs assembly
 	write a linker script and assembly file containing _start, use it with GCC (can't use the standard _start since I have special requirements as to the memory layout)
 	write code in C, test on an x64 machine
+	port newlib to the board, but before all that I have to order a rev 2 with all the issues fixed.
