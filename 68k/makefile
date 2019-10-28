@@ -2,13 +2,17 @@ exclude := src/boot/start.S
 SRC := $(filter-out $(exclude), $(wildcard src/boot/*.S))
 APP := $(wildcard src/app/*.S)
 TEST := src/test/test.S
+TESTC := src/test/test.c
 
 BOOT_LINK := src/boot/link_boot_script.l
 APP_LINK := src/app/link_app_script.l
 
-FLAGS := -march=68000 -mcpu=68000 -mno-float
+FLAGS := -march=68000 -mcpu=68000
 
 UNAME := $(shell uname)
+
+lang: pre # compile a C file
+	@m68k-elf-gcc $(FLAGS) $(TESTC)
 
 boot: pre # assemble the bootloader
 	@m68k-elf-as $(FLAGS) $(exclude) $(SRC) -o boot.o # start.S code always executes first, putting it in the SRC variable means other files may be put at 0x400
@@ -16,7 +20,7 @@ boot: pre # assemble the bootloader
 	@m68k-elf-objcopy -O binary boot.out boot.bin
 	@m68k-elf-readelf -S boot.out
 
-asm: # dump assembly of bootloader
+asm: pre # dump assembly of bootloader
 	@m68k-elf-objdump -d boot.out
 
 test: pre # assemble a test file only, then dump assembly
@@ -34,6 +38,8 @@ app: pre # assemble an application suitable to be booted into
 
 pre: # announce host and eventually check that binutils exists
 	@echo "Building on: $(UNAME)"
+	@echo "Using $(shell which m68k-elf-as) as assembler."
+	@echo "Using $(shell which m68k-elf-gcc) as C compiler."
 
 clean:
 	@rm -f	{*.out,*.o,*.bin,*.lsb,*.msb}

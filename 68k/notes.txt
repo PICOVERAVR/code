@@ -34,3 +34,8 @@ ideas for add-on boards:
 misc ideas:
 	put some artwork or something cool on the bottom side if it doesn't add too much to the cost of the board
 	make it so the bootloader program contains a lot of test code, and the board could read an unimplemented area of memory to determine what tests to run.
+
+toolchain todo:
+	decide how much stuff I want to write in C vs assembly
+	write a linker script and assembly file containing _start, use it with GCC (can't use the standard _start since I have special requirements as to the memory layout)
+	write code in C, test on an x64 machine
