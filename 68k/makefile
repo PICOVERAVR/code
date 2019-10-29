@@ -1,8 +1,11 @@
+# note that this is currently a well-formed makefile script with hardcoded files everywhere
 exclude := src/boot/start.S
 SRC := $(filter-out $(exclude), $(wildcard src/boot/*.S))
 APP := $(wildcard src/app/*.S)
 TEST := src/test/test.S
-TESTC := src/test/test.c
+
+C := src/c/main.c
+CSTART := src/c/cstart.S
 
 BOOT_LINK := src/boot/link_boot_script.l
 APP_LINK := src/app/link_app_script.l
@@ -11,8 +14,15 @@ FLAGS := -march=68000 -mcpu=68000
 
 UNAME := $(shell uname)
 
-lang: pre # compile a C file
-	@m68k-elf-gcc $(FLAGS) $(TESTC)
+lang: pre # compile a C file, building as an application
+	@m68k-elf-gcc -nostdlib $(FLAGS) -c $(C) -o lang.o
+	@m68k-elf-as $(FLAGS) $(CSTART) -o cstart.o
+	@m68k-elf-ld -T $(APP_LINK) cstart.o lang.o -o lang.out
+	@m68k-elf-objdump -d lang.out
+	# make a binary out of this later
+
+lfast: pre
+	@m68k-elf-gcc -Osmall -nostdlib $(FLAGS) -c $(TESTC) -o test.o
 
 boot: pre # assemble the bootloader
 	@m68k-elf-as $(FLAGS) $(exclude) $(SRC) -o boot.o # start.S code always executes first, putting it in the SRC variable means other files may be put at 0x400
