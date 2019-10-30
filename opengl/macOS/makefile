@@ -1,7 +1,7 @@
 CC := clang++
 CFLAGS := -Wall -o OpenGL.out
 
-SRC := main.cpp # fix this eventually please
+SRC := main.cpp load.cpp # fix this eventually please
 DSRC := diag.cpp
 
 PKGSRC := `pkg-config glfw3 --cflags`

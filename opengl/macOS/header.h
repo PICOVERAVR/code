@@ -3,7 +3,6 @@
 #include <cmath>
 
 #include <string>
-#include <fstream>
 #include <vector>
 
 #include <ctime> //for seeding the random number generator
@@ -22,6 +21,8 @@
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 #include "glm/gtc/type_ptr.hpp"
+
+#include "load.h"
 
 #define SRC_SIZE 4096
 

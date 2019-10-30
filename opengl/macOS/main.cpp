@@ -1,22 +1,5 @@
 #include "header.h"
 
-//read out a file, given the file name (why tf do I have to write a function for this?)
-string readFile(string filePath) {
-    string content;
-    ifstream srcStream(filePath, ios::in);
-    if (!srcStream.is_open()) {
-        cerr << "Could not open file " << filePath << endl;
-        return "";
-    }
-    string line = "";
-    while (!srcStream.eof()) {
-        getline(srcStream, line);
-        content.append(line + "\n");
-    }
-    srcStream.close();
-    return content;
-}
-
 void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
     glViewport(0, 0, width, height);
 }
@@ -25,7 +8,6 @@ glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
 glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
 glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
 glm::vec3 cameraDown = glm::vec3(0.0f, -1.0f, 0.0f);
-
 
 void processInput(GLFWwindow *window) {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
