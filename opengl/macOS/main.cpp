@@ -74,8 +74,8 @@ int main(int argc, char **argv) {
     unsigned int vertexShader = glCreateShader(GL_VERTEX_SHADER);
     unsigned int fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
     
-    string vertexShaderStr = readFile("./vertexShader.glsl"); //both shaders should be in the same directory
-    string fragmentShaderStr = readFile("./fragmentShader.glsl");
+    string vertexShaderStr = readFile("shader/vertexShader.glsl"); //both shaders should be in the same directory
+    string fragmentShaderStr = readFile("shader/fragmentShader.glsl");
 
     if (vertexShaderStr.compare("") == 0 || fragmentShaderStr.compare("") == 0) {
         cout << "No shader source files found." << endl;
@@ -226,14 +226,14 @@ int main(int argc, char **argv) {
     
     //get texture info from parsing the png
     int texWidth, texHeight, numChannels;
-    unsigned char *data = stbi_load("grass_texture.png", &texWidth, &texHeight, &numChannels, 0);
+    unsigned char *data = stbi_load("art/grass_texture.png", &texWidth, &texHeight, &numChannels, 0);
     if (!data) {
         cout << "no grass texture found." << endl;
         return -1;
     }
     
     int texWidthFace, texHeightFace, numChannelsFace;
-    unsigned char *dataFace = stbi_load("awesomeface.png", &texWidthFace, &texHeightFace, &numChannelsFace, 0);
+    unsigned char *dataFace = stbi_load("art/awesomeface.png", &texWidthFace, &texHeightFace, &numChannelsFace, 0);
     if (!dataFace) {
         cout << "no face texture found." << endl;
         return -1;

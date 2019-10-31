@@ -17,8 +17,3 @@ std::string readFile(std::string filePath) {
     return content;
 }
 
-bool compileShaders(shader_t* shaderList) {
-	
-	
-	return true;
-}

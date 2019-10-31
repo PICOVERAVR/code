@@ -1,4 +1,5 @@
 //header file to go with this test OpenGL thing
+#pragma once
 #include <iostream>
 #include <cmath>
 

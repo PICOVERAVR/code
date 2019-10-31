@@ -3,10 +3,13 @@
 #include <string>
 #include <fstream>
 
+#define GL_SILENCE_DEPRECATION
+#include <OpenGL/gl3.h>
+
 struct shader_t {
-	int shader_type;
+	GLenum shader_type;
 	const char* path;
 };
 
 std::string readFile(std::string path);
-bool compileShaders(shader_t* shaderList);
+bool compileShaders(shader_t* shaderList, int size);
