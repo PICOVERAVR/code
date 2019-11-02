@@ -18,8 +18,8 @@ lang: pre # compile a C file, building as an application
 	@m68k-elf-gcc -nostdlib $(FLAGS) -c $(C) -o lang.o
 	@m68k-elf-as $(FLAGS) $(CSTART) -o cstart.o
 	@m68k-elf-ld -T $(APP_LINK) cstart.o lang.o -o lang.out
-	@m68k-elf-objdump -d lang.out
-	# make a binary out of this later
+	@m68k-elf-objcopy -O binary lang.out lang.bin
+	@m68k-elf-objdump -D lang.out
 
 lfast: pre
 	@m68k-elf-gcc -Osmall -nostdlib $(FLAGS) -c $(TESTC) -o test.o

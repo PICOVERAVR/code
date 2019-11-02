@@ -1,8 +1,7 @@
 	.text
 	.global _start
-
+	.type _start,@function
 _start:
-	nop
-	| getting here as user, so some things are already set up
-	| init .bss
-	| call main
+	| getting here in user mode with stack set to 0x37000, CCR cleared.
+	jsr main
+
