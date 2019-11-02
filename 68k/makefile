@@ -11,14 +11,15 @@ BOOT_LINK := src/boot/link_boot_script.l
 APP_LINK := src/app/link_app_script.l
 
 FLAGS := -march=68000 -mcpu=68000
+GCCFLAGS := -nostdlib -ffreestanding $(FLAGS) $(C) -Wl,-lgcc,-T,$(APP_LINK)
 
 UNAME := $(shell uname)
 
 lang: pre # compile a C file, building as an application
 	@m68k-elf-as $(FLAGS) $(CSTART) -o cstart.o # assemble small start file
-	@m68k-elf-gcc -nostdlib -ffreestanding $(FLAGS) $(C) -Wl,-T,$(APP_LINK) -o lang.out # use gcc as linker as well
+	@m68k-elf-gcc $(GCCFLAGS) -o lang.out # use gcc as linker as well
 	@m68k-elf-objcopy -O binary lang.out lang.bin
-	@m68k-elf-objdump -D lang.out
+	@m68k-elf-objdump -d lang.out
 
 lfast: pre
 	@m68k-elf-gcc -Osmall -nostdlib $(FLAGS) -c $(TESTC) -o test.o

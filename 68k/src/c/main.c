@@ -1,13 +1,8 @@
-int x = 0xF00F;
-int y;
+#include <stdint.h>
 
-void delay(int value) { // value in ms
-	const int delaycycles = (value * 1000) / 22;
-	volatile int current = 0;
-	while (current++ < delaycycles);
-}
+uint16_t x = 0xF00F;
+uint16_t y;
 
 int main() {
-	delay(100);
 	return 0;
 }
