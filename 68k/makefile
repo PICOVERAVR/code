@@ -15,9 +15,8 @@ FLAGS := -march=68000 -mcpu=68000
 UNAME := $(shell uname)
 
 lang: pre # compile a C file, building as an application
-	@m68k-elf-gcc -nostdlib $(FLAGS) -c $(C) -o lang.o
-	@m68k-elf-as $(FLAGS) $(CSTART) -o cstart.o
-	@m68k-elf-ld -T $(APP_LINK) cstart.o lang.o -o lang.out
+	@m68k-elf-as $(FLAGS) $(CSTART) -o cstart.o # assemble small start file
+	@m68k-elf-gcc -nostdlib -ffreestanding $(FLAGS) $(C) -Wl,-T,$(APP_LINK) -o lang.out # use gcc as linker as well
 	@m68k-elf-objcopy -O binary lang.out lang.bin
 	@m68k-elf-objdump -D lang.out
 
