@@ -1,28 +1,14 @@
 # note that this is currently a well-formed makefile script with hardcoded files everywhere
+# c makefile is in the c source directory since it's a lot more complicated.
 exclude := src/boot/start.S
 SRC := $(filter-out $(exclude), $(wildcard src/boot/*.S))
 APP := $(wildcard src/app/*.S)
 TEST := src/test/test.S
 
-C := src/c/main.c
-CSTART := src/c/cstart.S
-
 BOOT_LINK := src/boot/link_boot_script.l
 APP_LINK := src/app/link_app_script.l
 
 FLAGS := -march=68000 -mcpu=68000
-GCCFLAGS := -nostdlib -ffreestanding $(FLAGS) $(C) -Wl,-lgcc,-T,$(APP_LINK)
-
-UNAME := $(shell uname)
-
-lang: pre # compile a C file, building as an application
-	@m68k-elf-as $(FLAGS) $(CSTART) -o cstart.o # assemble small start file
-	@m68k-elf-gcc $(GCCFLAGS) -o lang.out # use gcc as linker as well
-	@m68k-elf-objcopy -O binary lang.out lang.bin
-	@m68k-elf-objdump -d lang.out
-
-lfast: pre
-	@m68k-elf-gcc -Osmall -nostdlib $(FLAGS) -c $(TESTC) -o test.o
 
 boot: pre # assemble the bootloader
 	@m68k-elf-as $(FLAGS) $(exclude) $(SRC) -o boot.o # start.S code always executes first, putting it in the SRC variable means other files may be put at 0x400
@@ -40,16 +26,10 @@ test: pre # assemble a test file only, then dump assembly
 	@echo "Test build completed."
 	@m68k-elf-readelf -S test.out
 	@m68k-elf-objdump -D test.out
-app: pre # assemble an application suitable to be booted into
-	@m68k-elf-as $(FLAGS) $(APP) -o app.o
-	@m68k-elf-ld -T $(APP_LINK) app.o -o app.out
-	@m68k-elf-objcopy -O binary app.out app.bin
-	@m68k-elf-readelf -S app.out
 
 pre: # announce host and eventually check that binutils exists
-	@echo "Building on: $(UNAME)"
+	@echo "Building on: $(shell uname)"
 	@echo "Using $(shell which m68k-elf-as) as assembler."
-	@echo "Using $(shell which m68k-elf-gcc) as C compiler."
 
 clean:
 	@rm -f	{*.out,*.o,*.bin,*.lsb,*.msb}
