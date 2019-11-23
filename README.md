@@ -1,29 +1,13 @@
 # My things
 A variety of personal projects and tidbits from almost non-existant to small.
 ## Projects:
-### Major Ideas:
-- TCP/IP C stuff
-	- Networking basics (token ring, RR, etc)
-	- Raw sockets
-	- HTTP/HTTPS using ESP32
-	- Embedded HTML
-- FPGA project that actually benefits from using an FPGA
-	- Get RISC-V to work on the Artix board I have, extend the ISA
-	- Cache behavior / IO
-	- Make it fast
-- Embedded OpenGL implementation
-	- Start this once I finish learning OpenGL
-	- Target OpenGL ES 1.1 Common Lite spec and go from there
-### Minor Ideas:
-- Examine features of C++ at asm level
-- Low level C / asm with GDB
 ### In Progress:
-Nothing right now, just learning
+Nothing right now...
 ### On Hold:
 - 68000 based microcomputer (m68k branch)
 - Custom CPU (simulated in C and will be written in Verilog) (processor branch)
 - Forth interpreter, based on jonesforth but re-written for x86-64 (showcase folder)
-- Special code formatter for a class that is now done (showcase folder)
+- Special code formatter for a class that is now done (misc branch)
 ## Learning:
 ### Future:
 - Languages:
@@ -32,19 +16,21 @@ Nothing right now, just learning
 	- Scheme
 	- something fp
 	- sed/awk
-- Other:
+- APIs:
 	- Vulkan
+	- Pthreads
+- Topics:
+	- Networking basics (token ring, RR, etc)
+	- Raw sockets
+	- HTTP/HTTPS using ESP32
+- Programs:
+	- Vivado
+	- gdb (more)
 ### In Progress:
 - OpenGL
-- Modern C++
+- Modern C++ (not writing C in C++, as a lot of people do)
 ### Tabled:
-- Computer Architectures
-	- RISC-V
-	- x86-64
-	- 68000
-	- Patterson book
-- OpenMP / Pthreads / OpenCL
-- More Git
+- OpenCL - is being merged into Vulkan, learn that instead
 ## Setup guide on new hardware:
 - set bashrc location
 - clone repository: `clone https://www.github.com/PICOVERAVR/code`
