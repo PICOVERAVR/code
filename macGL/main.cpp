@@ -39,7 +39,7 @@ void processInput(GLFWwindow *window) {
 
 int main(int argc, char **argv) {
     //NOTE: a window context has to be created before OpenGL can do any work at all!
-    int height = 3200, width = 2400;
+    int height = 1200, width = 1200;
     
     //start GLFW section for actually drawing things
     glfwInit();
