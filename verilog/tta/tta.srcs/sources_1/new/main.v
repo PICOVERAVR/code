@@ -1,25 +1,10 @@
 /*
 main design file holding everything together
 
-fetches stuff from memory, assume a 24-bit data bus and 24-bit address bus, we can adjust it later with an external loading and storing unit
-
 R31: PC
 R30: ~SP~
 R29: ~FP~
 R0: $0x0
-
-Register list:
-0: R0
-...
-31: PC
-
-< input registers >
-
-< output registers >
-
-status register bits:
-0 - reset the processor
-1 - halt the processor
 
 */
 
@@ -38,7 +23,7 @@ module proc(
     output [23:0] draddr,
     input [23:0] drdata
 );
-    parameter num_units = 11; // number of read and write ports is the same, has to be
+    parameter num_units = 11; // number of read and write ports is the same for no good reason
     
     parameter ua0opa = 0; // number is offset from wirefile, not register number
     parameter ua0opb = 1;
@@ -124,14 +109,12 @@ module proc(
                     $write("executed ");
                     if (cond == 1'b1) begin $write("conditional "); end
                     if (valid_instr) begin // if not valid, turn it into a nop by doing nothing.
-                        if (lit_mv) begin // literal load, will fail if assigning a value to an output.
-                            $display("load %d -> %d.", lit, dest);
-                            if (!cond || (cond && outwirefile[c0result])) begin
+                        if (!cond || (cond && outwirefile[c0result])) begin
+                            if (lit_mv) begin // literal load, will fail if assigning a value to an output.
+                                $display("load %d -> %d.", lit, dest);
                                 unitfile[dest] <= hl ? { lit, unitfile[dest][11:0] } : { unitfile[dest][23:12], lit }; // load appropriate part
-                            end
-                        end else begin
-                            $display("move %d -> %d.", src, dest);
-                            if (!cond || (cond && outwirefile[c0result])) begin
+                            end else begin
+                                $display("move %d -> %d.", src, dest);
                                 unitfile[dest] <= unitfile[src];
                             end
                         end

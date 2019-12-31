@@ -27,7 +27,13 @@ module main_check();
     // TODO: turn off wen sometimes
     // TODO: prevent writes to R0
     // TODO: pipeline this
-    // TODO: add more stuff
+    // TODO: add more / multiple of each functional unit
+    // TODO: add caches to the processor
+    
+    // long TODO: load code onto this processor from host, run it on actual FPGA
+    
+    // IDEA: could seperate all three stages into modules and add an enable signal to all three
+    // that way we could eliminate the branch delay slot
     
     // here memories are totally different - iaddr 0 != daddr 0.
     imem #(.mem_size(128)) tm(.clk(clk), .addr(iaddr), .data(idata)); // test 128-word instruction memory
