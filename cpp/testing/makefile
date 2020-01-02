@@ -2,7 +2,7 @@
 CC = g++
 DFLAGS = -Wall -std=c++17
 
-SRC = $(wildcard *.cpp) #grab anything with a .c ending
+SRC = $(wildcard *.cpp) #grab anything with a .cpp ending
 
 debug:
 	@$(CC) $(SRC) $(DFLAGS)
