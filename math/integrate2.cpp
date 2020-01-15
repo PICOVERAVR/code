@@ -1,5 +1,5 @@
-// clang: clang++ main.cpp -Ofast -ffast-math -avx2 -o main.out
-// gcc: g++ main.cpp -Ofast -ffast-math -avx2 -pthread -o main.out
+// clang: clang++ main.cpp -Ofast -ffast-math -std=c++17 -o main.out
+// gcc: g++ main.cpp -Ofast -ffast-math -avx2 -pthread -std=c++17 -o main.out
 #include <iostream>
 #include <limits>
 #include <future>
