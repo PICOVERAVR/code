@@ -24,7 +24,7 @@ module soc(
     imem #(.mem_size(32)) rom(.clk(sysclk), .addr(iaddr), .data(idata));
     dpdmem #(.mem_size(2048)) ram(.clk(sysclk), .waddr(dwaddr), .wdata(dwdata), .raddr(draddr), .rdata(drdata), .wen(1'b1));
     
-    proc p0(.clk(sysclk), .rst(rst), .idata(idata), .iaddr(iaddr), .dwaddr(dwaddr), .dwdata(dwdata), .draddr(draddr), .drdata(drdata));
+    //proc p0(.clk(sysclk), .rst(rst), .idata(idata), .iaddr(iaddr), .dwaddr(dwaddr), .dwdata(dwdata), .draddr(draddr), .drdata(drdata));
     
     assign pio1 = drdata[0]; // garbage to get synthesizer to do something
     assign pio2 = sysclk; // garbage to get synthesizer to do something

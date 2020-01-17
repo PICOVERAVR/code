@@ -3,8 +3,6 @@
 //r-type: [ 0 c x x  x d d d  d d d d  s s s s  s s s x  x x x x ] - 1-bit op, 1-bit conditional, 7-bit src, 7-bit dest
 //l-type: [ 1 c h x  x d d d  d d d d  l l l l  l l l l  l l l l ] - 1-bit op, 1-bit conditional, 1 bit high/low select, 7-bit dest, 12-bit literal
 
-THIS NEEDS TO BE CHECKED AND FIXED
-
 0x820055 // loadl $0x55 -> 32
 0xA20000 // loadu $0x0 -> 32
 0x821001 // loadl $0x1 -> 33
