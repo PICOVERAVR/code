@@ -39,6 +39,20 @@ int main(int argc, char **argv) {
 	for (int i = 0; i < max_extensions; i++) {
 		cout << glGetStringi(GL_EXTENSIONS, i) << endl;
 	}
+
+	cout << endl;
+	
+	GLint max_texture_units;
+	glGetIntegerv(GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS, &max_texture_units);
+	cout << "Maximum texture units available: " << max_texture_units << endl;
+
+	GLint max_tex_size;
+	glGetIntegerv(GL_MAX_TEXTURE_SIZE, &max_tex_size);
+	cout << "Maximum texture size: " << max_tex_size << endl;
+	
+	int max_compressed_formats;
+	glGetIntegerv(GL_NUM_COMPRESSED_TEXTURE_FORMATS, &max_compressed_formats);
+	cout << "Number of compressed texture formats: " << max_compressed_formats << endl;
 	
 	glfwTerminate();
     return 0;
