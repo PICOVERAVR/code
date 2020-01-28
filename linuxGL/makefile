@@ -1,8 +1,6 @@
 # you can use the GCC -H option to list all included directories, helps with build debugging
 # and make -j for makefile debugging
 
-# TODO: differentiate debug and release builds.
-
 # specify directories to search for files
 VPATH := ./src ./header
 CC := g++
@@ -12,17 +10,24 @@ LIBS := $(shell pkg-config --libs glfw3 assimp glm) -ldl
 LIBFLAGS := $(shell pkg-config --cflags glfw3 assimp glm)
 
 DIRS := -I header
-CFLAGS := -Wall -g -std=c++14 $(DIRS) $(LIBFLAGS)
+CFLAGS := -Wall -std=c++14 $(DIRS) $(LIBFLAGS)
 
 # specify a single target name here
 TARGETS := debug release
 MAINS := $(addsuffix .o, $(TARGETS) )
+
+# specify a list of object files we want
 OBJFILES := camera.o main.o program.o vloader.o window.o glad.o
 
-# NOTE NOTE NOTE: glad.c has to be renamed to glad.cpp to make things easier
+# NOTE: glad.c has to be renamed to glad.cpp to make things easier
 # also glad.h and khrplatform have to be in folders to avoid having to adjust glad.cpp
 
+# all and clean aren't actually creating files, so they are declared as phony targets
 .PHONY: all clean
+
+# update CFLAGS conditionally based on make target
+debug: CFLAGS += -ggdb -Og
+release: CFLAGS += -Ofast -march=native
 
 # build for all possible targets
 all: $(TARGETS)
@@ -36,7 +41,7 @@ $(OBJFILES): %.o: %.cpp stb_image.h
 	$(CC) -c -o $@ $< $(CFLAGS)
 
 # for each target: compile in all dependancies as well as all library link flags we need
-$(TARGETS): % : $(filter-out $(MAINS), $(OBJFILES))
+$(TARGETS): % : $(OBJFILES)
 	$(CC) -o $@ $(LIBS) $^
 
 # for each cpp file: update timestamp, but don't create a file if you can't find it.
