@@ -18,7 +18,7 @@ string shaderProgram::getShaderString(string path) {
 }
 
 shaderProgram::shaderProgram() {
-	glGenProgramPipelines(1, &pipeline); // replace with create eventually
+	glCreateProgramPipelines(1, &pipeline);
 }
 
 shaderProgram::~shaderProgram() {

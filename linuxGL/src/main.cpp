@@ -69,26 +69,12 @@ void render(GLuint* stages, shaderProgram& s) {
 	c.update(w);
 
 	glm::mat4 modelMatrix = glm::mat4(1.0f);
-	GLuint modelUniformLocation = glGetUniformLocation(stages[vshdr], "model");
-	if (modelUniformLocation == GL_INVALID_INDEX) {
-		cout << "WARNING: model uniform location not found!" << endl;
-	}
-
 	glm::mat4 viewMatrix = glm::lookAt(c.pos, c.pos + c.front, glm::vec3(0.0f, 1.0f, 0.0f));
-	GLuint viewUniformLocation = glGetUniformLocation(stages[vshdr], "view");
-	if (viewUniformLocation == GL_INVALID_INDEX) {
-		cout << "WARNING: view uniform location not found!" << endl;
-	}
-
 	glm::mat4 projectionMatrix = glm::perspective(glm::radians(25.0f), (float)screenWidth / (float)screenHeight, 0.1f, 100.0f);
-	GLuint projectionUniformLocation = glGetUniformLocation(stages[vshdr], "projection");
-	if (projectionUniformLocation == GL_INVALID_INDEX) {
-		cout << "WARNING: projection uniform location not found!" << endl;
-	}
-
-	glProgramUniformMatrix4fv(stages[vshdr], modelUniformLocation, 1, GL_FALSE, glm::value_ptr(modelMatrix));
-	glProgramUniformMatrix4fv(stages[vshdr], viewUniformLocation, 1, GL_FALSE, glm::value_ptr(viewMatrix));
-	glProgramUniformMatrix4fv(stages[vshdr], projectionUniformLocation, 1, GL_FALSE, glm::value_ptr(projectionMatrix));
+	
+	glProgramUniformMatrix4fv(stages[vshdr], 0, 1, GL_FALSE, glm::value_ptr(modelMatrix));
+	glProgramUniformMatrix4fv(stages[vshdr], 1, 1, GL_FALSE, glm::value_ptr(viewMatrix));
+	glProgramUniformMatrix4fv(stages[vshdr], 2, 1, GL_FALSE, glm::value_ptr(projectionMatrix));
 	
 	glBindVertexArray(vao);
 	glDrawArrays(GL_TRIANGLES, 0, 3);
