@@ -2,7 +2,8 @@
 # and make -j for makefile debugging
 
 # specify directories to search for files
-VPATH := ./src ./header
+# special search paths are for GLAD headers
+VPATH := ./src ./header ./header/glad ./header/KHR
 CC := g++
 
 # get compilation options from libraries used, assuming they're actually installed
@@ -37,7 +38,7 @@ clean:
 	@rm -f $(TARGETS) $(OBJFILES)
 
 # for each object file: that matches %.o: replace with %.cpp and use stb_image.h
-$(OBJFILES): %.o: %.cpp stb_image.h
+$(OBJFILES): %.o: %.cpp %.h stb_image.h
 	$(CC) -c -o $@ $< $(CFLAGS)
 
 # for each target: compile in all dependancies as well as all library link flags we need
@@ -46,5 +47,8 @@ $(TARGETS): % : $(OBJFILES)
 
 # for each cpp file: update timestamp, but don't create a file if you can't find it.
 %.cpp:
+	touch -c $@
+
+%.h:
 	touch -c $@
 

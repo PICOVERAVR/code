@@ -4,7 +4,7 @@
 double mscale = 0.05; // movement speed
 double lscale = 0.05; // look speed
 
-camera::camera(GLFWwindow* window, glm::vec3 inPos) : pos(inPos), front(glm::vec3(0.0f, 0.0f, -1.0f)), prevX(0.0), prevY(0.0), hangle(-90.0f), vangle(0.0f), skip(0) {
+camera::camera(GLFWwindow* window, glm::vec3 inPos) : pos(inPos), front(glm::vec3(0.0f, 0.0f, -1.0f)), hangle(-90.0f), vangle(0.0f), skip(0), prevX(0.0), prevY(0.0) {
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 }
 

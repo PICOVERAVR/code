@@ -11,7 +11,7 @@ public:
 	float hangle; // angles to keep track of camera direction
 	float vangle;
 	
-	camera() : pos(glm::vec3(0.0f)), front(glm::vec3(0.0f, 0.0f, -1.0f)), prevX(0.0), prevY(0.0), hangle(-90.0f), vangle(0.0f), skip(0) { }
+	camera() : pos(glm::vec3(0.0f)), front(glm::vec3(0.0f, 0.0f, -1.0f)), hangle(-90.0f), vangle(0.0f), skip(0), prevX(0.0), prevY(0.0) { }
 	camera(GLFWwindow *w, glm::vec3 inPos);
 	void update(GLFWwindow*);
 private:
