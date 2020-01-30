@@ -24,14 +24,14 @@ OBJFILES := camera.o main.o program.o vloader.o window.o glad.o
 # also glad.h and khrplatform have to be in folders to avoid having to adjust glad.cpp
 
 # all and clean aren't actually creating files, so they are declared as phony targets
-.PHONY: all clean
+.PHONY: top clean
 
 # update CFLAGS conditionally based on make target
 debug: CFLAGS += -ggdb -Og
 release: CFLAGS += -Ofast -march=native
 
 # build for all possible targets
-all: $(TARGETS)
+top: debug
 
 # clean out .o and executable files
 clean:
