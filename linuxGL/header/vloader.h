@@ -13,6 +13,7 @@ namespace vload {
 	struct pt {
 		glm::vec3 pos;
 		glm::vec3 normal;
+		glm::vec3 tangent;
 		glm::vec2 texcoord;
 	};
 

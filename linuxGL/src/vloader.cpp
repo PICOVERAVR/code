@@ -5,7 +5,8 @@ namespace vload {
 
 	vloader::vloader(std::string path) : meshList() {
 		Assimp::Importer imp;
-		const aiScene* scene = imp.ReadFile(path, aiProcess_Triangulate | aiProcess_GenNormals); // turn anything that isn't a triangle into a triangle, and make normals if they don't exist
+		// make everything triangles, generate normals if they aren't there, calcuate tangents, and join identical vertices together.
+		const aiScene* scene = imp.ReadFile(path, aiProcess_Triangulate | aiProcess_CalcTangentSpace | aiProcess_GenNormals | aiProcess_JoinIdenticalVertices);
 
 		if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) { // check if import failed and exit
 			cerr << "Assimp scene import failed: " << imp.GetErrorString() << endl;
@@ -32,10 +33,11 @@ namespace vload {
 	mesh vloader::processMesh(aiMesh* inMesh, const aiScene* scene) {
 		vector<pt> vList;
 		vector<unsigned int> elemList;
-
+		
 		for (unsigned int i = 0; i < inMesh->mNumVertices; i++) { // extract position information
 			glm::vec3 position;
 			glm::vec3 normal;
+			glm::vec3 tangent;
 
 			position.x = inMesh->mVertices[i].x;
 			position.y = inMesh->mVertices[i].y;
@@ -44,7 +46,12 @@ namespace vload {
 			normal.x = inMesh->mNormals[i].x;
 			normal.y = inMesh->mNormals[i].y;
 			normal.z = inMesh->mNormals[i].z;
-			pt temppoint = { position, normal };
+
+			tangent.x = inMesh->mTangents[i].x;
+			tangent.y = inMesh->mTangents[i].y;
+			tangent.z = inMesh->mTangents[i].z;
+
+			pt temppoint = { position, normal, tangent };
 			vList.push_back(temppoint);
 		}
 
