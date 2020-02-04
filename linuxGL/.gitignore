@@ -1,5 +1,4 @@
-models/
-textures/
 debug
 release
+*.o
 
