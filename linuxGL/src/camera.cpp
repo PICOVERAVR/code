@@ -29,7 +29,26 @@ void camera::update(GLFWwindow *window) {
 
 	hangle += (float)(xoff * lscale);
 	vangle += (float)(yoff * lscale);
+	
+#define KEYBOARD_LOOK
 
+	// if using a laptop, sometimes the mouse can be annoying. keyboard versions of the same thing are set here.
+	// (mouse still works while using the keyboard!)
+#ifdef KEYBOARD_LOOK
+	if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS) {
+		hangle -= 20 * lscale;
+	}
+	if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS) {
+		hangle += 20 * lscale;
+	}
+	if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) {
+		vangle += 20 * lscale;
+	}
+	if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) {
+		vangle -= 20 * lscale;
+	}
+#endif
+	
 	// sine and cosine functions affect more than one axis
 
 	glm::vec3 dir;
