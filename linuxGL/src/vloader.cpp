@@ -16,7 +16,7 @@ namespace vload {
 		processNode(scene->mRootNode, scene);
 	}
 
-	// recursively visit nodes, not my code
+	// recursively visit nodes
 	bool vloader::processNode(aiNode* node, const aiScene* scene) {
 		for (unsigned int i = 0; i < node->mNumMeshes; i++) {
 			aiMesh* meshtemp = scene->mMeshes[node->mMeshes[i]];
@@ -37,7 +37,6 @@ namespace vload {
 		for (unsigned int i = 0; i < inMesh->mNumVertices; i++) { // extract position information
 			glm::vec3 position;
 			glm::vec3 normal;
-			glm::vec3 tangent;
 
 			position.x = inMesh->mVertices[i].x;
 			position.y = inMesh->mVertices[i].y;
@@ -47,11 +46,7 @@ namespace vload {
 			normal.y = inMesh->mNormals[i].y;
 			normal.z = inMesh->mNormals[i].z;
 
-			tangent.x = inMesh->mTangents[i].x;
-			tangent.y = inMesh->mTangents[i].y;
-			tangent.z = inMesh->mTangents[i].z;
-
-			pt temppoint = { position, normal, tangent };
+			pt temppoint = { position, normal };
 			vList.push_back(temppoint);
 		}
 
@@ -63,7 +58,7 @@ namespace vload {
 		}
 
 		if (!inMesh->mTextureCoords[0]) { // extract texture information, if available
-			cout << "Mesh has no texture coordinates, not loading anything." << endl;
+			cout << "Mesh has no texture coordinates." << endl;
 		}
 		else {
 			for (unsigned int i = 0; i < inMesh->mNumVertices; i++) {
@@ -74,7 +69,19 @@ namespace vload {
 			}
 		}
 		
+		// note that calculating tangent vectors requires knowing both position and uv coords.
+		if (!inMesh->HasTangentsAndBitangents()) { // extract tangent vector information, if possible
+			cout << "Mesh has no tangents." << endl;
+		} else {
+			for (unsigned int i = 0; i < inMesh->mNumVertices; i++) {
+				glm::vec3 tan;	
+				tan.x = inMesh->mTangents[i].x;
+				tan.y = inMesh->mTangents[i].y;
+				tan.z = inMesh->mTangents[i].z;
+				vList[i].tangent = tan;
+			}
+		}
+		
 		return mesh(vList, elemList);
 	}
-
 }
