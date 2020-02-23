@@ -1,3 +1,6 @@
 [submodule "WindowsGL"]
 	path = WindowsGL
 	url = https://github.com/PICOVERAVR/WindowsGL
+[submodule "LinuxGL"]
+	path = LinuxGL
+	url = https://github.com/PICOVERAVR/LinuxGL
