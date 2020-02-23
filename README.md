@@ -33,7 +33,7 @@ Nothing right now...
 - OpenCL - is being merged into Vulkan, learn that instead
 ## Setup guide on new hardware:
 - set bashrc location
-- clone repository: `clone https://www.github.com/PICOVERAVR/code`
+- clone repository: `git --recurse-submodules clone https://www.github.com/PICOVERAVR/code`
 - manually point .gitconfig to inside repo: `git config --local include.path ../.gitconfig` in main folder
 - add a new remote in order to pull branches besides the master branch: `git remote add origin <url>`
 	- use `git remote -v` to verify the "origin" branch is detected.
