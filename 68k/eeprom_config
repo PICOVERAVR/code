@@ -154,7 +154,7 @@ if __name__ == "__main__":
 		sys.exit(1)
 	
 	logger.info("Opening serial port with 8N1 " + str(args.speed) + " baud settings...")
-	serport = serial.Serial(args.device, 250000, timeout=5)
+	serport = serial.Serial(args.device, args.speed, timeout=5)
 	serport.readline() # swallow greeting message from arduino, remove this?
 
 	if args.action == 'erase':
