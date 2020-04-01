@@ -1,2 +1,0 @@
-MPLABX IDE is really unreliable rn (10/15/18), so i'm going to try to switch to using an FPGA and a softcore as a main driver microcontroller.
-Most of this code either isn't hard to port or is a wrapper for something else (I think...!)
